@@ -7,6 +7,7 @@ import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { CODES, KEYS } from "../keys";
 import { HelpIcon } from "../components/HelpIcon";
+import { InfoIcon } from "../components/InfoIcon";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -83,4 +84,20 @@ export const actionShortcuts = register({
     <HelpIcon title={t("helpDialog.title")} onClick={updateData} />
   ),
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,
+});
+
+export const actionShowInfo = register({
+  name: "toggleInfos",
+  perform: (_elements, appState) => {
+    return {
+      appState: {
+        ...appState,
+        showInfoDialog: !appState.showInfoDialog,
+      },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ updateData }) => (
+    <InfoIcon title="Über Excalidraw" onClick={updateData} />
+  ),
 });

@@ -113,6 +113,11 @@ export const questionCircle = createIcon(
   { mirror: true },
 );
 
+export const info = createIcon(
+  "M437.02,74.98C388.667,26.629,324.38,0,256,0S123.333,26.629,74.98,74.98C26.629,123.333,0,187.62,0,256s26.629,132.667,74.98,181.02C123.333,485.371,187.62,512,256,512s132.667-26.629,181.02-74.98C485.371,388.667,512,324.38,512,256S485.371,123.333,437.02,74.98z M256,70c30.327,0,55,24.673,55,55c0,30.327-24.673,55-55,55c-30.327,0-55-24.673-55-55C201,94.673,225.673,70,256,70z M326,420H186v-30h30V240h-30v-30h110v180h30V420z",
+  { mirror: true },
+);
+
 // Icon imported form Storybook
 // Storybook is licensed under MIT https://github.com/storybookjs/storybook/blob/next/LICENSE
 export const resetZoom = createIcon(
