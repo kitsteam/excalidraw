@@ -10,14 +10,15 @@ export interface Language {
   rtl?: boolean;
 }
 
-export const defaultLang = { code: "en", label: "English" };
+export const defaultLang = { code: "de-DE", label: "Deutsch" };
 
 const allLanguages: Language[] = [
   { code: "ar-SA", label: "العربية", rtl: true },
   { code: "bg-BG", label: "Български" },
   { code: "ca-ES", label: "Català" },
-  { code: "de-DE", label: "Deutsch" },
+  // { code: "de-DE", label: "Deutsch" },
   { code: "el-GR", label: "Ελληνικά" },
+  { code: "en", label: "English" },
   { code: "es-ES", label: "Español" },
   { code: "fa-IR", label: "فارسی", rtl: true },
   { code: "fi-FI", label: "Suomi" },

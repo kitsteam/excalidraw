@@ -12,7 +12,7 @@ import oc from "open-color";
 import clsx from "clsx";
 
 const activeElementColor = (appearance: "light" | "dark") =>
-  appearance === "light" ? oc.orange[4] : oc.orange[9];
+  appearance === "light" ? oc.blue[3] : oc.blue[7];
 const iconFillColor = (appearance: "light" | "dark") =>
   appearance === "light" ? oc.black : oc.gray[4];
 const handlerColor = (appearance: "light" | "dark") =>

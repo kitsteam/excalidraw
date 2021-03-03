@@ -12,7 +12,7 @@ import { exportToCanvas, getExportSize } from "../scene/export";
 import { AppState } from "../types";
 import { Dialog } from "./Dialog";
 import "./ExportDialog.scss";
-import { clipboard, exportFile, link } from "./icons";
+import { clipboard, exportFile } from "./icons";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 
@@ -159,7 +159,7 @@ const ExportModal = ({
                 onClick={() => onExportToClipboard(exportedElements, scale)}
               />
             )}
-            {onExportToBackend && (
+            {/* {onExportToBackend && (
               <ToolButton
                 type="button"
                 icon={link}
@@ -167,7 +167,7 @@ const ExportModal = ({
                 aria-label={t("buttons.getShareableLink")}
                 onClick={() => onExportToBackend(exportedElements)}
               />
-            )}
+            )} */}
           </Stack.Row>
           <div className="ExportDialog__name">
             {actionManager.renderAction("changeProjectName")}
