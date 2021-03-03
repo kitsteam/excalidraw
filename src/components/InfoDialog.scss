@@ -1,0 +1,55 @@
+.infoDialogButton {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #fff;
+  background: #00a3d3 !important;
+  border-radius: 3px;
+  padding: 8px 20px;
+  margin: 0 auto;
+}
+
+.InfoDialogKitsLogo {
+  position: relative;
+  left: calc(50% + 10px);
+  transform: translateX(-50%);
+  width: 90px;
+  height: auto;
+  margin-bottom: 5px;
+}
+
+.InfoDialog li {
+  display: inline-block;
+  padding: 5px;
+}
+
+.InfoDialog a {
+  color: #000;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.InfoDialog a:hover {
+  text-decoration: underline;
+}
+
+.InfoDialogGitlab {
+  text-align: center;
+  font-size: 12px;
+  margin-top: 5px;
+
+  a {
+    color: #999;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+}
+
+.GitlabLink {
+  display: inline-block;
+  width: auto;
+  height: 20px;
+  position: relative;
+  top: 5px;
+  margin-right: 3px;
+  color: #999;
+}
