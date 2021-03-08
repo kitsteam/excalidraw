@@ -4,6 +4,7 @@ import { Dialog } from "./Dialog";
 export const InfoDialog = ({ onClose }: { onClose?: () => void }) => {
   const handleClose = React.useCallback(() => {
     if (onClose) {
+      localStorage.setItem("InfoDialogSeen", JSON.stringify(true));
       onClose();
     }
   }, [onClose]);

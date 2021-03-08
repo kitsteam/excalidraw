@@ -65,7 +65,7 @@ export const getDefaultAppState = (): Omit<
     shouldAddWatermark: false,
     shouldCacheIgnoreZoom: false,
     showHelpDialog: false,
-    showInfoDialog: true,
+    showInfoDialog: !JSON.parse(localStorage.getItem("InfoDialogSeen") as any),
     showStats: false,
     startBoundElement: null,
     suggestedBindings: [],
