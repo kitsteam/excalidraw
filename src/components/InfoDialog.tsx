@@ -18,16 +18,6 @@ export const InfoDialog = ({ onClose }: { onClose?: () => void }) => {
           Mit »Excalidraw« kannst du Vorgänge in einem Flussdiagramm
           veranschaulichen, kollaborativ Ideen in einem Brainstorming sammeln
           und Sketchnotes erstellen.
-          <div>
-            <button
-              type="button"
-              className="infoDialogButton"
-              onClick={() => handleClose()}
-              title="Weiter"
-            >
-              Weiter
-            </button>
-          </div>
           <div className="kitsFooter">
             <a
               href="https://kits.blog/tools/"
