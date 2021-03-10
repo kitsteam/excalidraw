@@ -37,6 +37,7 @@ import { MobileMenu } from "./MobileMenu";
 import { PasteChartDialog } from "./PasteChartDialog";
 import { Section } from "./Section";
 import { HelpDialog } from "./HelpDialog";
+import { InfoDialog } from "./InfoDialog";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
@@ -602,6 +603,7 @@ const LayerUI = ({
       >
         {renderCustomFooter?.(false)}
         {actionManager.renderAction("toggleShortcuts")}
+        {actionManager.renderAction("toggleInfos")}
       </div>
       <button
         className={clsx("disable-zen-mode", {
@@ -625,6 +627,9 @@ const LayerUI = ({
       )}
       {appState.showHelpDialog && (
         <HelpDialog onClose={() => setAppState({ showHelpDialog: false })} />
+      )}
+      {appState.showInfoDialog && (
+        <InfoDialog onClose={() => setAppState({ showInfoDialog: false })} />
       )}
       {appState.pasteDialog.shown && (
         <PasteChartDialog

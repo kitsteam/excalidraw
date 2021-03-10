@@ -408,11 +408,11 @@
     bottom: 10px;
 
     :root[dir="ltr"] & {
-      right: 44px;
+      right: 70px;
     }
 
     :root[dir="rtl"] & {
-      left: 44px;
+      left: 70px;
     }
   }
 
@@ -440,6 +440,22 @@
   }
 
   .help-icon {
+    position: absolute;
+    cursor: pointer;
+    fill: $oc-gray-6;
+    bottom: 14px;
+    width: 1.5rem;
+
+    :root[dir="ltr"] & {
+      right: 44px;
+    }
+
+    :root[dir="rtl"] & {
+      left: 44px;
+    }
+  }
+
+  .info-icon {
     position: absolute;
     cursor: pointer;
     fill: $oc-gray-6;

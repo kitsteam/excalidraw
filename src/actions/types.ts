@@ -72,6 +72,7 @@ export type ActionName =
   | "changeTextAlign"
   | "toggleFullScreen"
   | "toggleShortcuts"
+  | "toggleInfos"
   | "group"
   | "ungroup"
   | "goToCollaborator"
