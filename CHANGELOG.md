@@ -10,10 +10,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
 
+### Fixed
+
+## [1.1.0] - 2021-03-10
+
+### Changed
+
 - Updated Excalidraw core
 - Removed shareable link on exportDialog
-
-### Fixed
 
 ## [1.0.0] - 2020-12-17
 
