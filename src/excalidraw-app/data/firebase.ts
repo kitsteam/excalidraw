@@ -20,7 +20,7 @@ import { getSyncableElements, SyncableExcalidrawElement } from ".";
 
 let FIREBASE_CONFIG: Record<string, any>;
 try {
-  FIREBASE_CONFIG = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
+  FIREBASE_CONFIG = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG) || "{}";
 } catch (error: any) {
   console.warn(
     `Error JSON parsing firebase config. Supplied value: ${process.env.REACT_APP_FIREBASE_CONFIG}`,
@@ -39,8 +39,10 @@ const _loadFirebase = async () => {
   const firebase = (
     await import(/* webpackChunkName: "firebase" */ "firebase/app")
   ).default;
+  const storage = process.env.STORAGE_BACKEND;
+  const useFirebase = storage === "firebase";
 
-  if (!isFirebaseInitialized) {
+  if (useFirebase && !isFirebaseInitialized) {
     try {
       firebase.initializeApp(FIREBASE_CONFIG);
     } catch (error: any) {

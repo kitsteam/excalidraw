@@ -1,3 +1,42 @@
+# Excalidraw without firebase
+
+This is a fork from the [excalidraw project](https://github.com/excalidraw/excalidraw) with changes inspired and partly taken from [Kilian Decaderincourt](https://gitlab.com/kiliandeca/excalidraw-fork) to enable support for rooms without using firebase.<br />
+
+## Setup with docker
+
+Please copy the .env.development.default or .env.production.default file to .env (or with environment without default at the end) and change it according to your needs, see [react-scripts](https://create-react-app.dev/docs/adding-custom-environment-variables/).
+
+### Development
+
+```
+docker-compose up -d
+docker-compose exec excalidraw yarn install
+docker-compose exec excalidraw yarn start
+```
+
+Hint: Collab mode requires a secure context (https). Localhost works as well, but not http over local network.
+
+#### Commands
+
+| Command            | Description                       |
+| ------------------ | --------------------------------- |
+| `yarn`             | Install the dependencies          |
+| `yarn start`       | Run the project                   |
+| `yarn fix`         | Reformat all files with Prettier  |
+| `yarn test`        | Run tests                         |
+| `yarn test:update` | Update test snapshots             |
+| `yarn test:code`   | Test for formatting with Prettier |
+
+### Production
+
+```
+docker-compose -f docker-compose-prod.yml up -d
+```
+
+
+## Additional licence
+
+The excalidraw [logo](https://thenounproject.com/icon/2357486/) in this repo – created by [Verry](https://thenounproject.com/verry.dsign.creative) – is licenced under [CC BY 3.0 Unported](https://creativecommons.org/licenses/by/3.0/).
 <div align="center" style="display:flex;flex-direction:column;"}>
   <a href="https://excalidraw.com">
     <img width="540" src="./public/og-image-sm.png" alt="Excalidraw logo: Sketch handrawn like diagrams."/>
@@ -42,3 +81,4 @@ Visit our documentation on [https://docs.excalidraw.com](https://docs.excalidraw
 ## Who's integrating Excalidraw
 
 [Google Cloud](https://googlecloudcheatsheet.withgoogle.com/architecture) • [Meta](https://meta.com/) • [CodeSandbox](https://codesandbox.io/) • [Obsidian Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) • [Replit](https://replit.com/) • [Slite](https://slite.com/) • [Notion](https://notion.so/) • [HackerRank](https://www.hackerrank.com/)
+```

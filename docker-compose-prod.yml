@@ -2,41 +2,41 @@ version: "3.8"
 
 services:
   excalidraw:
-    stdin_open: true
     build:
       context: .
-      target: development
+      target: production
     container_name: excalidraw
     ports:
-      - "3000:80"
-    restart: on-failure
+      - "5010:80"
+    restart: always
     stdin_open: true
     healthcheck:
       disable: true
     environment:
-      - NODE_ENV=development
-    volumes:
-      - node_modules:/opt/node_app/node_modules
-      - ./:/opt/node_app/
+      - NODE_ENV=production
 
   excalidraw-storage-backend:
     build: https://github.com/kitsteam/excalidraw-storage-backend.git#main
     ports:
-      - "8080:8080"
+      - "5011:8080"
+    restart: always
     environment:
       STORAGE_URI: redis://:${REDIS_PASSWORD}@redis:6379
       STORAGE_TTL: 2592000000
 
   excalidraw-room:
     image: excalidraw/excalidraw-room
+    restart: always
     ports:
-      - "5001:80"
+      - "5012:80"
   
   redis:
     image: redis
     command: redis-server --requirepass ${REDIS_PASSWORD}
+    restart: always
     volumes:
       - redis_data:/data
+
 volumes:
+  notused:
   redis_data:
-  node_modules:

@@ -3621,8 +3621,8 @@ base64-arraybuffer-es6@^0.7.0:
 
 base64-arraybuffer@0.1.4:
   version "0.1.4"
-  resolved "https://registry.yarnpkg.com/base64-arraybuffer/-/base64-arraybuffer-0.1.4.tgz#9818c79e059b1355f97e0428a017c838e90ba812"
-  integrity sha512-a1eIFi4R9ySrbiMuyTGx5e92uRH5tQY6kArNcFaKBUleIoLjdjBg7Zxm3Mqm3Kmkf27HLR/1fnxX9q8GQ7Iavg==
+  resolved "https://registry.npmjs.org/base64-arraybuffer/-/base64-arraybuffer-0.1.4.tgz"
+  integrity sha1-mBjHngWbE1X5fgQooBfIOOkLqBI=
 
 basic-auth@^2.0.1:
   version "2.0.1"

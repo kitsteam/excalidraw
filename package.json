@@ -117,7 +117,7 @@
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prepare": "husky install",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
-    "start": "react-scripts start",
+    "start": "PORT=80 react-scripts start",
     "start:production": "npm run build && npx http-server build -a localhost -p 5001 -o",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watchAll=false",
     "test:app": "react-scripts test --passWithNoTests",
