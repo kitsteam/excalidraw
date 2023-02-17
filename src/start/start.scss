@@ -1,0 +1,255 @@
+@use "bootstrap-grid.min";
+
+body {
+  overflow-y: auto !important;
+  background-color: #ffffff;
+  color: var(--font-grey);
+}
+
+:root {
+  --font-grey: rgb(33, 37, 41);
+  --primary: #00456f;
+  --primary-hover: #003b5e;
+  --secondary: #00a3d3;
+  --success: #50c878;
+  --danger: #ff5555;
+  --warning: #ffaa00;
+  --info: #55ffff;
+  --border: #dbdbdb;
+}
+
+.kits-start {
+  font-family: FiraSans !important;
+}
+
+.kits-container {
+  padding: 12px;
+  padding-bottom: 112px; /* distance for max footer size, to make sure it is not overlapping content */
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+  margin-top: 40px;
+}
+
+a {
+  text-decoration: none;
+}
+
+.muted {
+  color: #6c757d !important;
+}
+
+.kits-content-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+}
+
+.kits-content-left img {
+  width: 40%;
+  height: 40%;
+}
+
+.kits-content-right {
+  margin-left: auto;
+  display: flex !important;
+  align-items: center;
+}
+
+.kits-footer-wrapper-left {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.kits-primary-button {
+  background-color: var(--primary) !important;
+  font-family: FiraSans !important;
+  font-size: 16px !important;
+  box-shadow: none !important;
+  text-transform: none !important;
+  color: #ffffff;
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid var(--primary);
+  border-radius: 0.375rem;
+  background-color: var(--secondary);
+  transition: color 0.15s;
+  -webkit-appearance: button;
+}
+
+.kits-primary-button:hover {
+  background-color: var(--primary-hover) !important;
+}
+
+h1 {
+  font-size: 2.5em;
+  margin-bottom: 0.3em;
+  color: var(--primary);
+}
+
+h1.header-kits-h {
+  font-size: 1.5em;
+  font-weight: 700;
+}
+
+h5 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.center {
+  justify-content: center;
+  background-color: transparent !important;
+}
+
+.kits-mobile-footer-wrapper {
+  height: 112px !important;
+  padding: 0 !important;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+@media screen and (max-width: 991px) {
+  .kits-content-right {
+    align-items: flex-start !important;
+  }
+}
+
+@media screen and (max-width: 574px), screen and (max-height: 500px) {
+  .kits-mobile-footer-wrapper {
+    height: 55px !important;
+    padding: 0 !important;
+  }
+
+  .kits-footer-logo {
+    padding: 5px 5px 5px 10px !important;
+    width: 40px !important;
+    height: 40px !important;
+    text-align: center;
+  }
+
+  .kits-footer-logo img {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.kits-footer-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+.kits-footer-logo {
+  padding: 5px 5px 5px 20px;
+  width: 80px;
+  height: 80px;
+  text-align: center;
+}
+
+.kits-footer-logo img {
+  width: 100%;
+  height: 100%;
+}
+
+.kits-footer-text-right {
+  text-align: right;
+}
+
+.kits-footer-text-left {
+  text-align: center;
+}
+
+.kits-footer-text {
+  padding: 15px 5px 15px 5px;
+  font-family: FiraSans;
+  font-size: 16px !important;
+  width: 100%;
+}
+
+.gradient {
+  background-image: linear-gradient(
+    180deg,
+    rgb(0, 69, 111) 0%,
+    rgb(0, 163, 211) 100%
+  ) !important;
+}
+
+.padding-8 {
+  padding: 8px;
+}
+
+.font-white {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.header {
+  background-color: transparent !important;
+  height: 70px !important;
+  text-align: right;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 100%;
+  padding: 0 16px 0 16px;
+}
+
+.header a {
+  margin-left: auto;
+  margin-top: 16px;
+}
+
+.kits-list {
+  font-family: FiraSans;
+  list-style-type: none;
+}
+
+.list-border {
+  border-left: 3px solid var(--secondary);
+  padding: 0;
+}
+
+.kits-list li {
+  padding-left: 16px;
+  margin-bottom: 10px;
+}
+
+.fw-bold {
+  font-size: calc(1.375rem + 1.5vw);
+  font-weight: 700 !important;
+  color: var(--primary);
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.list-inline {
+  list-style: none;
+  padding-left: 0;
+}
+
+.list-inline li {
+  padding: 5px 0 5px 0;
+}
+
+.list-inline a {
+  color: var(--font-grey);
+}
+
+.list-inline a:hover {
+  color: var(--primary-hover);
+}

@@ -1,4 +1,5 @@
-import React, { useRef } from "react";
+import React, { useRef, useCallback } from "react";
+import QRCodeStyling, { FileExtension } from "qr-code-styling";
 import { copyTextToSystemClipboard } from "../../clipboard";
 import { Dialog } from "../../components/Dialog";
 import {
@@ -32,6 +33,30 @@ const getShareIcon = () => {
   return share;
 };
 
+const qrCode = new QRCodeStyling({
+  width: 200,
+  height: 200,
+  type: 'svg',
+  image: "",
+  dotsOptions: {
+    color: '#000000',
+    type: "dots",
+  },
+  cornersSquareOptions: {
+    type: 'square'
+  },
+  cornersDotOptions: {
+    type: 'dot'
+  },
+  backgroundOptions: {
+    color: "#fff",
+  },
+  imageOptions: {
+    crossOrigin: "anonymous",
+    margin: 20,
+  }
+});
+
 const RoomDialog = ({
   handleClose,
   activeRoomLink,
@@ -51,6 +76,14 @@ const RoomDialog = ({
   setErrorMessage: (message: string) => void;
   theme: AppState["theme"];
 }) => {
+
+  const qrRef = useCallback((node: HTMLDivElement) => {
+    if (node !== null) {
+        qrCode.append(node);
+        qrCode.update({ data: roomLinkInput?.current?.value });
+    }
+  }, []);
+
   const roomLinkInput = useRef<HTMLInputElement>(null);
 
   const copyRoomLink = async () => {
@@ -62,6 +95,12 @@ const RoomDialog = ({
     if (roomLinkInput.current) {
       roomLinkInput.current.select();
     }
+  };
+
+  const onQRDownloadClick = (extension: FileExtension) => {
+    qrCode.download({
+      extension
+    });
   };
 
   const shareRoomLink = async () => {
@@ -136,6 +175,29 @@ const RoomDialog = ({
                 ref={roomLinkInput}
                 onPointerDown={selectInput}
               />
+            </div>
+            <div className="RoomDialog-qrContainer" ref={qrRef}>
+            </div>
+            <div className="RoomDialog-qrDownloadContainer">
+            <DialogActionButton
+                actionType="primary"
+                label="Download PNG"
+                style={{marginRight: "10px"}}
+                onClick={() => {
+                  trackEvent("share", "qr download png");
+                  onQRDownloadClick("png");
+                }}
+              >
+              </DialogActionButton>
+              <DialogActionButton
+                actionType="primary"
+                label="Download SVG"
+                onClick={() => {
+                  trackEvent("share", "qr download svg");
+                  onQRDownloadClick("svg");
+                }}
+              >
+              </DialogActionButton>
             </div>
             <div className="RoomDialog-usernameContainer">
               <label className="RoomDialog-usernameLabel" htmlFor="username">

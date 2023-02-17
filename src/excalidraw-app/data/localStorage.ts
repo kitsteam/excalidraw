@@ -6,7 +6,7 @@ import {
 } from "../../appState";
 import { clearElementsForLocalStorage } from "../../element";
 import { STORAGE_KEYS } from "../app_constants";
-import { ImportedDataState } from "../../data/types";
+import { ImportedDataState, KitsLastUsedState } from "../../data/types";
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -19,6 +19,34 @@ export const saveUsernameToLocalStorage = (username: string) => {
     console.error(error);
   }
 };
+
+export const saveLastUsedRoomsToLocalStorage = (collabLink: string) => {
+  const existingItems: KitsLastUsedState[] = JSON.parse(
+    localStorage.getItem(STORAGE_KEYS.LOCAL_KITS_LAST_USED) || "[]",
+  ).slice(0, 2);
+  const newItems = [
+    {
+      createdAt: new Date().toUTCString(),
+      link: collabLink,
+    },
+    ...existingItems,
+  ];
+  try {
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_KITS_LAST_USED,
+      JSON.stringify(newItems),
+    );
+  } catch (error: any) {
+    // Unable to access window.localStorage
+    console.error(error);
+  }
+};
+
+export const loadLastUsedRoomsToLocalStorage = (): KitsLastUsedState[] => {
+  return JSON.parse(
+    localStorage.getItem(STORAGE_KEYS.LOCAL_KITS_LAST_USED) || "[]",
+  )
+}
 
 export const importUsernameFromLocalStorage = (): string | null => {
   try {

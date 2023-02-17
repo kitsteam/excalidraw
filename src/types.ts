@@ -98,6 +98,8 @@ export type AppState = {
     top: number;
     left: number;
   } | null;
+  featureFlagWelcomeScreen: boolean;
+  featureFlagLibraryButton: boolean;
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: string | null;

@@ -139,7 +139,8 @@ export const LibraryMenuContent = ({
   }
 
   const showBtn =
-    libraryItemsData.libraryItems.length > 0 || pendingElements.length > 0;
+    appState.featureFlagLibraryButton &&
+    (libraryItemsData.libraryItems.length > 0 || pendingElements.length > 0);
 
   return (
     <LibraryMenuWrapper>
@@ -156,6 +157,7 @@ export const LibraryMenuContent = ({
         id={id}
         libraryReturnUrl={libraryReturnUrl}
         theme={appState.theme}
+        featureFlagLibraryButton={appState.featureFlagLibraryButton}
       />
       {showBtn && (
         <LibraryMenuBrowseButton

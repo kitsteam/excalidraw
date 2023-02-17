@@ -18,8 +18,8 @@
 
     // double .active to force specificity
     &.active.active {
-      background-color: #0fb884;
-      border-color: #0fb884;
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
 
       svg {
         color: #fff;
@@ -27,15 +27,15 @@
 
       &:hover,
       &:active {
-        background-color: #0fb884;
-        border-color: #0fb884;
+        background-color: var(--color-primary-darker);
+        border-color: var(--color-primary-darker);
       }
     }
   }
 
   &.theme--dark {
     .collab-button {
-      color: var(--color-gray-90);
+      color: var(--white);
     }
   }
 
@@ -44,7 +44,7 @@
 
     .ToolIcon__icon svg,
     .ToolIcon__label {
-      color: var(--icon-green-fill-color);
+      color: var(--color-primary);
     }
   }
 
@@ -62,8 +62,8 @@
     bottom: -5px;
     padding: 3px;
     border-radius: 50%;
-    background-color: $oc-green-2;
-    color: $oc-green-9;
+    background-color: var(--color-primary-darker);
+    color: $oc-white;
     font-size: 0.6rem;
     font-family: "Cascadia";
   }

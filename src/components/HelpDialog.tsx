@@ -21,7 +21,7 @@ const Header = () => (
     </a>
     <a
       className="HelpDialog__btn"
-      href="https://blog.excalidraw.com"
+      href="https://kits.blog"
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -30,7 +30,7 @@ const Header = () => (
     </a>
     <a
       className="HelpDialog__btn"
-      href="https://github.com/excalidraw/excalidraw/issues"
+      href="https://github.com/kitsteam/excalidraw"
       target="_blank"
       rel="noopener noreferrer"
     >

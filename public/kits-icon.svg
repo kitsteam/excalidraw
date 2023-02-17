@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="23.841049mm"
+   height="32.072655mm"
+   viewBox="0 0 23.841049 32.072655"
+   version="1.1"
+   id="svg53"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="kits_sprechblase.svg">
+  <defs
+     id="defs47" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="0.87016655"
+     inkscape:cy="1.2389103"
+     inkscape:document-units="mm"
+     inkscape:current-layer="g16"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:snap-bbox="true"
+     inkscape:snap-global="false"
+     showguides="true"
+     inkscape:guide-bbox="true" />
+  <metadata
+     id="metadata50">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-68.707492,-85.436107)">
+    <g
+       id="g16"
+       transform="matrix(0,0.26458333,-0.26458333,0,93.871458,84.11319)"
+       style="fill:#23a7d7;fill-opacity:1">
+      <polygon
+         points="48.554,50 5,6.446 5,93.554 26.337,72.216 "
+         id="polygon2"
+         style="fill:#00a3d3;fill-opacity:1" />
+      <polygon
+         points="72.288,26.266 93.554,5 6.446,5 50,48.554 "
+         id="polygon4"
+         style="fill:#00a3d3;fill-opacity:1" />
+      <rect
+         x="57.762001"
+         y="34.750999"
+         transform="matrix(0.7071,0.7071,-0.7071,0.7071,56.7399,-36.9822)"
+         width="30.497999"
+         height="30.497999"
+         id="rect6"
+         style="fill:#00a3d3;fill-opacity:1" />
+      <polygon
+         points="95,47.531 95,6.446 74.458,26.989 "
+         id="polygon8"
+         style="fill:#00a3d3;fill-opacity:1" />
+      <polygon
+         points="52.469,95 95,95 95,52.469 73.734,73.734 "
+         id="polygon10"
+         style="fill:#00a3d3;fill-opacity:1" />
+      <polygon
+         points="27.484,73.962 6.446,95 49.577,95 70.614,73.962 "
+         id="polygon12"
+         style="fill:#00a3d3;fill-opacity:1" />
+      <polygon
+         transform="rotate(-45,167.90581,33.584296)"
+         points="74.458,26.989 95,47.531 95,6.446 "
+         id="polygon8-6"
+         style="fill:#00a3d3;fill-opacity:1" />
+    </g>
+  </g>
+</svg>

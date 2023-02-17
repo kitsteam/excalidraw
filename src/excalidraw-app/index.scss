@@ -28,8 +28,8 @@
   .dropdown-menu-container {
     .dropdown-menu-item {
       &.active-collab {
-        background-color: #ecfdf5;
-        color: #064e3c;
+        background-color: var(--color-primary);
+        color: var(--border-radius-md);
       }
       &.ExcalidrawPlus {
         color: var(--color-promo);
@@ -40,7 +40,7 @@
   &.theme--dark {
     .dropdown-menu-item {
       &.active-collab {
-        background-color: #064e3c;
+        background-color: var(--color-primary);
         color: #ecfdf5;
       }
     }

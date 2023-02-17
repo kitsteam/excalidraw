@@ -40,6 +40,34 @@
     }
   }
 
+  .RoomDialog-qrContainer {
+    display: flex;
+    margin: 1.5em 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @include isMobile {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .RoomDialog-qrDownloadContainer {
+    display: flex;
+    margin: 1.5em 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @include isMobile {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    button {
+      padding: 10px;
+    }
+  }
+
   @include isMobile {
     .RoomDialog-usernameLabel {
       font-weight: bold;

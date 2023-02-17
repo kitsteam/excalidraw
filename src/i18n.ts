@@ -10,7 +10,7 @@ export interface Language {
   rtl?: boolean;
 }
 
-export const defaultLang = { code: "en", label: "English" };
+export const defaultLang = { code: "de-DE", label: "Deutsch" };
 
 const allLanguages: Language[] = [
   { code: "ar-SA", label: "العربية", rtl: true },

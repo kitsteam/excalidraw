@@ -8,12 +8,15 @@
   --button-gray-1: #{$oc-gray-2};
   --button-gray-2: #{$oc-gray-4};
   --button-gray-3: #{$oc-gray-5};
-  --button-special-active-bg-color: #{$oc-green-0};
+  --button-color: var(--color-gray-80);
+  --button-color-active: #{$oc-white};
+  --button-bg: var(--color-gray-20);
+  --button-special-active-bg-color: var(--color-primary);
   --dialog-border-color: var(--color-gray-20);
   --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
   --focus-highlight-color: #{$oc-blue-2};
   --icon-fill-color: var(--color-gray-80);
-  --icon-green-fill-color: #{$oc-green-9};
+  --icon-green-fill-color: var(--color-primary);
   --default-bg-color: #{$oc-white};
   --input-bg-color: #{$oc-white};
   --input-border-color: #{$oc-gray-4};
@@ -76,12 +79,12 @@
   --space-factor: 0.25rem;
   --text-primary-color: var(--color-gray-80);
 
-  --color-selection: #6965db;
+  --color-selection: #00a3d3;
 
-  --color-primary: #6965db;
-  --color-primary-darker: #5b57d1;
-  --color-primary-darkest: #4a47b1;
-  --color-primary-light: #e3e2fe;
+  --color-primary: #00a3d3;
+  --color-primary-darker: #0067a7;
+  --color-primary-darkest: #00456f;
+  --color-primary-light: #00a3d3;
 
   --color-gray-10: #f5f5f5;
   --color-gray-20: #ebebeb;
@@ -94,6 +97,8 @@
   --color-gray-85: #242424;
   --color-gray-90: #1e1e1e;
   --color-gray-100: #121212;
+
+  --white: #{$oc-white};
 
   --color-warning: #fceeca;
   --color-text-warning: var(--text-primary-color);
@@ -118,12 +123,14 @@
     --button-gray-1: #363636;
     --button-gray-2: #272727;
     --button-gray-3: #222;
-    --button-special-active-bg-color: #204624;
+    --button-color: var(--color-gray-20);
+    --button-color-active: #{$oc-white};
+    --button-special-active-bg-color: #{$oc-white};
     --dialog-border-color: var(--color-gray-80);
     --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path fill="%23ced4da" d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
     --focus-highlight-color: #{$oc-blue-6};
-    --icon-fill-color: var(--color-gray-40);
-    --icon-green-fill-color: #{$oc-green-4};
+    --icon-fill-color: var(--white);
+    --icon-green-fill-color: var(--color-primary);
     --default-bg-color: #121212;
     --input-bg-color: #121212;
     --input-border-color: #2e2e2e;
@@ -138,8 +145,8 @@
     --popup-text-color: #{$oc-gray-4};
     --popup-text-inverted-color: #2c2c2c;
     --select-highlight-color: #{$oc-blue-4};
-    --text-primary-color: var(--color-gray-40);
-    --button-hover-bg: var(--color-gray-80);
+    --text-primary-color: var(--color-gray-30);
+    --button-hover-bg: var(--color-gray-60);
     --default-border-color: var(--color-gray-80);
     --shadow-island: 0px 13px 33px rgba(0, 0, 0, 0.07),
       0px 4.13px 9.94853px rgba(0, 0, 0, 0.0456112),
@@ -151,6 +158,7 @@
       0px 12.5216px 10.0172px rgba(0, 0, 0, 0.035),
       0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
       0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
+    --button-hover-bg: var(--color-gray-80);
     --avatar-border-color: var(--color-gray-85);
     --sidebar-border-color: var(--color-gray-85);
     --sidebar-bg-color: #191919;
@@ -158,13 +166,13 @@
     --scrollbar-thumb: #{$oc-gray-8};
     --scrollbar-thumb-hover: #{$oc-gray-7};
 
-    // will be inverted to a lighter color.
-    --color-selection: #3530c4;
+    --color-primary: #00a3d3;
+    --color-primary-darker: #0067a7;
+    --color-primary-darkest: #00456f;
+    --color-primary-light: #00a3d3;
 
-    --color-primary: #a8a5ff;
-    --color-primary-darker: #b2aeff;
-    --color-primary-darkest: #beb9ff;
-    --color-primary-light: #4f4d6f;
+    // will be inverted to a lighter color.
+    --color-selection: var(--color-primary);
 
     --color-text-warning: var(--color-gray-80);
 

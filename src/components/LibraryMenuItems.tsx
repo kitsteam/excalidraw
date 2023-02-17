@@ -24,6 +24,7 @@ const LibraryMenuItems = ({
   selectedItems,
   onSelectItems,
   theme,
+  featureFlagLibraryButton,
   id,
   libraryReturnUrl,
 }: {
@@ -36,6 +37,7 @@ const LibraryMenuItems = ({
   onSelectItems: (id: LibraryItem["id"][]) => void;
   libraryReturnUrl: ExcalidrawProps["libraryReturnUrl"];
   theme: AppState["theme"];
+  featureFlagLibraryButton: boolean;
   id: string;
 }) => {
   const [lastSelectedItem, setLastSelectedItem] = useState<
@@ -194,6 +196,7 @@ const LibraryMenuItems = ({
   );
 
   const showBtn =
+    featureFlagLibraryButton &&
     !libraryItems.length &&
     !unpublishedItems.length &&
     !publishedItems.length &&
@@ -268,16 +271,17 @@ const LibraryMenuItems = ({
         </>
 
         <>
-          {(publishedItems.length > 0 ||
+          {featureFlagLibraryButton && (
+            publishedItems.length > 0 ||
             pendingElements.length > 0 ||
             unpublishedItems.length > 0) && (
             <div className="library-menu-items-container__header library-menu-items-container__header--excal">
               {t("labels.excalidrawLib")}
             </div>
           )}
-          {publishedItems.length > 0 ? (
+          {featureFlagLibraryButton && publishedItems.length > 0 ? (
             renderLibrarySection(publishedItems)
-          ) : unpublishedItems.length > 0 ? (
+          ) : unpublishedItems.length > 0 && featureFlagLibraryButton ? (
             <div
               style={{
                 margin: "1rem 0",

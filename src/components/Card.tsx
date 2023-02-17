@@ -1,5 +1,5 @@
 import OpenColor from "open-color";
-
+import "./Kits.scss";
 import "./Card.scss";
 
 export const Card: React.FC<{
@@ -11,15 +11,15 @@ export const Card: React.FC<{
       className="Card"
       style={{
         ["--card-color" as any]:
-          color === "primary" ? "var(--color-primary)" : OpenColor[color][7],
+          color === "primary" ? "var(--color-primary)" : 'var(--kits-primary)',
         ["--card-color-darker" as any]:
           color === "primary"
             ? "var(--color-primary-darker)"
-            : OpenColor[color][8],
+            : 'var(--kits-primary-darker)',
         ["--card-color-darkest" as any]:
           color === "primary"
             ? "var(--color-primary-darkest)"
-            : OpenColor[color][9],
+            : 'var(--kits-primary-darkest)',
       }}
     >
       {children}

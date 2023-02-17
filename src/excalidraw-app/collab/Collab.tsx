@@ -45,6 +45,7 @@ import {
 import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
+  saveLastUsedRoomsToLocalStorage,
 } from "../data/localStorage";
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
@@ -292,7 +293,7 @@ class Collab extends PureComponent<Props, CollabState> {
       // that could have been saved in other tabs while we were collaborating
       resetBrowserStateVersions();
 
-      window.history.pushState({}, APP_NAME, window.location.origin);
+      window.history.pushState({}, APP_NAME, window.location.origin + "/app");
       this.destroySocketClient();
 
       LocalData.fileStorage.reset();
@@ -395,11 +396,13 @@ class Collab extends PureComponent<Props, CollabState> {
       ({ roomId, roomKey } = existingRoomLinkData);
     } else {
       ({ roomId, roomKey } = await generateCollaborationLinkData());
+      const collabLink = getCollaborationLink({ roomId, roomKey });
       window.history.pushState(
         {},
         APP_NAME,
-        getCollaborationLink({ roomId, roomKey }),
+        collabLink,
       );
+      saveLastUsedRoomsToLocalStorage(collabLink);
     }
 
     const scenePromise = resolvablePromise<ImportedDataState | null>();

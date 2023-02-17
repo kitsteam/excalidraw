@@ -47,9 +47,9 @@ const ExportButton: React.FC<{
     <button
       className="ExportDialog-imageExportButton"
       style={{
-        ["--button-color" as any]: OpenColor[color][shade],
-        ["--button-color-darker" as any]: OpenColor[color][shade + 1],
-        ["--button-color-darkest" as any]: OpenColor[color][shade + 2],
+        ["--button-color" as any]: '#00a3d3',
+        ["--button-color-darker" as any]: '#0067a7',
+        ["--button-color-darkest" as any]: '#00456f',
       }}
       title={title}
       aria-label={title}
