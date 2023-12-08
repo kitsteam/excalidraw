@@ -34,6 +34,9 @@ interface ImportMetaEnv {
   VITE_APP_PLUS_APP: string;
 
   VITE_APP_GIT_SHA: string;
+
+  VITE_APP_HTTP_STORAGE_BACKEND_URL: string;
+  VITE_APP_STORAGE_BACKEND: "http" | "firebase";
 }
 
 interface ImportMeta {
