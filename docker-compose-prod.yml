@@ -21,7 +21,7 @@ services:
       - "5011:8080"
     restart: always
     environment:
-      STORAGE_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      STORAGE_URI: redis://:${REDIS_PASSWORD}@redis:6379
       STORAGE_TTL: 2592000000
 
   excalidraw-room:
@@ -30,22 +30,13 @@ services:
     ports:
       - "5012:80"
   
-  postgres:
-    image: postgres:12-alpine
-    # Pass config parameters to the postgres server.
-    # Find more information below when you need to generate the ssl-relevant file your self
-    # command: -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key
-    environment:
-      PGDATA: /var/lib/postgresql/data/pgdata
-      POSTGRES_DB: ${POSTGRES_DB:-excalidraw-prod}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_USER: ${POSTGRES_USER}
+  redis:
+    image: redis
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data/pgdata
-    ports:
-      - "5432:5432"
+      - redis_data:/data
 
 volumes:
   notused:
-  postgres_data:
+  redis_data:
