@@ -16,7 +16,8 @@ on:
     types: [published]
   push:
     branches:
-      - main
+      - master
+      - add-build-workflow
 
 env:
   REGISTRY: ghcr.io
