@@ -20,7 +20,7 @@ services:
       - ./:/opt/node_app/
 
   excalidraw-storage-backend:
-    build: https://github.com/kitsteam/excalidraw-storage-backend.git#main
+    build: ghcr.io/kitsteam/excalidraw-storage-backend:master
     ports:
       - "8080:8080"
     environment:
