@@ -15,7 +15,6 @@ services:
     environment:
       - NODE_ENV=production
       - NGINX_PORT=3000
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
   excalidraw-storage-backend:
     build:
       context: https://github.com/kitsteam/excalidraw-storage-backend.git#main

@@ -15,7 +15,6 @@ services:
       disable: true
     environment:
       - NODE_ENV=development
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:
       - node_modules:/opt/node_app/node_modules
       - ./:/opt/node_app/
