@@ -7,19 +7,22 @@ services:
       target: production
     container_name: excalidraw
     ports:
-      - "5010:80"
+      - "5010:3000"
     restart: always
     stdin_open: true
     healthcheck:
       disable: true
     environment:
       - NODE_ENV=production
-
+      - NGINX_PORT=3000
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
   excalidraw-storage-backend:
-    build: https://github.com/kitsteam/excalidraw-storage-backend.git#main
+    build:
+      context: https://github.com/kitsteam/excalidraw-storage-backend.git#main
+      target: production
     ports:
       - "5011:8080"
-    restart: always
+    # restart: always
     environment:
       STORAGE_URI: redis://:${REDIS_PASSWORD}@redis:6379
       STORAGE_TTL: 2592000000

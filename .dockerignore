@@ -1,5 +1,4 @@
 *
-!.env
 !.env.development
 !.env.production
 !.eslintrc.json
@@ -8,5 +7,6 @@
 !package.json
 !public/
 !src/
+!docker/
 !tsconfig.json
 !yarn.lock
