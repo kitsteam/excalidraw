@@ -49,8 +49,8 @@ export const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
     isSyncableElement(element),
   ) as SyncableExcalidrawElement[];
 
-const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
-const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;
+const BACKEND_V2_GET = process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME ? createServerUrl(process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME) + '/scenes/' : process.env.REACT_APP_BACKEND_V2_GET_URL
+const BACKEND_V2_POST = process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME ? createServerUrl(process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME) + '/scenes/' : process.env.REACT_APP_BACKEND_V2_POST_URL
 
 const generateRoomId = async () => {
   const buffer = new Uint8Array(ROOM_ID_BYTES);
