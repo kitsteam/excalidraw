@@ -26,6 +26,7 @@ import {
 } from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
 import { getStorageBackend } from "./config";
+import { createServerUrl } from "./httpStorage";
 
 export type SyncableExcalidrawElement = ExcalidrawElement & {
   _brand: "SyncableExcalidrawElement";
@@ -68,7 +69,12 @@ export const getCollabServer = async (): Promise<{
   url: string;
   polling: boolean;
 }> => {
-  if (process.env.REACT_APP_WS_SERVER_URL) {
+  if(process.env.REACT_APP_HTTP_STORAGE_WS_URL_PART_NAME) {
+    return {
+      url: createServerUrl(process.env.REACT_APP_HTTP_STORAGE_WS_URL_PART_NAME),
+      polling: true,
+    };
+  } else if (process.env.REACT_APP_WS_SERVER_URL) {
     return {
       url: process.env.REACT_APP_WS_SERVER_URL,
       polling: true,

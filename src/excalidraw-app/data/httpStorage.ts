@@ -14,21 +14,18 @@ import { reconcileElements } from "../collab/reconciliation";
 import { decryptData } from "../../data/encryption";
 import { StoredScene } from "./StorageBackend";
 
-const createBackendUrl = () => {
-  if(process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL) {
-    return process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL
-  } else if (process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME) {
-    const hostArray = window.location.host.split('.')
-    const protocol =  window.location.protocol + '//'
-    if(hostArray.length === 1) console.warn("localhost for parameter REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME not supported");
+export const createServerUrl = (targetSubdomain: string) => {
+  const hostArray = window.location.host.split('.')
+  const protocol =  window.location.protocol + '//'
+  if(hostArray.length === 1) console.warn("Localhost for does not work for URL_PART_NAME variables");
 
-    return `${protocol}${process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME}.${hostArray.slice(1, hostArray.length).join('.')}`
-  } else {
-    return ''
-  }
+  // Kits domains for excali start with draw
+  const subdomain = hostArray[0].replace('draw', targetSubdomain)
+
+  return `${protocol}${subdomain}.${hostArray.slice(1, hostArray.length).join('.')}`
 }
 
-const httpStorageBackendUrl = createBackendUrl()
+const httpStorageBackendUrl = process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME ? createServerUrl(process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME) : process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL 
 const SCENE_VERSION_LENGTH_BYTES = 4
 
 // There is a lot of intentional duplication with the firebase file

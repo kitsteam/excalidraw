@@ -14,9 +14,6 @@ name: Create and publish a Docker image
 on:
   release:
     types: [published]
-  push:
-    branches:
-      - master
 
 env:
   REGISTRY: ghcr.io
@@ -49,6 +46,9 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           target: production
+          build-args: |
+            "REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME=draw-backend"
+            "REACT_APP_HTTP_STORAGE_WS_URL_PART_NAME=draw-room"
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
