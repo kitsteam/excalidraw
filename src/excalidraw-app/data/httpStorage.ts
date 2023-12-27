@@ -14,7 +14,21 @@ import { reconcileElements } from "../collab/reconciliation";
 import { decryptData } from "../../data/encryption";
 import { StoredScene } from "./StorageBackend";
 
-const HTTP_STORAGE_BACKEND_URL = process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL;
+const createBackendUrl = () => {
+  if(process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL) {
+    return process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL
+  } else if (process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME) {
+    const hostArray = window.location.host.split('.')
+    const protocol =  window.location.protocol + '//'
+    if(hostArray.length === 1) console.warn("localhost for parameter REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME not supported");
+
+    return `${protocol}${process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME}.${hostArray.slice(1, hostArray.length).join('.')}`
+  } else {
+    return ''
+  }
+}
+
+const httpStorageBackendUrl = createBackendUrl()
 const SCENE_VERSION_LENGTH_BYTES = 4
 
 // There is a lot of intentional duplication with the firebase file
@@ -58,7 +72,7 @@ export const saveToHttpStorage = async (
 
   const sceneVersion = getSceneVersion(elements);
   const getResponse = await fetch(
-    `${HTTP_STORAGE_BACKEND_URL}/rooms/${roomId}`,
+    `${httpStorageBackendUrl}/rooms/${roomId}`,
   );
 
   if (!getResponse.ok && getResponse.status !== 404) {
@@ -104,9 +118,8 @@ export const loadFromHttpStorage = async (
   roomKey: string,
   socket: SocketIOClient.Socket | null,
 ): Promise<readonly ExcalidrawElement[] | null> => {
-  const HTTP_STORAGE_BACKEND_URL = process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL;
   const getResponse = await fetch(
-    `${HTTP_STORAGE_BACKEND_URL}/rooms/${roomId}`,
+    `${httpStorageBackendUrl}/rooms/${roomId}`,
   );
 
   const buffer = await getResponse.arrayBuffer();
@@ -144,14 +157,12 @@ export const saveFilesToHttpStorage = async ({
   const erroredFiles = new Map<FileId, true>();
   const savedFiles = new Map<FileId, true>();
 
-  const HTTP_STORAGE_BACKEND_URL = process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL;
-
   await Promise.all(
     files.map(async ({ id, buffer }) => {
       try {
         const payloadBlob = new Blob([buffer]);
         const payload = await new Response(payloadBlob).arrayBuffer();
-        await fetch(`${HTTP_STORAGE_BACKEND_URL}/files/${id}`, {
+        await fetch(`${httpStorageBackendUrl}/files/${id}`, {
           method: "PUT",
           body: payload,
         });
@@ -177,8 +188,7 @@ export const loadFilesFromHttpStorage = async (
   await Promise.all(
     [...new Set(filesIds)].map(async (id) => {
       try {
-        const HTTP_STORAGE_BACKEND_URL = process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL;
-        const response = await fetch(`${HTTP_STORAGE_BACKEND_URL}/files/${id}`);
+        const response = await fetch(`${httpStorageBackendUrl}/files/${id}`);
         if (response.status < 400) {
           const arrayBuffer = await response.arrayBuffer();
 
@@ -221,7 +231,7 @@ const saveElementsToBackend = async (roomKey: string, roomId: string, elements: 
   const sceneVersionBuffer = numberView.buffer;
   const payloadBlob = await new Response(new Blob([sceneVersionBuffer, iv.buffer, ciphertext])).arrayBuffer();
   const putResponse = await fetch(
-    `${HTTP_STORAGE_BACKEND_URL}/rooms/${roomId}`,
+    `${httpStorageBackendUrl}/rooms/${roomId}`,
     {
       method: "PUT",
       body: payloadBlob,
