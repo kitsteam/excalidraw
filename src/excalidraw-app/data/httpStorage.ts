@@ -14,8 +14,8 @@ import { reconcileElements } from "../collab/reconciliation";
 import { decryptData } from "../../data/encryption";
 import { StoredScene } from "./StorageBackend";
 
-const apiPath = '/api/v2/'
-const scenePath = 'scenes/'
+const apiPath = '/api/v2'
+const scenePath = '/scenes/'
 export const sceneApiPath = apiPath + scenePath
 
 export const createServerUrl = (targetSubdomain: string, postFix?: string): string => {
