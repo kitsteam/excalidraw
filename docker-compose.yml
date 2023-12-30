@@ -10,7 +10,6 @@ services:
     ports:
       - "3000:80"
     restart: on-failure
-    stdin_open: true
     healthcheck:
       disable: true
     environment:
@@ -20,7 +19,11 @@ services:
       - ./:/opt/node_app/
 
   excalidraw-storage-backend:
-    build: https://github.com/kitsteam/excalidraw-storage-backend.git#main
+    build:
+      context: https://github.com/kitsteam/excalidraw-storage-backend.git#main
+      target: production
+    tty: true
+    stdin_open: true
     ports:
       - "8080:8080"
     environment:
