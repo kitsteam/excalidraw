@@ -1,9 +1,10 @@
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
-import { t } from "../../i18n";
+import { useI18n } from "../../i18n";
 import {
-  useExcalidrawAppState,
   useExcalidrawSetAppState,
   useExcalidrawActionManager,
+  useExcalidrawElements,
+  useAppProps,
 } from "../App";
 import {
   ExportIcon,
@@ -31,21 +32,44 @@ import "./DefaultItems.scss";
 import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
+import { jotaiScope } from "../../jotai";
+import { useUIAppState } from "../../context/ui-appState";
+import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
+import Trans from "../Trans";
 
 export const LoadScene = () => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
+  const elements = useExcalidrawElements();
 
   if (!actionManager.isActionEnabled(actionLoadScene)) {
     return null;
   }
 
+  const handleSelect = async () => {
+    if (
+      !elements.length ||
+      (await openConfirmModal({
+        title: t("overwriteConfirm.modal.loadFromFile.title"),
+        actionLabel: t("overwriteConfirm.modal.loadFromFile.button"),
+        color: "warning",
+        description: (
+          <Trans
+            i18nKey="overwriteConfirm.modal.loadFromFile.description"
+            bold={(text) => <strong>{text}</strong>}
+            br={() => <br />}
+          />
+        ),
+      }))
+    ) {
+      actionManager.executeAction(actionLoadScene);
+    }
+  };
+
   return (
     <DropdownMenuItem
       icon={LoadIcon}
-      onSelect={() => actionManager.executeAction(actionLoadScene)}
+      onSelect={handleSelect}
       data-testid="load-button"
       shortcut={getShortcutFromShortcutName("loadScene")}
       aria-label={t("buttons.load")}
@@ -57,9 +81,7 @@ export const LoadScene = () => {
 LoadScene.displayName = "LoadScene";
 
 export const SaveToActiveFile = () => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
 
   if (!actionManager.isActionEnabled(actionSaveToActiveFile)) {
@@ -80,14 +102,12 @@ SaveToActiveFile.displayName = "SaveToActiveFile";
 
 export const SaveAsImage = () => {
   const setAppState = useExcalidrawSetAppState();
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
   return (
     <DropdownMenuItem
       icon={ExportImageIcon}
       data-testid="image-export-button"
-      onSelect={() => setAppState({ openDialog: "imageExport" })}
+      onSelect={() => setAppState({ openDialog: { name: "imageExport" } })}
       shortcut={getShortcutFromShortcutName("imageExport")}
       aria-label={t("buttons.exportImage")}
     >
@@ -98,9 +118,7 @@ export const SaveAsImage = () => {
 SaveAsImage.displayName = "SaveAsImage";
 
 export const Help = () => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
 
   const actionManager = useExcalidrawActionManager();
 
@@ -119,10 +137,12 @@ export const Help = () => {
 Help.displayName = "Help";
 
 export const ClearCanvas = () => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
-  const setActiveConfirmDialog = useSetAtom(activeConfirmDialogAtom);
+  const { t } = useI18n();
+
+  const setActiveConfirmDialog = useSetAtom(
+    activeConfirmDialogAtom,
+    jotaiScope,
+  );
   const actionManager = useExcalidrawActionManager();
 
   if (!actionManager.isActionEnabled(actionClearCanvas)) {
@@ -143,7 +163,8 @@ export const ClearCanvas = () => {
 ClearCanvas.displayName = "ClearCanvas";
 
 export const ToggleTheme = () => {
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
+  const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
 
   if (!actionManager.isActionEnabled(actionToggleTheme)) {
@@ -175,15 +196,23 @@ export const ToggleTheme = () => {
 ToggleTheme.displayName = "ToggleTheme";
 
 export const ChangeCanvasBackground = () => {
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
+  const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
+  const appProps = useAppProps();
 
-  if (appState.viewModeEnabled) {
+  if (
+    appState.viewModeEnabled ||
+    !appProps.UIOptions.canvasActions.changeViewBackgroundColor
+  ) {
     return null;
   }
   return (
     <div style={{ marginTop: "0.5rem" }}>
-      <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
+      <div
+        data-testid="canvas-background-label"
+        style={{ fontSize: ".75rem", marginBottom: ".5rem" }}
+      >
         {t("labels.canvasBackground")}
       </div>
       <div style={{ padding: "0 0.625rem" }}>
@@ -195,15 +224,13 @@ export const ChangeCanvasBackground = () => {
 ChangeCanvasBackground.displayName = "ChangeCanvasBackground";
 
 export const Export = () => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
   const setAppState = useExcalidrawSetAppState();
   return (
     <DropdownMenuItem
       icon={ExportIcon}
       onSelect={() => {
-        setAppState({ openDialog: "jsonExport" });
+        setAppState({ openDialog: { name: "jsonExport" } });
       }}
       data-testid="json-export-button"
       aria-label={t("buttons.export")}
@@ -248,9 +275,7 @@ export const LiveCollaborationTrigger = ({
   onSelect: () => void;
   isCollaborating: boolean;
 }) => {
-  // FIXME Hack until we tie "t" to lang state
-  // eslint-disable-next-line
-  const appState = useExcalidrawAppState();
+  const { t } = useI18n();
   return (
     <DropdownMenuItem
       data-testid="collab-button"

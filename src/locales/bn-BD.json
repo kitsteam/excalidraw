@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "পেস্ট করুন",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "প্লেইনটেক্সট হিসাবে পেস্ট করুন",
     "pasteCharts": "চার্ট পেস্ট করুন",
     "selectAll": "সবটা সিলেক্ট করুন",
     "multiSelect": "একাধিক সিলেক্ট করুন",
@@ -40,10 +40,6 @@
     "arrowhead_triangle": "ত্রিভূজ",
     "fontSize": "লেখনীর মাত্রা",
     "fontFamily": "লেখনীর হরফ",
-    "onlySelected": "শুধুমাত্র সিলেক্টকৃত",
-    "withBackground": "পটভূমি সমেত",
-    "exportEmbedScene": "দৃশ্য",
-    "exportEmbedScene_details": "সিনের ডেটা এক্সপোর্টকৃত পীএনজী বা এসভীজী ফাইলের মধ্যে সেভ করা হবে যাতে করে পরবর্তী সময়ে আপনি এডিট করতে পারেন। তবে এতে ফাইলের সাইজ বাড়বে",
     "addWatermark": "এক্সক্যালিড্র দ্বারা প্রস্তুত",
     "handDrawn": "হাতে আঁকা",
     "normal": "স্বাভাবিক",
@@ -54,6 +50,7 @@
     "veryLarge": "অনেক বড়",
     "solid": "দৃঢ়",
     "hachure": "ভ্রুলেখা",
+    "zigzag": "আঁকাবাঁকা",
     "crossHatch": "ক্রস হ্যাচ",
     "thin": "পাতলা",
     "bold": "পুরু",
@@ -72,7 +69,7 @@
     "layers": "মাত্রা",
     "actions": "ক্রিয়া",
     "language": "ভাষা",
-    "liveCollaboration": "",
+    "liveCollaboration": "সরাসরি পারস্পরিক সহযোগিতা...",
     "duplicateSelection": "সদৃশ সিলেক্ট",
     "untitled": "অনামী",
     "name": "নাম",
@@ -99,7 +96,6 @@
     "flipHorizontal": "অনুভূমিক আবর্তন",
     "flipVertical": "উলম্ব আবর্তন",
     "viewMode": "দৃশ্য",
-    "toggleExportColorScheme": "",
     "share": "ভাগ করুন",
     "showStroke": "",
     "showBackground": "",
@@ -110,10 +106,15 @@
     "increaseFontSize": "লেখনীর মাত্রা বাড়ান",
     "unbindText": "",
     "bindText": "",
+    "createContainerFromText": "",
     "link": {
       "edit": "লিঙ্ক সংশোধন",
+      "editEmbed": "",
       "create": "লিঙ্ক তৈরী",
-      "label": "লিঙ্ক নামকরণ"
+      "createEmbed": "",
+      "label": "লিঙ্ক নামকরণ",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "",
@@ -126,7 +127,10 @@
       "unlockAll": "সব বিচ্ছিন্ন করুন"
     },
     "statusPublished": "প্রকাশিত",
-    "sidebarLock": "লক"
+    "sidebarLock": "লক",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": ""
   },
   "library": {
     "noItems": "সংগ্রহে কিছু যোগ করা হয়নি",
@@ -138,11 +142,7 @@
     "exportJSON": "জেসন নিবদ্ধ করুন",
     "exportImage": "",
     "export": "",
-    "exportToPng": "পীএনজী ছবির মতন নিবদ্ধ করুন",
-    "exportToSvg": "এসভীজী ছবির মতন নিবদ্ধ করুন",
     "copyToClipboard": "ক্লিপবোর্ডে কপি করুন",
-    "copyPngToClipboard": "পীএনজী ছবির মতন ক্লিপবোর্ডে কপি করুন",
-    "scale": "মাপ",
     "save": "জমা করুন",
     "saveAs": "অন্যভাবে জমা করুন",
     "load": "",
@@ -164,13 +164,16 @@
     "darkMode": "ডার্ক মোড",
     "lightMode": "লাইট মোড",
     "zenMode": "জেন মোড",
+    "objectsSnapMode": "",
     "exitZenMode": "জেন মোড বন্ধ করুন",
     "cancel": "বাতিল",
     "clear": "সাফ",
     "remove": "বিয়োগ",
+    "embed": "",
     "publishLibrary": "সংগ্রহ প্রকাশ করুন",
     "submit": "জমা করুন",
-    "confirm": "নিশ্চিত করুন"
+    "confirm": "নিশ্চিত করুন",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "এটি পুরো ক্যানভাস সাফ করবে। আপনি কি নিশ্চিত?",
@@ -192,18 +195,30 @@
     "invalidSceneUrl": "সরবরাহ করা লিঙ্ক থেকে দৃশ্য লোড করা যায়নি৷ এটি হয় বিকৃত, অথবা বৈধ এক্সক্যালিড্র জেসন তথ্য নেই৷",
     "resetLibrary": "এটি আপনার সংগ্রহ পরিষ্কার করবে। আপনি কি নিশ্চিত?",
     "removeItemsFromsLibrary": "সংগ্রহ থেকে {{count}} বস্তু বিয়োগ করা হবে। আপনি কি নিশ্চিত?",
-    "invalidEncryptionKey": "অবৈধ এনক্রীপশন কী।"
+    "invalidEncryptionKey": "অবৈধ এনক্রীপশন কী।",
+    "collabOfflineWarning": ""
   },
   "errors": {
     "unsupportedFileType": "অসমর্থিত ফাইল।",
     "imageInsertError": "ছবি সন্নিবেশ করা যায়নি। পরে আবার চেষ্টা করুন...",
     "fileTooBig": "ফাইলটি খুব বড়। সর্বাধিক অনুমোদিত আকার হল {{maxSize}}৷",
     "svgImageInsertError": "এসভীজী ছবি সন্নিবেশ করা যায়নি। এসভীজী মার্কআপটি অবৈধ মনে হচ্ছে৷",
+    "failedToFetchImage": "",
     "invalidSVGString": "এসভীজী মার্কআপটি অবৈধ মনে হচ্ছে৷",
     "cannotResolveCollabServer": "কোল্যাব সার্ভারের সাথে সংযোগ করা যায়নি। পৃষ্ঠাটি পুনরায় লোড করে আবার চেষ্টা করুন।",
     "importLibraryError": "সংগ্রহ লোড করা যায়নি",
     "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": ""
+    "collabSaveFailed_sizeExceeded": "",
+    "brave_measure_text_error": {
+      "line1": "",
+      "line2": "",
+      "line3": "",
+      "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
+    }
   },
   "toolBar": {
     "selection": "বাছাই",
@@ -220,7 +235,11 @@
     "penMode": "",
     "link": "একটি নির্বাচিত আকৃতির জন্য লিঙ্ক যোগ বা আপডেট করুন",
     "eraser": "ঝাড়ন",
-    "hand": ""
+    "frame": "",
+    "embeddable": "",
+    "laser": "",
+    "hand": "",
+    "extraTools": ""
   },
   "headings": {
     "canvasActions": "ক্যানভাস কার্যকলাপ",
@@ -232,6 +251,7 @@
     "linearElement": "একাধিক বিন্দু শুরু করতে ক্লিক করুন, একক লাইনের জন্য টেনে আনুন",
     "freeDraw": "ক্লিক করুন এবং টেনে আনুন, আপনার কাজ শেষ হলে ছেড়ে দিন",
     "text": "বিশেষ্য: আপনি নির্বাচন টুলের সাথে যে কোনো জায়গায় ডাবল-ক্লিক করে পাঠ্য যোগ করতে পারেন",
+    "embeddable": "",
     "text_selected": "লেখা সম্পাদনা করতে ডাবল-ক্লিক করুন বা এন্টার টিপুন",
     "text_editing": "লেখা সম্পাদনা শেষ করতে এসকেপ বা কন্ট্রোল/কম্যান্ড যোগে এন্টার টিপুন",
     "linearElementMulti": "শেষ বিন্দুতে ক্লিক করুন অথবা শেষ করতে এসকেপ বা এন্টার টিপুন",
@@ -247,7 +267,8 @@
     "bindTextToElement": "লেখা যোগ করতে এন্টার টিপুন",
     "deepBoxSelect": "",
     "eraserRevert": "মুছে ফেলার জন্য চিহ্নিত উপাদানগুলিকে ফিরিয়ে আনতে অল্ট ধরে রাখুন",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "প্রিভিউ দেখাতে অপারগ",
@@ -255,16 +276,11 @@
     "canvasTooBigTip": "বিশেষ্য: দূরতম উপাদানগুলোকে একটু কাছাকাছি নিয়ে যাওয়ার চেষ্টা করুন।"
   },
   "errorSplash": {
-    "headingMain_pre": "একটি ত্রুটির সম্মুখীন হয়েছে৷ চেষ্টা করুন ",
-    "headingMain_button": "পৃষ্ঠাটি পুনরায় লোড করার।",
-    "clearCanvasMessage": "যদি পুনরায় লোড করা কাজ না করে, চেষ্টা করুন ",
-    "clearCanvasMessage_button": "ক্যানভাস পরিষ্কার করার।",
+    "headingMain": "একটি ত্রুটির সম্মুখীন হয়েছে৷ চেষ্টা করুন <button>পৃষ্ঠাটি পুনরায় লোড করার।</button>",
+    "clearCanvasMessage": "যদি পুনরায় লোড করা কাজ না করে, চেষ্টা করুন <button>ক্যানভাস পরিষ্কার করার।</button>",
     "clearCanvasCaveat": " এর ফলে কাজের ক্ষতি হবে ",
-    "trackedToSentry_pre": "ত্রুটি ",
-    "trackedToSentry_post": " আমাদের সিস্টেমে ট্র্যাক করা হয়েছিল।",
-    "openIssueMessage_pre": "আমরা ত্রুটিতে আপনার দৃশ্যের তথ্য অন্তর্ভুক্ত না করার জন্য খুব সতর্ক ছিলাম। আপনার দৃশ্য ব্যক্তিগত না হলে, আমাদের অনুসরণ করার কথা বিবেচনা করুন ",
-    "openIssueMessage_button": "ত্রুটি ইতিবৃত্ত।",
-    "openIssueMessage_post": " অনুগ্রহ করে GitHub ইস্যুতে অনুলিপি এবং পেস্ট করে নীচের তথ্য অন্তর্ভুক্ত করুন।",
+    "trackedToSentry": "ত্রুটি {{eventId}} আমাদের সিস্টেমে ট্র্যাক করা হয়েছিল।",
+    "openIssueMessage": "আমরা ত্রুটিতে আপনার দৃশ্যের তথ্য অন্তর্ভুক্ত না করার জন্য খুব সতর্ক ছিলাম। আপনার দৃশ্য ব্যক্তিগত না হলে, আমাদের অনুসরণ করার কথা বিবেচনা করুন <button>ত্রুটি ইতিবৃত্ত।</button> অনুগ্রহ করে GitHub ইস্যুতে অনুলিপি এবং পেস্ট করে নীচের তথ্য অন্তর্ভুক্ত করুন।",
     "sceneContent": "দৃশ্য বিষয়বস্তু:"
   },
   "roomDialog": {
@@ -302,7 +318,8 @@
     "doubleClick": "",
     "drag": "",
     "editor": "",
-    "editSelectedShape": "",
+    "editLineArrowPoints": "",
+    "editText": "",
     "github": "",
     "howto": "",
     "or": "অথবা",
@@ -343,33 +360,44 @@
       "required": "",
       "website": ""
     },
-    "noteDescription": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteGuidelines": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
-    "noteLicense": {
-      "pre": "",
-      "link": "",
-      "post": ""
-    },
+    "noteDescription": "",
+    "noteGuidelines": "",
+    "noteLicense": "",
     "noteItems": "",
     "atleastOneLibItem": "",
     "republishWarning": ""
   },
   "publishSuccessDialog": {
     "title": "",
-    "content": "",
-    "link": ""
+    "content": ""
   },
   "confirmDialog": {
     "resetLibrary": "",
     "removeItemsFromLib": ""
+  },
+  "imageExportDialog": {
+    "header": "",
+    "label": {
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
+    },
+    "tooltip": {
+      "embedScene": ""
+    },
+    "title": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    },
+    "button": {
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
+    }
   },
   "encrypted": {
     "tooltip": "",
@@ -399,54 +427,26 @@
     "fileSavedToFilename": "",
     "canvas": "",
     "selection": "বাছাই",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
-    "ffffff": "সাদা",
-    "f8f9fa": "",
-    "f1f3f5": "",
-    "fff5f5": "",
-    "fff0f6": "",
-    "f8f0fc": "",
-    "f3f0ff": "",
-    "edf2ff": "",
-    "e7f5ff": "",
-    "e3fafc": "",
-    "e6fcf5": "",
-    "ebfbee": "",
-    "f4fce3": "",
-    "fff9db": "",
-    "fff4e6": "",
     "transparent": "",
-    "ced4da": "",
-    "868e96": "",
-    "fa5252": "",
-    "e64980": "",
-    "be4bdb": "",
-    "7950f2": "",
-    "4c6ef5": "",
-    "228be6": "",
-    "15aabf": "",
-    "12b886": "",
-    "40c057": "",
-    "82c91e": "",
-    "fab005": "",
-    "fd7e14": "",
-    "000000": "কালো",
-    "343a40": "",
-    "495057": "",
-    "c92a2a": "",
-    "a61e4d": "",
-    "862e9c": "",
-    "5f3dc4": "",
-    "364fc7": "",
-    "1864ab": "",
-    "0b7285": "",
-    "087f5b": "",
-    "2b8a3e": "",
-    "5c940d": "",
-    "e67700": "",
-    "d9480f": ""
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -459,6 +459,44 @@
       "center_heading": "",
       "toolbarHint": "",
       "helpHint": ""
+    }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
     }
   }
 }

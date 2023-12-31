@@ -1,38 +1,50 @@
-import { NonDeletedExcalidrawElement } from "../element/types";
+import { isIframeElement } from "../element/typeChecks";
+import {
+  ExcalidrawIframeElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
+import { ElementOrToolType } from "../types";
 
-export const hasBackground = (type: string) =>
+export const hasBackground = (type: ElementOrToolType) =>
   type === "rectangle" ||
+  type === "iframe" ||
+  type === "embeddable" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "line" ||
   type === "freedraw";
 
-export const hasStrokeColor = (type: string) => type !== "image";
+export const hasStrokeColor = (type: ElementOrToolType) =>
+  type !== "image" && type !== "frame" && type !== "magicframe";
 
-export const hasStrokeWidth = (type: string) =>
+export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "rectangle" ||
+  type === "iframe" ||
+  type === "embeddable" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "freedraw" ||
   type === "arrow" ||
   type === "line";
 
-export const hasStrokeStyle = (type: string) =>
+export const hasStrokeStyle = (type: ElementOrToolType) =>
   type === "rectangle" ||
+  type === "iframe" ||
+  type === "embeddable" ||
   type === "ellipse" ||
   type === "diamond" ||
   type === "arrow" ||
   type === "line";
 
-export const canChangeRoundness = (type: string) =>
+export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "rectangle" ||
+  type === "iframe" ||
+  type === "embeddable" ||
   type === "arrow" ||
   type === "line" ||
   type === "diamond";
 
-export const hasText = (type: string) => type === "text";
-
-export const canHaveArrowheads = (type: string) => type === "arrow";
+export const canHaveArrowheads = (type: ElementOrToolType) => type === "arrow";
 
 export const getElementAtPosition = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -60,9 +72,21 @@ export const getElementsAtPosition = (
   elements: readonly NonDeletedExcalidrawElement[],
   isAtPositionFn: (element: NonDeletedExcalidrawElement) => boolean,
 ) => {
+  const iframeLikes: ExcalidrawIframeElement[] = [];
   // The parameter elements comes ordered from lower z-index to higher.
   // We want to preserve that order on the returned array.
-  return elements.filter(
-    (element) => !element.isDeleted && isAtPositionFn(element),
-  );
+  // Exception being embeddables which should be on top of everything else in
+  // terms of hit testing.
+  const elsAtPos = elements.filter((element) => {
+    const hit = !element.isDeleted && isAtPositionFn(element);
+    if (hit) {
+      if (isIframeElement(element)) {
+        iframeLikes.push(element);
+        return false;
+      }
+      return true;
+    }
+    return false;
+  });
+  return elsAtPos.concat(iframeLikes);
 };

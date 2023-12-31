@@ -12,26 +12,44 @@ import "./Dialog.scss";
 import { back, CloseIcon } from "./icons";
 import { Island } from "./Island";
 import { Modal } from "./Modal";
-import { AppState } from "../types";
 import { queryFocusableElements } from "../utils";
 import { useSetAtom } from "jotai";
-import { isLibraryMenuOpenAtom } from "./LibraryMenuHeaderContent";
+import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+import { jotaiScope } from "../jotai";
+
+export type DialogSize = number | "small" | "regular" | "wide" | undefined;
 
 export interface DialogProps {
   children: React.ReactNode;
   className?: string;
-  small?: boolean;
+  size?: DialogSize;
   onCloseRequest(): void;
-  title: React.ReactNode;
+  title: React.ReactNode | false;
   autofocus?: boolean;
-  theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
+}
+
+function getDialogSize(size: DialogSize): number {
+  if (size && typeof size === "number") {
+    return size;
+  }
+
+  switch (size) {
+    case "small":
+      return 550;
+    case "wide":
+      return 1024;
+    case "regular":
+    default:
+      return 800;
+  }
 }
 
 export const Dialog = (props: DialogProps) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [lastActiveElement] = useState(document.activeElement);
   const { id } = useExcalidrawContainer();
+  const isFullscreen = useDevice().viewport.isMobile;
 
   useEffect(() => {
     if (!islandNode) {
@@ -72,7 +90,7 @@ export const Dialog = (props: DialogProps) => {
   }, [islandNode, props.autofocus]);
 
   const setAppState = useExcalidrawSetAppState();
-  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
+  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom, jotaiScope);
 
   const onClose = () => {
     setAppState({ openMenu: null });
@@ -83,25 +101,28 @@ export const Dialog = (props: DialogProps) => {
 
   return (
     <Modal
-      className={clsx("Dialog", props.className)}
+      className={clsx("Dialog", props.className, {
+        "Dialog--fullscreen": isFullscreen,
+      })}
       labelledBy="dialog-title"
-      maxWidth={props.small ? 550 : 800}
+      maxWidth={getDialogSize(props.size)}
       onCloseRequest={onClose}
-      theme={props.theme}
       closeOnClickOutside={props.closeOnClickOutside}
     >
       <Island ref={setIslandNode}>
-        <h2 id={`${id}-dialog-title`} className="Dialog__title">
-          <span className="Dialog__titleContent">{props.title}</span>
-          <button
-            className="Modal__close"
-            onClick={onClose}
-            title={t("buttons.close")}
-            aria-label={t("buttons.close")}
-          >
-            {useDevice().isMobile ? back : CloseIcon}
-          </button>
-        </h2>
+        {props.title && (
+          <h2 id={`${id}-dialog-title`} className="Dialog__title">
+            <span className="Dialog__titleContent">{props.title}</span>
+          </h2>
+        )}
+        <button
+          className="Dialog__close"
+          onClick={onClose}
+          title={t("buttons.close")}
+          aria-label={t("buttons.close")}
+        >
+          {isFullscreen ? back : CloseIcon}
+        </button>
         <div className="Dialog__content">{props.children}</div>
       </Island>
     </Modal>

@@ -1,5 +1,12 @@
 import React from "react";
-import { AppState, Device, ExcalidrawProps } from "../types";
+import {
+  AppClassProperties,
+  AppProps,
+  AppState,
+  Device,
+  ExcalidrawProps,
+  UIAppState,
+} from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -13,16 +20,15 @@ import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockButton } from "./LockButton";
-import { LibraryButton } from "./LibraryButton";
 import { PenModeButton } from "./PenModeButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
-import { useTunnels } from "./context/tunnels";
+import { useTunnels } from "../context/tunnels";
 
 type MobileMenuProps = {
-  appState: AppState;
+  appState: UIAppState;
   actionManager: ActionManager;
   renderJSONExportDialog: () => React.ReactNode;
   renderImageExportDialog: () => React.ReactNode;
@@ -30,18 +36,18 @@ type MobileMenuProps = {
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
   onHandToolToggle: () => void;
-  onPenModeToggle: () => void;
-  canvas: HTMLCanvasElement | null;
+  onPenModeToggle: AppClassProperties["togglePenMode"];
 
-  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
-    appState: AppState,
+    appState: UIAppState,
   ) => JSX.Element | null;
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderSidebars: () => JSX.Element | null;
   device: Device;
   renderWelcomeScreen: boolean;
+  UIOptions: AppProps["UIOptions"];
+  app: AppClassProperties;
 };
 
 export const MobileMenu = ({
@@ -52,19 +58,24 @@ export const MobileMenu = ({
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
-  canvas,
-  onImageAction,
+
   renderTopRightUI,
   renderCustomStats,
   renderSidebars,
   device,
   renderWelcomeScreen,
+  UIOptions,
+  app,
 }: MobileMenuProps) => {
-  const { welcomeScreenCenterTunnel, mainMenuTunnel } = useTunnels();
+  const {
+    WelcomeScreenCenterTunnel,
+    MainMenuTunnel,
+    DefaultSidebarTriggerTunnel,
+  } = useTunnels();
   const renderToolbar = () => {
     return (
       <FixedSideContainer side="top" className="App-top-bar">
-        {renderWelcomeScreen && <welcomeScreenCenterTunnel.Out />}
+        {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
         <Section heading="shapes">
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
@@ -74,29 +85,20 @@ export const MobileMenu = ({
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
                       appState={appState}
-                      canvas={canvas}
                       activeTool={appState.activeTool}
-                      setAppState={setAppState}
-                      onImageAction={({ pointerType }) => {
-                        onImageAction({
-                          insertOnCanvasDirectly: pointerType !== "mouse",
-                        });
-                      }}
+                      UIOptions={UIOptions}
+                      app={app}
                     />
                   </Stack.Row>
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
                 <div className="mobile-misc-tools-container">
                   {!appState.viewModeEnabled && (
-                    <LibraryButton
-                      appState={appState}
-                      setAppState={setAppState}
-                      isMobile
-                    />
+                    <DefaultSidebarTriggerTunnel.Out />
                   )}
                   <PenModeButton
                     checked={appState.penMode}
-                    onChange={onPenModeToggle}
+                    onChange={() => onPenModeToggle(null)}
                     title={t("toolBar.penMode")}
                     isMobile
                     penDetected={appState.penDetected}
@@ -120,9 +122,9 @@ export const MobileMenu = ({
         </Section>
         <HintViewer
           appState={appState}
-          elements={elements}
           isMobile={true}
           device={device}
+          app={app}
         />
       </FixedSideContainer>
     );
@@ -132,14 +134,14 @@ export const MobileMenu = ({
     if (appState.viewModeEnabled) {
       return (
         <div className="App-toolbar-content">
-          <mainMenuTunnel.Out />
+          <MainMenuTunnel.Out />
         </div>
       );
     }
 
     return (
       <div className="App-toolbar-content">
-        <mainMenuTunnel.Out />
+        <MainMenuTunnel.Out />
         {actionManager.renderAction("toggleEditMenu")}
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
@@ -190,13 +192,13 @@ export const MobileMenu = ({
             {renderAppToolbar()}
             {appState.scrolledOutside &&
               !appState.openMenu &&
-              appState.openSidebar !== "library" && (
+              !appState.openSidebar && (
                 <button
                   className="scroll-back-to-content"
                   onClick={() => {
-                    setAppState({
-                      ...calculateScrollCenter(elements, appState, canvas),
-                    });
+                    setAppState((appState) => ({
+                      ...calculateScrollCenter(elements, appState),
+                    }));
                   }}
                 >
                   {t("buttons.scrollBackToContent")}

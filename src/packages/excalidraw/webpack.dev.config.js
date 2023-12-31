@@ -2,8 +2,8 @@ const path = require("path");
 const webpack = require("webpack");
 const autoprefixer = require("autoprefixer");
 const { parseEnvVariables } = require("./env");
-
 const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
+
 module.exports = {
   mode: "development",
   devtool: false,
@@ -17,7 +17,6 @@ module.exports = {
     filename: "[name].js",
     chunkFilename: "excalidraw-assets-dev/[name]-[contenthash].js",
     assetModuleFilename: "excalidraw-assets-dev/[name][ext]",
-
     publicPath: "",
   },
   resolve: {
@@ -42,10 +41,22 @@ module.exports = {
           "sass-loader",
         ],
       },
+      // So that type module works with webpack
+      // https://github.com/webpack/webpack/issues/11467#issuecomment-691873586
+      {
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,
-        exclude: /node_modules\/(?!browser-fs-access)/,
+        exclude:
+          /node_modules[\\/](?!(browser-fs-access|canvas-roundrect-polyfill))/,
         use: [
+          {
+            loader: "import-meta-loader",
+          },
           {
             loader: "ts-loader",
             options: {

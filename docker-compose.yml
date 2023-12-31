@@ -8,7 +8,7 @@ services:
       target: development
     container_name: excalidraw
     ports:
-      - "3000:80"
+      - "3000:3000"
     restart: on-failure
     healthcheck:
       disable: true

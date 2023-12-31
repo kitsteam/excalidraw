@@ -3,8 +3,22 @@
 
 :root {
   --zIndex-canvas: 1;
-  --zIndex-wysiwyg: 2;
-  --zIndex-layerUI: 3;
+  --zIndex-interactiveCanvas: 2;
+  --zIndex-wysiwyg: 3;
+  --zIndex-canvasButtons: 3;
+  --zIndex-layerUI: 4;
+  --zIndex-eyeDropperBackdrop: 5;
+  --zIndex-eyeDropperPreview: 6;
+  --zIndex-hyperlinkContainer: 7;
+
+  --zIndex-modal: 1000;
+  --zIndex-popup: 1001;
+  --zIndex-toast: 999999;
+
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+  --sat: env(safe-area-inset-top);
 }
 
 .excalidraw {
@@ -25,6 +39,7 @@
 
   button {
     cursor: pointer;
+    user-select: none;
   }
 
   &:focus {
@@ -38,13 +53,19 @@
   //    component (e.g. if you select text in a sidebar)
   user-select: none;
 
+  .excalidraw-link,
   a {
     font-weight: 500;
     text-decoration: none;
     color: var(--link-color);
+    user-select: none;
+    cursor: pointer;
 
     &:hover {
       text-decoration: underline;
+    }
+    &:active {
+      text-decoration: none;
     }
   }
 
@@ -60,12 +81,34 @@
 
     z-index: var(--zIndex-canvas);
 
+    &.interactive {
+      z-index: var(--zIndex-interactiveCanvas);
+    }
+
     // Remove the main canvas from document flow to avoid resizeObserver
     // feedback loop (see https://github.com/excalidraw/excalidraw/pull/3379)
   }
 
+  &__canvas-wrapper,
+  &__canvas.static {
+    pointer-events: none;
+  }
+
   &__canvas {
     position: absolute;
+  }
+
+  &__embeddable {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  &__embeddable-container {
+    position: absolute;
+    z-index: 2;
+    transform-origin: top left;
+    pointer-events: none;
   }
 
   &.theme--dark {
@@ -155,10 +198,13 @@
     margin: 1px;
   }
 
+  .welcome-screen-menu-item:focus-visible,
+  .dropdown-menu-item:focus-visible,
+  button:focus-visible,
   .buttonList label:focus-within,
   input:focus-visible {
     outline: transparent;
-    box-shadow: 0 0 0 2px var(--focus-highlight-color);
+    box-shadow: 0 0 0 1px var(--color-brand-hover);
   }
 
   .buttonList {
@@ -218,7 +264,7 @@
       max-height: 100%;
       display: flex;
       flex-direction: column;
-      pointer-events: initial;
+      pointer-events: var(--ui-pointerEvents);
 
       .panelColumn {
         padding: 8px 8px 0 8px;
@@ -245,6 +291,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 8px;
+
+    .dropdown-menu--mobile {
+      bottom: 55px;
+      top: auto;
+    }
   }
 
   .App-mobile-menu {
@@ -266,7 +317,7 @@
     pointer-events: none !important;
 
     & > * {
-      pointer-events: all;
+      pointer-events: var(--ui-pointerEvents);
     }
   }
 
@@ -277,14 +328,14 @@
     cursor: default;
     pointer-events: none !important;
 
+    & > * {
+      pointer-events: var(--ui-pointerEvents);
+    }
+
     @media (min-width: 1536px) {
       grid-template-columns: 1fr 1fr 1fr;
       grid-gap: 3rem;
     }
-  }
-
-  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_top > * {
-    pointer-events: all;
   }
 
   .App-menu_top > *:first-child {
@@ -353,6 +404,7 @@
     border-radius: var(--space-factor);
     border: 1px solid var(--button-gray-2);
     font-size: 0.8rem;
+    font-family: inherit;
     outline: none;
     appearance: none;
     background-image: var(--dropdown-icon);
@@ -389,17 +441,6 @@
     }
   }
 
-  .disable-zen-mode {
-    border-radius: var(--border-radius-lg);
-    background-color: var(--color-gray-20);
-    border: 1px solid var(--color-gray-30);
-    padding: 10px 20px;
-
-    &:hover {
-      background-color: var(--color-gray-30);
-    }
-  }
-
   .scroll-back-to-content {
     border-radius: var(--border-radius-lg);
     background-color: var(--island-bg-color);
@@ -411,14 +452,15 @@
     left: 50%;
     bottom: 30px;
     transform: translateX(-50%);
-    pointer-events: all;
+    pointer-events: var(--ui-pointerEvents);
+    font-family: inherit;
 
     &:hover {
       background-color: var(--button-hover-bg);
     }
 
     &:active {
-      border: 1px solid var(--color-primary-darkest);
+      border: 1px solid var(--button-active-border);
     }
   }
 
@@ -444,7 +486,8 @@
 
   .help-icon {
     @include outlineButtonStyles;
-    background-color: var(--island-bg-color);
+    @include filledButtonOnCanvas;
+
     width: var(--lg-button-size);
     height: var(--lg-button-size);
 
@@ -519,6 +562,12 @@
     }
   }
 
+  input.is-redacted {
+    // we don't use type=password because browsers (chrome?) prompt
+    // you to save it which is annoying
+    -webkit-text-security: disc;
+  }
+
   input[type="text"],
   textarea:not(.excalidraw-wysiwyg) {
     color: var(--text-primary-color);
@@ -530,13 +579,13 @@
 
     &:not(:focus) {
       &:hover {
-        background-color: var(--input-hover-bg-color);
+        border-color: var(--color-brand-hover);
       }
     }
 
     &:focus {
       outline: none;
-      box-shadow: 0 0 0 2px var(--focus-highlight-color);
+      border-color: var(--color-brand-hover);
     }
   }
 
@@ -552,6 +601,11 @@
   // (doesn't work in Firefox)
   ::-webkit-scrollbar {
     width: 3px;
+    height: 3px;
+  }
+
+  select::-webkit-scrollbar {
+    width: 10px;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -580,17 +634,19 @@
     background-color: var(--island-bg-color);
 
     .ToolIcon__icon {
+      width: 2rem;
+      height: 2rem;
       border-radius: 0;
     }
 
-    .library-button {
+    .default-sidebar-trigger {
       border: 0;
     }
   }
 
   .App-toolbar--mobile {
-    overflow-x: hidden;
-    max-width: 100vw;
+    overflow: visible;
+    max-width: 98vw;
 
     .ToolIcon__keybinding {
       display: none;
@@ -608,6 +664,33 @@
       font-weight: 400;
       margin: 0 0 0.25rem;
       padding: 0;
+    }
+  }
+
+  .main-menu-trigger {
+    @include filledButtonOnCanvas;
+  }
+
+  .App-menu__left {
+    --button-border: transparent;
+    --button-bg: var(--color-surface-mid);
+
+    @at-root .excalidraw.theme--dark#{&} {
+      --button-hover-bg: #363541;
+      --button-bg: var(--color-surface-high);
+    }
+  }
+
+  .excalidraw__paragraph {
+    margin: 1rem 0;
+  }
+
+  .Modal__content {
+    .excalidraw__paragraph:first-child {
+      margin-top: 0;
+    }
+    .excalidraw__paragraph + .excalidraw__paragraph {
+      margin-top: 0rem;
     }
   }
 }
@@ -665,102 +748,32 @@
   }
 }
 
-// RANGE INPUT STYLES
+.excalidraw__embeddable-container {
+  .excalidraw__embeddable-container__inner {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--embeddable-radius);
+  }
 
-input[type="range"] {
-  width: 100%;
-  margin: 6.9px 0;
-  background-color: transparent;
-  -webkit-appearance: none;
-}
-input[type="range"]:focus {
-  outline: none;
-}
-input[type="range"]::-webkit-slider-runnable-track {
-  background: rgba(51, 154, 240, 0.2);
-  border: 0px solid rgba(1, 1, 1, 0);
-  border: 0;
-  border-radius: 25px;
-  width: 100%;
-  height: 4.2px;
-  cursor: pointer;
-}
-input[type="range"]::-webkit-slider-thumb {
-  margin-top: -6.9px;
-  width: 18px;
-  height: 18px;
-  background: #339af0;
-  border: 0px solid rgba(0, 0, 0, 0);
-  border: 0;
-  border-radius: 9px;
-  cursor: pointer;
-  -webkit-appearance: none;
-}
-input[type="range"]:focus::-webkit-slider-runnable-track {
-  background: #a5d2f8;
-}
-input[type="range"]::-moz-range-track {
-  background: rgba(51, 154, 240, 0.2);
-  border: 0px solid rgba(1, 1, 1, 0);
-  border: 0;
-  border-radius: 25px;
-  width: 100%;
-  height: 4.2px;
-  cursor: pointer;
-}
-input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  background: #339af0;
-  border: 0px solid rgba(0, 0, 0, 0);
-  border: 0;
-  border-radius: 9px;
-  cursor: pointer;
-}
-input[type="range"]::-ms-track {
-  background: transparent;
-  border-color: transparent;
-  border-width: 6.9px 0;
-  color: transparent;
-  width: 100%;
-  height: 4.2px;
-  cursor: pointer;
-}
-input[type="range"]::-ms-fill-lower {
-  background: #0c5b9d;
-  border: 0px solid rgba(1, 1, 1, 0);
-  border: 0;
-  border-radius: 50px;
-}
-input[type="range"]::-ms-fill-upper {
-  background: rgba(51, 154, 240, 0.2);
-  border: 0px solid rgba(1, 1, 1, 0);
-  border: 0;
-  border-radius: 50px;
-}
-input[type="range"]::-ms-thumb {
-  width: 18px;
-  height: 18px;
-  background: #339af0;
-  border: 0px solid rgba(0, 0, 0, 0);
-  border: 0;
-  border-radius: 9px;
-  cursor: pointer;
-  margin-top: 0px;
-  /*Needed to keep the Edge thumb centred*/
-}
-input[type="range"]:focus::-ms-fill-lower {
-  background: rgba(51, 154, 240, 0.2);
-}
-input[type="range"]:focus::-ms-fill-upper {
-  background: #a5d2f8;
-}
-/*TODO: Use one of the selectors from https://stackoverflow.com/a/20541859/7077589 and figure out
-how to remove the virtical space around the range input in IE*/
-@supports (-ms-ime-align: auto) {
-  /* Pre-Chromium Edge only styles, selector taken from hhttps://stackoverflow.com/a/32202953/7077589 */
-  input[type="range"] {
-    margin: 0;
-    /*Edge starts the margin from the thumb, not the track as other browsers do*/
+  .excalidraw__embeddable__outer {
+    width: 100%;
+    height: 100%;
+    & > * {
+      border-radius: var(--embeddable-radius);
+    }
+  }
+
+  .excalidraw__embeddable-hint {
+    position: absolute;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1rem 1.6rem;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: bold;
+    letter-spacing: 0.6px;
+    font-family: "Assistant";
   }
 }

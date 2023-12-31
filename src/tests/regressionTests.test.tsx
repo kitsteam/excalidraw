@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import { ExcalidrawElement } from "../element/types";
 import { CODES, KEYS } from "../keys";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
 import { setDateTimeForTests } from "../utils";
@@ -12,15 +12,14 @@ import {
   fireEvent,
   render,
   screen,
-  waitFor,
+  togglePopover,
 } from "./test-utils";
-import { defaultLang } from "../i18n";
 import { FONT_FAMILY } from "../constants";
-import { t } from "../i18n";
+import { vi } from "vitest";
 
 const { h } = window;
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
 
 const mouse = new Pointer("mouse");
 const finger1 = new Pointer("touch", 1);
@@ -32,7 +31,7 @@ const finger2 = new Pointer("touch", 2);
  * to debug where a test failure came from.
  */
 const checkpoint = (name: string) => {
-  expect(renderScene.mock.calls.length).toMatchSnapshot(
+  expect(renderStaticScene.mock.calls.length).toMatchSnapshot(
     `[${name}] number of renders`,
   );
   expect(h.state).toMatchSnapshot(`[${name}] appState`);
@@ -42,13 +41,12 @@ const checkpoint = (name: string) => {
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
   );
 };
-
 beforeEach(async () => {
   // Unmount ReactDOM from root
   ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
   localStorage.clear();
-  renderScene.mockClear();
+  renderStaticScene.mockClear();
   reseed(7);
   setDateTimeForTests("201933152653");
 
@@ -56,7 +54,7 @@ beforeEach(async () => {
   finger1.reset();
   finger2.reset();
 
-  await render(<ExcalidrawApp />);
+  await render(<Excalidraw handleKeyboardGlobally={true} />);
   h.setState({ height: 768, width: 1024 });
 });
 
@@ -157,15 +155,17 @@ describe("regression tests", () => {
   }
   it("change the properties of a shape", () => {
     UI.clickTool("rectangle");
+
     mouse.down(10, 10);
     mouse.up(10, 10);
+    togglePopover("Background");
+    UI.clickOnTestId("color-yellow");
+    UI.clickOnTestId("color-red");
 
-    UI.clickLabeledElement("Background");
-    UI.clickLabeledElement(t("colors.fa5252"));
-    UI.clickLabeledElement("Stroke");
-    UI.clickLabeledElement(t("colors.5f3dc4"));
-    expect(API.getSelectedElement().backgroundColor).toBe("#fa5252");
-    expect(API.getSelectedElement().strokeColor).toBe("#5f3dc4");
+    togglePopover("Stroke");
+    UI.clickOnTestId("color-blue");
+    expect(API.getSelectedElement().backgroundColor).toBe("#ffc9c9");
+    expect(API.getSelectedElement().strokeColor).toBe("#1971c2");
   });
 
   it("click on an element and drag it", () => {
@@ -441,26 +441,6 @@ describe("regression tests", () => {
     expect(h.state.zoom.value).toBe(1);
   });
 
-  it("rerenders UI on language change", async () => {
-    // select rectangle tool to show properties menu
-    UI.clickTool("rectangle");
-    // english lang should display `thin` label
-    expect(screen.queryByTitle(/thin/i)).not.toBeNull();
-    fireEvent.click(document.querySelector(".dropdown-menu-button")!);
-
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "de-DE" },
-    });
-    // switching to german, `thin` label should no longer exist
-    await waitFor(() => expect(screen.queryByTitle(/thin/i)).toBeNull());
-    // reset language
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: defaultLang.code },
-    });
-    // switching back to English
-    await waitFor(() => expect(screen.queryByTitle(/thin/i)).not.toBeNull());
-  });
-
   it("make a group and duplicate it", () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);
@@ -542,7 +522,7 @@ describe("regression tests", () => {
       expect(element.groupIds.length).toBe(1);
     }
 
-    mouse.reset();
+    mouse.moveTo(-10, -10); // the NW resizing handle is at [0, 0], so moving further
     mouse.down();
     mouse.restorePosition(...end);
     mouse.up();
@@ -988,8 +968,8 @@ describe("regression tests", () => {
       UI.clickTool("rectangle");
       // change background color since default is transparent
       // and transparent elements can't be selected by clicking inside of them
-      UI.clickLabeledElement("Background");
-      UI.clickLabeledElement(t("colors.fa5252"));
+      togglePopover("Background");
+      UI.clickOnTestId("color-red");
       mouse.down();
       mouse.up(1000, 1000);
 
@@ -1054,6 +1034,28 @@ describe("regression tests", () => {
     expect(API.getSelectedElements()).toEqual(selectedElements_prev);
   });
 
+  it("deleting last but one element in editing group should unselect the group", () => {
+    const rect1 = UI.createElement("rectangle", { x: 10 });
+    const rect2 = UI.createElement("rectangle", { x: 50 });
+
+    UI.group([rect1, rect2]);
+
+    mouse.doubleClickOn(rect1);
+    Keyboard.keyDown(KEYS.DELETE);
+
+    // Clicking on the deleted element, hence in the empty space
+    mouse.clickOn(rect1);
+
+    expect(h.state.selectedGroupIds).toEqual({});
+    expect(API.getSelectedElements()).toEqual([]);
+
+    // Clicking back in and expecting no group selection
+    mouse.clickOn(rect2);
+
+    expect(h.state.selectedGroupIds).toEqual({ [rect2.groupIds[0]]: false });
+    expect(API.getSelectedElements()).toEqual([rect2.get()]);
+  });
+
   it("Cmd/Ctrl-click exclusively select element under pointer", () => {
     const rect1 = UI.createElement("rectangle", { x: 0 });
     const rect2 = UI.createElement("rectangle", { x: 30 });
@@ -1086,21 +1088,6 @@ describe("regression tests", () => {
       mouse.clickOn(rect3);
     });
     assertSelectedElements(rect3);
-  });
-
-  it("should show fill icons when element has non transparent background", () => {
-    UI.clickTool("rectangle");
-    expect(screen.queryByText(/fill/i)).not.toBeNull();
-    mouse.down();
-    mouse.up(10, 10);
-    expect(screen.queryByText(/fill/i)).toBeNull();
-
-    UI.clickLabeledElement("Background");
-    UI.clickLabeledElement(t("colors.fa5252"));
-    // select rectangle
-    mouse.reset();
-    mouse.click();
-    expect(screen.queryByText(/fill/i)).not.toBeNull();
   });
 });
 

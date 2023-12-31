@@ -39,7 +39,7 @@ export type SuggestedPointBinding = [
 ];
 
 export const shouldEnableBindingForPointerEvent = (
-  event: React.PointerEvent<HTMLCanvasElement>,
+  event: React.PointerEvent<HTMLElement>,
 ) => {
   return !event[KEYS.CTRL_OR_CMD];
 };
@@ -190,7 +190,7 @@ export const maybeBindLinearElement = (
   }
 };
 
-const bindLinearElement = (
+export const bindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
@@ -474,6 +474,7 @@ const maybeCalculateNewGapWhenScaling = (
   return { elementId, gap: newGap, focus };
 };
 
+// TODO: this is a bottleneck, optimise
 export const getEligibleElementsForBinding = (
   elements: NonDeleted<ExcalidrawElement>[],
 ): SuggestedBinding[] => {

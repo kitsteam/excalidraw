@@ -4,8 +4,11 @@ import {
 } from "../scene/export";
 import { getDefaultAppState } from "../appState";
 import { AppState, BinaryFiles } from "../types";
-import { ExcalidrawElement, NonDeleted } from "../element/types";
-import { getNonDeletedElements } from "../element";
+import {
+  ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
+  NonDeleted,
+} from "../element/types";
 import { restore } from "../data/restore";
 import { MIME_TYPES } from "../constants";
 import { encodePngMetadata } from "../data/image";
@@ -23,6 +26,7 @@ type ExportOpts = {
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   files: BinaryFiles | null;
   maxWidthOrHeight?: number;
+  exportingFrame?: ExcalidrawFrameLikeElement | null;
   getDimensions?: (
     width: number,
     height: number,
@@ -36,6 +40,7 @@ export const exportToCanvas = ({
   maxWidthOrHeight,
   getDimensions,
   exportPadding,
+  exportingFrame,
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
@@ -46,10 +51,10 @@ export const exportToCanvas = ({
   );
   const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
-    getNonDeletedElements(restoredElements),
+    restoredElements,
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
-    { exportBackground, exportPadding, viewBackgroundColor },
+    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
 
@@ -62,7 +67,11 @@ export const exportToCanvas = ({
 
         const max = Math.max(width, height);
 
-        const scale = maxWidthOrHeight / max;
+        // if content is less then maxWidthOrHeight, fallback on supplied scale
+        const scale =
+          maxWidthOrHeight < max
+            ? maxWidthOrHeight / max
+            : appState?.exportScale ?? 1;
 
         canvas.width = width * scale;
         canvas.height = height * scale;
@@ -132,6 +141,9 @@ export const exportToBlob = async (
           blob = await encodePngMetadata({
             blob,
             metadata: serializeAsJSON(
+              // NOTE as long as we're using the Scene hack, we need to ensure
+              // we pass the original, uncloned elements when serializing
+              // so that we keep ids stable
               opts.elements,
               opts.appState,
               opts.files || {},
@@ -152,22 +164,27 @@ export const exportToSvg = async ({
   appState = getDefaultAppState(),
   files = {},
   exportPadding,
+  renderEmbeddables,
+  exportingFrame,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
+  renderEmbeddables?: boolean;
 }): Promise<SVGSVGElement> => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
     null,
     null,
   );
-  return _exportToSvg(
-    getNonDeletedElements(restoredElements),
-    {
-      ...restoredAppState,
-      exportPadding,
-    },
-    files,
-  );
+
+  const exportAppState = {
+    ...restoredAppState,
+    exportPadding,
+  };
+
+  return _exportToSvg(restoredElements, exportAppState, files, {
+    exportingFrame,
+    renderEmbeddables,
+  });
 };
 
 export const exportToClipboard = async (
@@ -183,20 +200,18 @@ export const exportToClipboard = async (
   } else if (opts.type === "png") {
     await copyBlobToClipboardAsPng(exportToBlob(opts));
   } else if (opts.type === "json") {
-    const appState = {
-      offsetTop: 0,
-      offsetLeft: 0,
-      width: 0,
-      height: 0,
-      ...getDefaultAppState(),
-      ...opts.appState,
-    };
-    await copyToClipboard(opts.elements, appState, opts.files);
+    await copyToClipboard(opts.elements, opts.files);
   } else {
     throw new Error("Invalid export type");
   }
 };
 
+export * from "./bbox";
+export {
+  elementsOverlappingBBox,
+  isElementInsideBBox,
+  elementPartiallyOverlapsWithOrContainsBBox,
+} from "./withinBounds";
 export { serializeAsJSON, serializeLibraryAsJSON } from "../data/json";
 export {
   loadFromBlob,

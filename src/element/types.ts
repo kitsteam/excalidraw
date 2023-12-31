@@ -6,9 +6,11 @@ import {
   THEME,
   VERTICAL_ALIGN,
 } from "../constants";
+import { MarkNonNullable, ValueOf } from "../utility-types";
+import { MagicCacheData } from "../data/magic";
 
 export type ChartType = "bar" | "line";
-export type FillStyle = "hachure" | "cross-hatch" | "solid";
+export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
 export type FontFamilyKeys = keyof typeof FONT_FAMILY;
 export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
 export type Theme = typeof THEME[keyof typeof THEME];
@@ -52,6 +54,7 @@ type _ExcalidrawElementBase = Readonly<{
   /** List of groups the element belongs to.
       Ordered from deepest to shallowest. */
   groupIds: readonly GroupId[];
+  frameId: string | null;
   /** other elements that are bound to this element */
   boundElements:
     | readonly Readonly<{
@@ -82,6 +85,39 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
   type: "ellipse";
 };
 
+export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "embeddable";
+    /**
+     * indicates whether the embeddable src (url) has been validated for rendering.
+     * null value indicates that the validation is pending. We reset the
+     * value on each restore (or url change) so that we can guarantee
+     * the validation came from a trusted source (the editor). Also because we
+     * may not have access to host-app supplied url validator during restore.
+     */
+    validated: boolean | null;
+  }>;
+
+export type ExcalidrawIframeElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "iframe";
+    // TODO move later to AI-specific frame
+    customData?: { generationData?: MagicCacheData };
+  }>;
+
+export type ExcalidrawIframeLikeElement =
+  | ExcalidrawIframeElement
+  | ExcalidrawEmbeddableElement;
+
+export type IframeData =
+  | {
+      intrinsicSize: { w: number; h: number };
+      warning?: string;
+    } & (
+      | { type: "video" | "generic"; link: string }
+      | { type: "document"; srcdoc: (theme: Theme) => string }
+    );
+
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
   Readonly<{
     type: "image";
@@ -96,6 +132,20 @@ export type InitializedExcalidrawImageElement = MarkNonNullable<
   ExcalidrawImageElement,
   "fileId"
 >;
+
+export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
+  type: "frame";
+  name: string | null;
+};
+
+export type ExcalidrawMagicFrameElement = _ExcalidrawElementBase & {
+  type: "magicframe";
+  name: string | null;
+};
+
+export type ExcalidrawFrameLikeElement =
+  | ExcalidrawFrameElement
+  | ExcalidrawMagicFrameElement;
 
 /**
  * These are elements that don't have any additional properties.
@@ -116,7 +166,11 @@ export type ExcalidrawElement =
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
   | ExcalidrawFreeDrawElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawFrameElement
+  | ExcalidrawMagicFrameElement
+  | ExcalidrawIframeElement
+  | ExcalidrawEmbeddableElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: boolean;
@@ -135,6 +189,11 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
+    /**
+     * Unitless line height (aligned to W3C). To get line height in px, multiply
+     *  with font size (using `getLineHeightInPx` helper).
+     */
+    lineHeight: number & { _brand: "unitlessLineHeight" };
   }>;
 
 export type ExcalidrawBindableElement =
@@ -142,13 +201,16 @@ export type ExcalidrawBindableElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
-  | ExcalidrawImageElement;
+  | ExcalidrawImageElement
+  | ExcalidrawIframeElement
+  | ExcalidrawEmbeddableElement
+  | ExcalidrawFrameElement
+  | ExcalidrawMagicFrameElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
-  | ExcalidrawImageElement
   | ExcalidrawArrowElement;
 
 export type ExcalidrawTextElementWithContainer = {
@@ -161,7 +223,16 @@ export type PointBinding = {
   gap: number;
 };
 
-export type Arrowhead = "arrow" | "bar" | "dot" | "triangle";
+export type Arrowhead =
+  | "arrow"
+  | "bar"
+  | "dot" // legacy. Do not use for new elements.
+  | "circle"
+  | "circle_outline"
+  | "triangle"
+  | "triangle_outline"
+  | "diamond"
+  | "diamond_outline";
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
@@ -189,3 +260,5 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   }>;
 
 export type FileId = string & { _brand: "FileId" };
+
+export type ExcalidrawElementType = ExcalidrawElement["type"];

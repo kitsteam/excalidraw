@@ -40,10 +40,6 @@
     "arrowhead_triangle": "Triangolo",
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
-    "onlySelected": "Solo selezionati",
-    "withBackground": "Sfondo",
-    "exportEmbedScene": "Includi scena",
-    "exportEmbedScene_details": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato.",
     "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
     "handDrawn": "A mano libera",
     "normal": "Normale",
@@ -54,6 +50,7 @@
     "veryLarge": "Molto grande",
     "solid": "Pieno",
     "hachure": "Tratteggio obliquo",
+    "zigzag": "Zig zag",
     "crossHatch": "Tratteggio incrociato",
     "thin": "Sottile",
     "bold": "Grassetto",
@@ -99,7 +96,6 @@
     "flipHorizontal": "Capovolgi orizzontalmente",
     "flipVertical": "Capovolgi verticalmente",
     "viewMode": "Modalità visualizzazione",
-    "toggleExportColorScheme": "Cambia lo schema di colori in esportazione",
     "share": "Condividi",
     "showStroke": "Mostra selettore colore del tratto",
     "showBackground": "Mostra selettore colore di sfondo",
@@ -110,10 +106,15 @@
     "increaseFontSize": "Aumenta la dimensione dei caratteri",
     "unbindText": "Scollega testo",
     "bindText": "Associa il testo al container",
+    "createContainerFromText": "Avvolgi il testo in un container",
     "link": {
       "edit": "Modifica link",
+      "editEmbed": "Modifica collegamento e incorpora",
       "create": "Crea link",
-      "label": "Link"
+      "createEmbed": "Crea collegamento e incorpora",
+      "label": "Link",
+      "labelEmbed": "Collega & incorpora",
+      "empty": "Nessun collegamento impostato"
     },
     "lineEditor": {
       "edit": "Modifica linea",
@@ -126,7 +127,10 @@
       "unlockAll": "Sblocca tutto"
     },
     "statusPublished": "Pubblicato",
-    "sidebarLock": "Mantieni aperta la barra laterale"
+    "sidebarLock": "Mantieni aperta la barra laterale",
+    "selectAllElementsInFrame": "Seleziona tutti gli elementi nel riquadro",
+    "removeAllElementsFromFrame": "Rimuovi tutti gli elementi dal riquadro",
+    "eyeDropper": "Scegli il colore della tela"
   },
   "library": {
     "noItems": "Nessun elemento ancora aggiunto...",
@@ -138,11 +142,7 @@
     "exportJSON": "Esporta su file",
     "exportImage": "Esporta immagine...",
     "export": "Salva in...",
-    "exportToPng": "Esporta come PNG",
-    "exportToSvg": "Esporta come SVG",
     "copyToClipboard": "Copia negli appunti",
-    "copyPngToClipboard": "Copia PNG negli appunti",
-    "scale": "Scala",
     "save": "Salva sul file corrente",
     "saveAs": "Salva con nome",
     "load": "Apri",
@@ -164,13 +164,16 @@
     "darkMode": "Tema scuro",
     "lightMode": "Tema chiaro",
     "zenMode": "Modalità Zen",
+    "objectsSnapMode": "Aggancia agli oggetti",
     "exitZenMode": "Uscire dalla modalità zen",
     "cancel": "Annulla",
     "clear": "Cancella",
     "remove": "Rimuovi",
+    "embed": "Attiva/disattiva incorporamento",
     "publishLibrary": "Pubblica",
     "submit": "Invia",
-    "confirm": "Conferma"
+    "confirm": "Conferma",
+    "embeddableInteractionButton": "Clicca per interagire"
   },
   "alerts": {
     "clearReset": "Questa azione cancellerà l'intera tela. Sei sicuro?",
@@ -192,18 +195,30 @@
     "invalidSceneUrl": "Impossibile importare la scena dall'URL fornito. Potrebbe essere malformato o non contenere dati JSON Excalidraw validi.",
     "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?",
     "removeItemsFromsLibrary": "Eliminare {{count}} elementi dalla libreria?",
-    "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata."
+    "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata.",
+    "collabOfflineWarning": "Nessuna connessione internet disponibile.\nLe tue modifiche non verranno salvate!"
   },
   "errors": {
     "unsupportedFileType": "Tipo di file non supportato.",
     "imageInsertError": "Non è stato possibile inserire l'immagine. Riprova più tardi...",
     "fileTooBig": "Il file è troppo grande. La dimensione massima consentita è {{maxSize}}.",
     "svgImageInsertError": "Impossibile inserire l'immagine SVG. Il markup SVG non sembra corretto.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG non valido.",
     "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova.",
     "importLibraryError": "Impossibile caricare la libreria",
     "collabSaveFailed": "Impossibile salvare nel database di backend. Se i problemi persistono, dovresti salvare il tuo file localmente per assicurarti di non perdere il tuo lavoro.",
-    "collabSaveFailed_sizeExceeded": "Impossibile salvare nel database di backend, la tela sembra essere troppo grande. Dovresti salvare il file localmente per assicurarti di non perdere il tuo lavoro."
+    "collabSaveFailed_sizeExceeded": "Impossibile salvare nel database di backend, la tela sembra essere troppo grande. Dovresti salvare il file localmente per assicurarti di non perdere il tuo lavoro.",
+    "brave_measure_text_error": {
+      "line1": "Sembra che tu stia utilizzando il browser Brave con l'impostazione <bold>Blocco aggressivo delle impronte digitali</bold> abilitata.",
+      "line2": "Ciò potrebbe causare la rottura degli <bold>Elementi di testo</bold> nei tuoi disegni.",
+      "line3": "Consigliamo vivamente di disabilitare questa impostazione. Puoi seguire <link>questi passaggi</link> su come farlo.",
+      "line4": "Se la disattivazione di questa impostazione non risolve la visualizzazione degli elementi di testo, apri un <issueLink>problema</issueLink> sul nostro GitHub o scrivici su <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "Gli elementi incorporabili non possono essere aggiunti alla libreria.",
+      "image": "Il supporto per l'aggiunta d'immagini alla libreria verrà aggiunto a breve!"
+    }
   },
   "toolBar": {
     "selection": "Selezione",
@@ -220,7 +235,11 @@
     "penMode": "Modalità penna - previene il tocco",
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
     "eraser": "Gomma",
-    "hand": "Mano (strumento di panoramica)"
+    "frame": "Strumento riquadro",
+    "embeddable": "Incorporamento Web",
+    "laser": "Puntatore laser",
+    "hand": "Mano (strumento di panoramica)",
+    "extraTools": "Altri strumenti"
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
@@ -232,6 +251,7 @@
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
+    "embeddable": "Fare click e trascina per creare un incorporamento web",
     "text_selected": "Fai doppio click o premi INVIO per modificare il testo",
     "text_editing": "Premi ESC o CtrlOCmd+INVIO per completare le modifiche",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
@@ -247,7 +267,8 @@
     "bindTextToElement": "Premi invio per aggiungere il testo",
     "deepBoxSelect": "Tieni premuto CtrlOCmd per selezionare in profondità e per impedire il trascinamento",
     "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione",
-    "firefox_clipboard_write": "Questa funzione può essere abilitata impostando il flag \"dom.events.asyncClipboard.clipboardItem\" su \"true\". Per modificare i flag del browser in Firefox, visitare la pagina \"about:config\"."
+    "firefox_clipboard_write": "Questa funzione può essere abilitata impostando il flag \"dom.events.asyncClipboard.clipboardItem\" su \"true\". Per modificare i flag del browser in Firefox, visitare la pagina \"about:config\".",
+    "disableSnapping": "Tieni premuto Ctrl o Cmd per disabilitare lo snap"
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
@@ -255,16 +276,11 @@
     "canvasTooBigTip": "Suggerimento: prova a spostare gli elementi più lontani più vicini tra loro."
   },
   "errorSplash": {
-    "headingMain_pre": "Si è verificato un errore. Provare ",
-    "headingMain_button": "ricaricando la pagina.",
-    "clearCanvasMessage": "Se ricaricare non funziona, prova ",
-    "clearCanvasMessage_button": "pulire la tela.",
+    "headingMain": "Si è verificato un errore. Provare <button>ricaricando la pagina.</button>",
+    "clearCanvasMessage": "Se ricaricare non funziona, prova <button>pulire la tela.</button>",
     "clearCanvasCaveat": " Questo risulterà nella perdita del lavoro ",
-    "trackedToSentry_pre": "L'errore con identificativo ",
-    "trackedToSentry_post": " è stato tracciato nel nostro sistema.",
-    "openIssueMessage_pre": "Siamo stati molto cauti nel non includere informazioni della scena nell'errore. Se la tua scena non è privata, ti preghiamo di considerare la sua inclusione nel nostro ",
-    "openIssueMessage_button": "bug tracker.",
-    "openIssueMessage_post": " Per favore includi le informazioni riportate qui sotto copiandole e incollandole nella issue di GitHub.",
+    "trackedToSentry": "L'errore con identificativo {{eventId}} è stato tracciato nel nostro sistema.",
+    "openIssueMessage": "Siamo stati molto cauti nel non includere informazioni della scena nell'errore. Se la tua scena non è privata, ti preghiamo di considerare la sua inclusione nel nostro <button>bug tracker.</button> Per favore includi le informazioni riportate qui sotto copiandole e incollandole nella issue di GitHub.",
     "sceneContent": "Contenuto della scena:"
   },
   "roomDialog": {
@@ -302,7 +318,8 @@
     "doubleClick": "doppio-click",
     "drag": "trascina",
     "editor": "Editor",
-    "editSelectedShape": "Modifica la forma selezionata (testo/freccia/linea)",
+    "editLineArrowPoints": "Modifica punti linea/freccia",
+    "editText": "Modifica testo / aggiungi etichetta",
     "github": "Trovato un problema? Segnalalo",
     "howto": "Segui le nostre guide",
     "or": "oppure",
@@ -343,33 +360,44 @@
       "required": "Obbligatorio",
       "website": "Inserisci un URL valido"
     },
-    "noteDescription": {
-      "pre": "Invia la tua libreria da includere nella ",
-      "link": "repository della libreria pubblica",
-      "post": "perché sia usata da altri nei loro disegni."
-    },
-    "noteGuidelines": {
-      "pre": "La libreria dev'esser prima approvata manualmente. Sei pregato di leggere le ",
-      "link": "linee guida",
-      "post": " prima di inviarla. Necessiterai di un profilo di GitHub per comunicare ed effettuare modifiche se richiesto, ma non è strettamente necessario."
-    },
-    "noteLicense": {
-      "pre": "Inviando, acconsenti che la libreria sarà pubblicata sotto la ",
-      "link": "Licenza MIT, ",
-      "post": "che in breve significa che chiunque possa usarla senza restrizioni."
-    },
+    "noteDescription": "Invia la tua libreria da includere nella <link>repository della libreria pubblica</link>perché sia usata da altri nei loro disegni.",
+    "noteGuidelines": "La libreria dev'esser prima approvata manualmente. Sei pregato di leggere le <link>linee guida</link> prima di inviarla. Necessiterai di un profilo di GitHub per comunicare ed effettuare modifiche se richiesto, ma non è strettamente necessario.",
+    "noteLicense": "Inviando, acconsenti che la libreria sarà pubblicata sotto la <link>Licenza MIT, </link>che in breve significa che chiunque possa usarla senza restrizioni.",
     "noteItems": "Ogni elemento della libreria deve avere il proprio nome, così che sia filtrabile. Gli elementi della seguente libreria saranno inclusi:",
     "atleastOneLibItem": "Sei pregato di selezionare almeno un elemento della libreria per iniziare",
     "republishWarning": "Nota: alcuni degli elementi selezionati sono contrassegnati come già pubblicati/presentati. È necessario reinviare gli elementi solo quando si aggiorna una libreria o una presentazione esistente."
   },
   "publishSuccessDialog": {
     "title": "Libreria inviata",
-    "content": "Grazie {{authorName}}. La tua libreria è stata inviata per la revisione. Puoi monitorarne lo stato",
-    "link": "qui"
+    "content": "Grazie {{authorName}}. La tua libreria è stata inviata per la revisione. Puoi monitorarne lo stato<link>qui</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Ripristina la libreria",
     "removeItemsFromLib": "Rimuovi gli elementi selezionati dalla libreria"
+  },
+  "imageExportDialog": {
+    "header": "Esporta immagine",
+    "label": {
+      "withBackground": "Sfondo",
+      "onlySelected": "Solo selezionato",
+      "darkMode": "Tema scuro",
+      "embedScene": "Includi scena",
+      "scale": "Scala",
+      "padding": "Rientro"
+    },
+    "tooltip": {
+      "embedScene": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato."
+    },
+    "title": {
+      "exportToPng": "Esporta come PNG",
+      "exportToSvg": "Esporta come SVG",
+      "copyPngToClipboard": "Copia PNG negli appunti"
+    },
+    "button": {
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copia negli appunti"
+    }
   },
   "encrypted": {
     "tooltip": "I tuoi disegni sono crittografati end-to-end in modo che i server di Excalidraw non li possano mai vedere.",
@@ -399,54 +427,26 @@
     "fileSavedToFilename": "Salvato in {filename}",
     "canvas": "tela",
     "selection": "selezione",
-    "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente"
+    "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente",
+    "unableToEmbed": "Incorporare questo url non è permesso. Crea una issue su GitHub per richiedere che l'url sia autorizzato",
+    "unrecognizedLinkFormat": "Il link che hai incorporato non corrisponde al formato previsto. Prova a incollare la stringa 'embed' fornita dal sito di origine"
   },
   "colors": {
-    "ffffff": "Bianco",
-    "f8f9fa": "Grigio 0",
-    "f1f3f5": "Grigio 1",
-    "fff5f5": "Rosso 0",
-    "fff0f6": "Rosa 0",
-    "f8f0fc": "Uva 0",
-    "f3f0ff": "Viola 0",
-    "edf2ff": "Indaco 0",
-    "e7f5ff": "Blu 0",
-    "e3fafc": "Ciano 0",
-    "e6fcf5": "Verde acqua 0",
-    "ebfbee": "Verde 0",
-    "f4fce3": "Lime 0",
-    "fff9db": "Giallo 0",
-    "fff4e6": "Arancio 0",
     "transparent": "Trasparente",
-    "ced4da": "Grigio 4",
-    "868e96": "Grigio 6",
-    "fa5252": "Rosso 6",
-    "e64980": "Rosa 6",
-    "be4bdb": "Uva 6",
-    "7950f2": "Viola 6",
-    "4c6ef5": "Indaco 6",
-    "228be6": "Blu 6",
-    "15aabf": "Ciano 6",
-    "12b886": "Verde acqua 6",
-    "40c057": "Verde 6",
-    "82c91e": "Lime 6",
-    "fab005": "Giallo 6",
-    "fd7e14": "Arancio 6",
-    "000000": "Nero",
-    "343a40": "Grigio 8",
-    "495057": "Grigio 7",
-    "c92a2a": "Rosso 9",
-    "a61e4d": "Rosa 9",
-    "862e9c": "Uva 9",
-    "5f3dc4": "Viola 9",
-    "364fc7": "Indaco 9",
-    "1864ab": "Blu 9",
-    "0b7285": "Ciano 9",
-    "087f5b": "Verde acqua 9",
-    "2b8a3e": "Verde 9",
-    "5c940d": "Lime 9",
-    "e67700": "Giallo 9",
-    "d9480f": "Arancio 9"
+    "black": "Nero",
+    "white": "Bianco",
+    "red": "Rosso",
+    "pink": "Rosa",
+    "grape": "Uva",
+    "violet": "Viola",
+    "gray": "Grigio",
+    "blue": "Blu",
+    "cyan": "Ciano",
+    "teal": "Verde acqua",
+    "green": "Verde",
+    "yellow": "Giallo",
+    "orange": "Arancio",
+    "bronze": "Bronzo"
   },
   "welcomeScreen": {
     "app": {
@@ -459,6 +459,44 @@
       "center_heading": "Diagrammi. Fatto. Semplice.",
       "toolbarHint": "Scegli uno strumento & Inizia a disegnare!",
       "helpHint": "Scorciatoie & aiuto"
+    }
+  },
+  "colorPicker": {
+    "mostUsedCustomColors": "Colori personalizzati più utilizzati",
+    "colors": "Colori",
+    "shades": "Sfumature",
+    "hexCode": "Codice esadecimale",
+    "noShades": "Nessuna sfumatura disponibile per questo colore"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Esporta come immagine",
+        "button": "Esporta come immagine",
+        "description": "Esporta i dati della scena come immagine, che potrai importare in seguito."
+      },
+      "saveToDisk": {
+        "title": "Salva su disco",
+        "button": "Salva su disco",
+        "description": "Esporta i dati della scena su file, che potrai importare in seguito."
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Esporta su Excalidraw+",
+        "description": "Salva la scena sul tuo spazio di lavoro Excalidraw+."
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Carica da file",
+        "button": "Carica da file",
+        "description": "Il caricamento da file sostituirà <bold>il contenuto esistente</bold>.<br></br>Puoi salvare il tuo disegno prima usando una delle opzioni qui sotto."
+      },
+      "shareableLink": {
+        "title": "Carica da link",
+        "button": "Sostituisci il mio contenuto",
+        "description": "Il caricamento da file sostituirà <bold>il contenuto esistente</bold>.<br></br>Puoi salvare il tuo disegno prima usando una delle opzioni qui sotto."
+      }
     }
   }
 }

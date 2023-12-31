@@ -1,8 +1,16 @@
+import clsx from "clsx";
+import { composeEventHandlers } from "../utils";
 import "./Button.scss";
 
-interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+interface ButtonProps
+  extends React.DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  > {
   type?: "button" | "submit" | "reset";
   onSelect: () => any;
+  /** whether button is in active state */
+  selected?: boolean;
   children: React.ReactNode;
   className?: string;
 }
@@ -15,18 +23,18 @@ interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 export const Button = ({
   type = "button",
   onSelect,
+  selected,
   children,
   className = "",
   ...rest
 }: ButtonProps) => {
   return (
     <button
-      onClick={(event) => {
+      onClick={composeEventHandlers(rest.onClick, (event) => {
         onSelect();
-        rest.onClick?.(event);
-      }}
+      })}
       type={type}
-      className={`excalidraw-button ${className}`}
+      className={clsx("excalidraw-button", className, { selected })}
       {...rest}
     >
       {children}

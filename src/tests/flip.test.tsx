@@ -1,6 +1,12 @@
 import ReactDOM from "react-dom";
-import { GlobalTestState, render, waitFor } from "./test-utils";
-import { UI, Pointer } from "./helpers/ui";
+import {
+  fireEvent,
+  GlobalTestState,
+  render,
+  screen,
+  waitFor,
+} from "./test-utils";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
 import { getElementAbsoluteCoords } from "../element";
@@ -8,28 +14,33 @@ import {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
   FileId,
 } from "../element/types";
 import { newLinearElement } from "../element";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { mutateElement } from "../element/mutateElement";
 import { NormalizedZoomValue } from "../types";
 import { ROUNDNESS } from "../constants";
+import { vi } from "vitest";
+import * as blob from "../data/blob";
+import { KEYS } from "../keys";
+import { getBoundTextElementPosition } from "../element/textElement";
+import { createPasteEvent } from "../clipboard";
+import { cloneJSON } from "../utils";
 
 const { h } = window;
-
 const mouse = new Pointer("mouse");
-jest.mock("../data/blob", () => {
-  const originalModule = jest.requireActual("../data/blob");
+// This needs to fixed in vitest mock, as when importActual used with mock
+// the tests hangs - https://github.com/vitest-dev/vitest/issues/546.
+// But fortunately spying and mocking the return value of spy works :p
 
-  //Prevent Node.js modules errors (document is not defined etc...)
-  return {
-    __esModule: true,
-    ...originalModule,
-    resizeImageFile: (imageFile: File) => imageFile,
-    generateIdFromFile: () => "fileId" as FileId,
-  };
-});
+const resizeImageFileSpy = vi.spyOn(blob, "resizeImageFile");
+const generateIdFromFileSpy = vi.spyOn(blob, "generateIdFromFile");
+
+resizeImageFileSpy.mockImplementation(async (imageFile: File) => imageFile);
+generateIdFromFileSpy.mockImplementation(async () => "fileId" as FileId);
+
 beforeEach(async () => {
   // Unmount ReactDOM from root
   ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -37,12 +48,12 @@ beforeEach(async () => {
   mouse.reset();
   localStorage.clear();
   sessionStorage.clear();
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 
   Object.assign(document, {
     elementFromPoint: () => GlobalTestState.canvas,
   });
-  await render(<ExcalidrawApp />);
+  await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
   h.setState({
     zoom: {
       value: 1 as NormalizedZoomValue,
@@ -190,53 +201,63 @@ const checkElementsBoundingBox = async (
   debugger;
   await waitFor(() => {
     // Check if width and height did not change
-    expect(x1 - toleranceInPx <= x12 && x12 <= x1 + toleranceInPx).toBeTruthy();
-    expect(y1 - toleranceInPx <= y12 && y12 <= y1 + toleranceInPx).toBeTruthy();
-    expect(x2 - toleranceInPx <= x22 && x22 <= x2 + toleranceInPx).toBeTruthy();
-    expect(y2 - toleranceInPx <= y22 && y22 <= y2 + toleranceInPx).toBeTruthy();
+    expect(x2 - x1).toBeCloseTo(x22 - x12, -1);
+    expect(y2 - y1).toBeCloseTo(y22 - y12, -1);
   });
 };
 
 const checkHorizontalFlip = async (toleranceInPx: number = 0.00001) => {
-  const originalElement = JSON.parse(JSON.stringify(h.elements[0]));
+  const originalElement = cloneJSON(h.elements[0]);
   h.app.actionManager.executeAction(actionFlipHorizontal);
   const newElement = h.elements[0];
   await checkElementsBoundingBox(originalElement, newElement, toleranceInPx);
 };
 
 const checkTwoPointsLineHorizontalFlip = async () => {
-  const originalElement = JSON.parse(
-    JSON.stringify(h.elements[0]),
-  ) as ExcalidrawLinearElement;
+  const originalElement = cloneJSON(h.elements[0]) as ExcalidrawLinearElement;
   h.app.actionManager.executeAction(actionFlipHorizontal);
   const newElement = h.elements[0] as ExcalidrawLinearElement;
   await waitFor(() => {
-    expect(originalElement.points[0][0]).toEqual(
-      newElement.points[0][0] !== 0 ? -newElement.points[0][0] : 0,
+    expect(originalElement.points[0][0]).toBeCloseTo(
+      -newElement.points[0][0],
+      5,
     );
-    expect(originalElement.points[0][1]).toEqual(newElement.points[0][1]);
-    expect(originalElement.points[1][0]).toEqual(
-      newElement.points[1][0] !== 0 ? -newElement.points[1][0] : 0,
+    expect(originalElement.points[0][1]).toBeCloseTo(
+      newElement.points[0][1],
+      5,
     );
-    expect(originalElement.points[1][1]).toEqual(newElement.points[1][1]);
+    expect(originalElement.points[1][0]).toBeCloseTo(
+      -newElement.points[1][0],
+      5,
+    );
+    expect(originalElement.points[1][1]).toBeCloseTo(
+      newElement.points[1][1],
+      5,
+    );
   });
 };
 
 const checkTwoPointsLineVerticalFlip = async () => {
-  const originalElement = JSON.parse(
-    JSON.stringify(h.elements[0]),
-  ) as ExcalidrawLinearElement;
+  const originalElement = cloneJSON(h.elements[0]) as ExcalidrawLinearElement;
   h.app.actionManager.executeAction(actionFlipVertical);
   const newElement = h.elements[0] as ExcalidrawLinearElement;
   await waitFor(() => {
-    expect(originalElement.points[0][0]).toEqual(
-      newElement.points[0][0] !== 0 ? -newElement.points[0][0] : 0,
+    expect(originalElement.points[0][0]).toBeCloseTo(
+      newElement.points[0][0],
+      5,
     );
-    expect(originalElement.points[0][1]).toEqual(newElement.points[0][1]);
-    expect(originalElement.points[1][0]).toEqual(
-      newElement.points[1][0] !== 0 ? -newElement.points[1][0] : 0,
+    expect(originalElement.points[0][1]).toBeCloseTo(
+      -newElement.points[0][1],
+      5,
     );
-    expect(originalElement.points[1][1]).toEqual(newElement.points[1][1]);
+    expect(originalElement.points[1][0]).toBeCloseTo(
+      newElement.points[1][0],
+      5,
+    );
+    expect(originalElement.points[1][1]).toBeCloseTo(
+      -newElement.points[1][1],
+      5,
+    );
   });
 };
 
@@ -244,7 +265,7 @@ const checkRotatedHorizontalFlip = async (
   expectedAngle: number,
   toleranceInPx: number = 0.00001,
 ) => {
-  const originalElement = JSON.parse(JSON.stringify(h.elements[0]));
+  const originalElement = cloneJSON(h.elements[0]);
   h.app.actionManager.executeAction(actionFlipHorizontal);
   const newElement = h.elements[0];
   await waitFor(() => {
@@ -257,7 +278,7 @@ const checkRotatedVerticalFlip = async (
   expectedAngle: number,
   toleranceInPx: number = 0.00001,
 ) => {
-  const originalElement = JSON.parse(JSON.stringify(h.elements[0]));
+  const originalElement = cloneJSON(h.elements[0]);
   h.app.actionManager.executeAction(actionFlipVertical);
   const newElement = h.elements[0];
   await waitFor(() => {
@@ -267,7 +288,7 @@ const checkRotatedVerticalFlip = async (
 };
 
 const checkVerticalFlip = async (toleranceInPx: number = 0.00001) => {
-  const originalElement = JSON.parse(JSON.stringify(h.elements[0]));
+  const originalElement = cloneJSON(h.elements[0]);
 
   h.app.actionManager.executeAction(actionFlipVertical);
 
@@ -276,7 +297,7 @@ const checkVerticalFlip = async (toleranceInPx: number = 0.00001) => {
 };
 
 const checkVerticalHorizontalFlip = async (toleranceInPx: number = 0.00001) => {
-  const originalElement = JSON.parse(JSON.stringify(h.elements[0]));
+  const originalElement = cloneJSON(h.elements[0]);
 
   h.app.actionManager.executeAction(actionFlipHorizontal);
   h.app.actionManager.executeAction(actionFlipVertical);
@@ -313,7 +334,7 @@ describe("rectangle", () => {
 
   it("flips a rotated rectangle vertically correctly", async () => {
     const originalAngle = (3 * Math.PI) / 4;
-    const expectedAgnle = Math.PI / 4;
+    const expectedAgnle = (5 * Math.PI) / 4;
 
     createAndSelectOneRectangle(originalAngle);
 
@@ -346,7 +367,7 @@ describe("diamond", () => {
 
   it("flips a rotated diamond vertically correctly", async () => {
     const originalAngle = (5 * Math.PI) / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const expectedAngle = (3 * Math.PI) / 4;
 
     createAndSelectOneDiamond(originalAngle);
 
@@ -379,7 +400,7 @@ describe("ellipse", () => {
 
   it("flips a rotated ellipse vertically correctly", async () => {
     const originalAngle = (7 * Math.PI) / 4;
-    const expectedAngle = (5 * Math.PI) / 4;
+    const expectedAngle = Math.PI / 4;
 
     createAndSelectOneEllipse(originalAngle);
 
@@ -411,7 +432,10 @@ describe("arrow", () => {
     const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementWithCurveInsideMinMaxPoints("arrow");
     h.app.scene.replaceAllElements([line]);
-    h.app.state.selectedElementIds[line.id] = true;
+    h.state.selectedElementIds = {
+      ...h.state.selectedElementIds,
+      [line.id]: true,
+    };
     mutateElement(line, {
       angle: originalAngle,
     });
@@ -424,10 +448,13 @@ describe("arrow", () => {
 
   it("flips a rotated arrow vertically with line inside min/max points bounds", async () => {
     const originalAngle = Math.PI / 4;
-    const expectedAngle = (3 * Math.PI) / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementWithCurveInsideMinMaxPoints("arrow");
     h.app.scene.replaceAllElements([line]);
-    h.app.state.selectedElementIds[line.id] = true;
+    h.state.selectedElementIds = {
+      ...h.state.selectedElementIds,
+      [line.id]: true,
+    };
     mutateElement(line, {
       angle: originalAngle,
     });
@@ -476,7 +503,7 @@ describe("arrow", () => {
   //TODO: elements with curve outside minMax points have a wrong bounding box!!!
   it.skip("flips a rotated arrow vertically with line outside min/max points bounds", async () => {
     const originalAngle = Math.PI / 4;
-    const expectedAngle = (3 * Math.PI) / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
     mutateElement(line, { angle: originalAngle });
     h.app.scene.replaceAllElements([line]);
@@ -507,7 +534,6 @@ describe("arrow", () => {
 
   it("flips a two points arrow vertically correctly", async () => {
     createAndSelectOneArrow();
-
     await checkTwoPointsLineVerticalFlip();
   });
 });
@@ -576,7 +602,7 @@ describe("line", () => {
   //TODO: elements with curve outside minMax points have a wrong bounding box
   it.skip("flips a rotated line vertically with line outside min/max points bounds", async () => {
     const originalAngle = Math.PI / 4;
-    const expectedAngle = (3 * Math.PI) / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
     mutateElement(line, { angle: originalAngle });
     h.app.scene.replaceAllElements([line]);
@@ -598,7 +624,10 @@ describe("line", () => {
     const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
     h.app.scene.replaceAllElements([line]);
-    h.app.state.selectedElementIds[line.id] = true;
+    h.state.selectedElementIds = {
+      ...h.state.selectedElementIds,
+      [line.id]: true,
+    };
     mutateElement(line, {
       angle: originalAngle,
     });
@@ -611,10 +640,13 @@ describe("line", () => {
 
   it("flips a rotated line vertically with line inside min/max points bounds", async () => {
     const originalAngle = Math.PI / 4;
-    const expectedAngle = (3 * Math.PI) / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
     h.app.scene.replaceAllElements([line]);
-    h.app.state.selectedElementIds[line.id] = true;
+    h.state.selectedElementIds = {
+      ...h.state.selectedElementIds,
+      [line.id]: true,
+    };
     mutateElement(line, {
       angle: originalAngle,
     });
@@ -641,14 +673,20 @@ describe("freedraw", () => {
   it("flips an unrotated drawing horizontally correctly", async () => {
     const draw = createAndReturnOneDraw();
     // select draw, since not done automatically
-    h.state.selectedElementIds[draw.id] = true;
+    h.state.selectedElementIds = {
+      ...h.state.selectedElementIds,
+      [draw.id]: true,
+    };
     await checkHorizontalFlip();
   });
 
   it("flips an unrotated drawing vertically correctly", async () => {
     const draw = createAndReturnOneDraw();
     // select draw, since not done automatically
-    h.state.selectedElementIds[draw.id] = true;
+    h.state.selectedElementIds = {
+      ...h.state.selectedElementIds,
+      [draw.id]: true,
+    };
     await checkVerticalFlip();
   });
 
@@ -658,18 +696,24 @@ describe("freedraw", () => {
 
     const draw = createAndReturnOneDraw(originalAngle);
     // select draw, since not done automatically
-    h.state.selectedElementIds[draw.id] = true;
+    h.state.selectedElementIds = {
+      ...h.state.selectedElementIds,
+      [draw.id]: true,
+    };
 
     await checkRotatedHorizontalFlip(expectedAngle);
   });
 
   it("flips a rotated drawing vertically correctly", async () => {
     const originalAngle = Math.PI / 4;
-    const expectedAngle = (3 * Math.PI) / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
 
     const draw = createAndReturnOneDraw(originalAngle);
     // select draw, since not done automatically
-    h.state.selectedElementIds[draw.id] = true;
+    h.state.selectedElementIds = {
+      ...h.state.selectedElementIds,
+      [draw.id]: true,
+    };
 
     await checkRotatedVerticalFlip(expectedAngle);
   });
@@ -680,19 +724,7 @@ describe("freedraw", () => {
 describe("image", () => {
   const createImage = async () => {
     const sendPasteEvent = (file?: File) => {
-      const clipboardEvent = new Event("paste", {
-        bubbles: true,
-        cancelable: true,
-        composed: true,
-      });
-
-      // set `clipboardData` properties.
-      // @ts-ignore
-      clipboardEvent.clipboardData = {
-        getData: () => window.navigator.clipboard.readText(),
-        files: [file],
-      };
-
+      const clipboardEvent = createPasteEvent({ files: file ? [file] : [] });
       document.dispatchEvent(clipboardEvent);
     };
 
@@ -702,7 +734,6 @@ describe("image", () => {
   it("flips an unrotated image horizontally correctly", async () => {
     //paste image
     await createImage();
-
     await waitFor(() => {
       expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, 1]);
       expect(API.getSelectedElements().length).toBeGreaterThan(0);
@@ -725,8 +756,8 @@ describe("image", () => {
     });
 
     await checkVerticalFlip();
-    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([-1, 1]);
-    expect(h.elements[0].angle).toBeCloseTo(Math.PI);
+    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, -1]);
+    expect(h.elements[0].angle).toBeCloseTo(0);
   });
 
   it("flips an rotated image horizontally correctly", async () => {
@@ -749,7 +780,7 @@ describe("image", () => {
 
   it("flips an rotated image vertically correctly", async () => {
     const originalAngle = Math.PI / 4;
-    const expectedAngle = (3 * Math.PI) / 4;
+    const expectedAngle = (7 * Math.PI) / 4;
     //paste image
     await createImage();
     await waitFor(() => {
@@ -764,7 +795,7 @@ describe("image", () => {
     });
 
     await checkRotatedVerticalFlip(expectedAngle);
-    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([-1, 1]);
+    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, -1]);
     expect(h.elements[0].angle).toBeCloseTo(expectedAngle);
   });
 
@@ -779,7 +810,73 @@ describe("image", () => {
     });
 
     await checkVerticalHorizontalFlip();
-    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([1, 1]);
-    expect(h.elements[0].angle).toBeCloseTo(Math.PI);
+    expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([-1, -1]);
+    expect(h.elements[0].angle).toBeCloseTo(0);
+  });
+});
+
+describe("mutliple elements", () => {
+  it("with bound text flip correctly", async () => {
+    UI.clickTool("arrow");
+    fireEvent.click(screen.getByTitle("Architect"));
+    const arrow = UI.createElement("arrow", {
+      x: 0,
+      y: 0,
+      width: 180,
+      height: 80,
+    });
+
+    Keyboard.keyPress(KEYS.ENTER);
+    let editor = document.querySelector<HTMLTextAreaElement>(
+      ".excalidraw-textEditorContainer > textarea",
+    )!;
+    fireEvent.input(editor, { target: { value: "arrow" } });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    Keyboard.keyPress(KEYS.ESCAPE);
+
+    const rectangle = UI.createElement("rectangle", {
+      x: 0,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+
+    Keyboard.keyPress(KEYS.ENTER);
+    editor = document.querySelector<HTMLTextAreaElement>(
+      ".excalidraw-textEditorContainer > textarea",
+    )!;
+    fireEvent.input(editor, { target: { value: "rect\ntext" } });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    Keyboard.keyPress(KEYS.ESCAPE);
+
+    mouse.select([arrow, rectangle]);
+    h.app.actionManager.executeAction(actionFlipHorizontal);
+    h.app.actionManager.executeAction(actionFlipVertical);
+
+    const arrowText = h.elements[1] as ExcalidrawTextElementWithContainer;
+    const arrowTextPos = getBoundTextElementPosition(arrow.get(), arrowText)!;
+    const rectText = h.elements[3] as ExcalidrawTextElementWithContainer;
+
+    expect(arrow.x).toBeCloseTo(180);
+    expect(arrow.y).toBeCloseTo(200);
+    expect(arrow.points[1][0]).toBeCloseTo(-180);
+    expect(arrow.points[1][1]).toBeCloseTo(-80);
+
+    expect(arrowTextPos.x - (arrow.x - arrow.width)).toBeCloseTo(
+      arrow.x - (arrowTextPos.x + arrowText.width),
+    );
+    expect(arrowTextPos.y - (arrow.y - arrow.height)).toBeCloseTo(
+      arrow.y - (arrowTextPos.y + arrowText.height),
+    );
+
+    expect(rectangle.x).toBeCloseTo(80);
+    expect(rectangle.y).toBeCloseTo(0);
+
+    expect(rectText.x - rectangle.x).toBeCloseTo(
+      rectangle.x + rectangle.width - (rectText.x + rectText.width),
+    );
+    expect(rectText.y - rectangle.y).toBeCloseTo(
+      rectangle.y + rectangle.height - (rectText.y + rectText.height),
+    );
   });
 });
