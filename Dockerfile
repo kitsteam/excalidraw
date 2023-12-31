@@ -5,7 +5,7 @@ WORKDIR /opt/node_app
 FROM build as production_buildstage
 
 COPY package.json yarn.lock ./
-RUN yarn --ignore-optional --network-timeout 600000
+RUN yarn --network-timeout 600000
 
 COPY . .
 
