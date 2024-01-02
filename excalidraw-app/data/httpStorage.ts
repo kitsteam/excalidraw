@@ -42,7 +42,7 @@ const SCENE_VERSION_LENGTH_BYTES = 4
 // to prevent modifying upstream files and ease futur maintenance of this fork
 
 const httpStorageSceneVersionCache = new WeakMap<
-SocketIOClient.Socket,
+  SocketIOClient.Socket,
   number
 >();
 
