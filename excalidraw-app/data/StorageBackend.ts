@@ -1,4 +1,3 @@
-import { Socket } from "socket.io-client";
 import { SyncableExcalidrawElement } from ".";
 import { ExcalidrawElement, FileId } from "../../packages/excalidraw/element/types";
 import { AppState, BinaryFileData } from "../../packages/excalidraw/types";
@@ -14,7 +13,7 @@ export interface StorageBackend {
   loadFromStorageBackend: (
     roomId: string,
     roomKey: string,
-    socket: typeof Socket | null,
+    socket: SocketIOClient.Socket | null,
   ) => Promise<readonly ExcalidrawElement[] | null>;
   saveFilesToStorageBackend: ({
     prefix,
