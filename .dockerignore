@@ -10,3 +10,4 @@
 !packages/
 !tsconfig.json
 !yarn.lock
+!docker/default.conf.template
