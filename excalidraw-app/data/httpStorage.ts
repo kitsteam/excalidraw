@@ -1,6 +1,7 @@
 // Inspired and partly copied from https://gitlab.com/kiliandeca/excalidraw-fork
 // MIT, Kilian Decaderincourt
 
+import { Socket } from "socket.io-client";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
 import { MIME_TYPES } from "../../packages/excalidraw/constants";
 import { decompressData } from "../../packages/excalidraw/data/encode";
@@ -42,7 +43,7 @@ const SCENE_VERSION_LENGTH_BYTES = 4
 // to prevent modifying upstream files and ease futur maintenance of this fork
 
 const httpStorageSceneVersionCache = new WeakMap<
-  SocketIOClient.Socket,
+  typeof Socket,
   number
 >();
 
@@ -123,7 +124,7 @@ export const saveToHttpStorage = async (
 export const loadFromHttpStorage = async (
   roomId: string,
   roomKey: string,
-  socket: SocketIOClient.Socket | null,
+  socket: typeof Socket | null,
 ): Promise<readonly ExcalidrawElement[] | null> => {
   const getResponse = await fetch(
     `${httpStorageBackendUrl}/rooms/${roomId}`,
