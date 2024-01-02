@@ -141,12 +141,12 @@ const decryptElements = async (
 };
 
 class FirebaseSceneVersionCache {
-  private static cache = new WeakMap<SocketIOClient.Socket, number>();
-  static get = (socket: SocketIOClient.Socket) => {
+  private static cache = new WeakMap<typeof Socket, number>();
+  static get = (socket: typeof Socket) => {
     return FirebaseSceneVersionCache.cache.get(socket);
   };
   static set = (
-    socket: SocketIOClient.Socket,
+    socket: typeof Socket,
     elements: readonly SyncableExcalidrawElement[],
   ) => {
     FirebaseSceneVersionCache.cache.set(socket, getSceneVersion(elements));
@@ -288,7 +288,7 @@ export const saveToFirebase = async (
 export const loadFromFirebase = async (
   roomId: string,
   roomKey: string,
-  socket: SocketIOClient.Socket | null,
+  socket: typeof Socket | null,
 ): Promise<readonly ExcalidrawElement[] | null> => {
   const firebase = await loadFirestore();
   const db = firebase.firestore();
