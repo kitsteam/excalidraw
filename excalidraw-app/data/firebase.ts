@@ -21,7 +21,6 @@ import { MIME_TYPES } from "../../packages/excalidraw/constants";
 import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
 import { ResolutionType } from "../../packages/excalidraw/utility-types";
-import { Socket } from "socket.io-client";
 
 // private
 // -----------------------------------------------------------------------------
@@ -141,12 +140,12 @@ const decryptElements = async (
 };
 
 class FirebaseSceneVersionCache {
-  private static cache = new WeakMap<typeof Socket, number>();
-  static get = (socket: typeof Socket) => {
+  private static cache = new WeakMap<any, number>();
+  static get = (socket: any) => {
     return FirebaseSceneVersionCache.cache.get(socket);
   };
   static set = (
-    socket: typeof Socket,
+    socket: any,
     elements: readonly SyncableExcalidrawElement[],
   ) => {
     FirebaseSceneVersionCache.cache.set(socket, getSceneVersion(elements));
@@ -288,7 +287,7 @@ export const saveToFirebase = async (
 export const loadFromFirebase = async (
   roomId: string,
   roomKey: string,
-  socket: typeof Socket | null,
+  socket: any | null,
 ): Promise<readonly ExcalidrawElement[] | null> => {
   const firebase = await loadFirestore();
   const db = firebase.firestore();
