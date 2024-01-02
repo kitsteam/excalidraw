@@ -2,18 +2,18 @@
 // MIT, Kilian Decaderincourt
 
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
-import { MIME_TYPES } from "../../src/constants";
-import { decompressData } from "../../src/data/encode";
-import { encryptData, decryptData, IV_LENGTH_BYTES } from "../../src/data/encryption";
-import { restoreElements } from "../../src/data/restore";
-import { getSceneVersion } from "../../src/element";
-import { ExcalidrawElement, FileId } from "../../src/element/types";
+import { MIME_TYPES } from "../../packages/excalidraw/constants";
+import { decompressData } from "../../packages/excalidraw/data/encode";
+import { encryptData, decryptData, IV_LENGTH_BYTES } from "../../packages/excalidraw/data/encryption";
+import { restoreElements } from "../../packages/excalidraw/data/restore";
+import { getSceneVersion } from "../../packages/excalidraw/element";
+import { ExcalidrawElement, FileId } from "../../packages/excalidraw/element/types";
 import {
   AppState,
   BinaryFileData,
   BinaryFileMetadata,
   DataURL,
-} from "../../src/types";
+} from "../../packages/excalidraw/types";
 import Portal from "../collab/Portal";
 import { reconcileElements } from "../collab/reconciliation";
 import { StoredScene } from "./StorageBackend";

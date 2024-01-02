@@ -19,11 +19,10 @@ services:
       - ./:/opt/node_app/
 
   excalidraw-storage-backend:
-    build:
+    stdin_open: true
+    build: 
       context: https://github.com/kitsteam/excalidraw-storage-backend.git#main
       target: production
-    tty: true
-    stdin_open: true
     ports:
       - "8080:8080"
     environment:

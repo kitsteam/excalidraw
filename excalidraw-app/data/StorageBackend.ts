@@ -1,6 +1,6 @@
 import { SyncableExcalidrawElement } from ".";
-import { ExcalidrawElement, FileId } from "../../src/element/types";
-import { AppState, BinaryFileData } from "../../src/types";
+import { ExcalidrawElement, FileId } from "../../packages/excalidraw/element/types";
+import { AppState, BinaryFileData } from "../../packages/excalidraw/types";
 import Portal from "../collab/Portal";
 
 export interface StorageBackend {

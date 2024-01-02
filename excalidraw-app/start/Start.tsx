@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import DialogActionButton from "../../src/components/DialogActionButton";
-import { KitsLastUsedState } from "../../src/data/types";
+import DialogActionButton from "../../packages/excalidraw/components/DialogActionButton";
+import { KitsLastUsedState } from "../../packages/excalidraw/data/types";
 import { loadLastUsedRoomsToLocalStorage } from "../data/localStorage";
 import "./start.scss"
 

@@ -117,7 +117,7 @@ We'll be adding these features as drop-in plugins for the npm package in the fut
 
 ## Quick start
 
-Install the [Excalidraw npm package](https://www.npmjs.com/package/@excalidraw/excalidraw):
+**Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
 
 ```
 npm install react react-dom @excalidraw/excalidraw
@@ -129,7 +129,7 @@ or via yarn
 yarn add react react-dom @excalidraw/excalidraw
 ```
 
-Don't forget to check out our [Documentation](https://docs.excalidraw.com)!
+Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
 
 ## Contributing
 
@@ -159,8 +159,6 @@ If you like the project, you can become a sponsor at [Open Collective](https://o
 Last but not least, we're thankful to these companies for offering their services for free:
 
 [![Vercel](./.github/assets/vercel.svg)](https://vercel.com) [![Sentry](./.github/assets/sentry.svg)](https://sentry.io) [![Crowdin](./.github/assets/crowdin.svg)](https://crowdin.com)
-<<<<<<< HEAD
-=======
 
 ## Developers
 
@@ -171,9 +169,4 @@ Visit our documentation on [https://docs.excalidraw.com](https://docs.excalidraw
 ## Who's integrating Excalidraw
 
 [Google Cloud](https://googlecloudcheatsheet.withgoogle.com/architecture) • [Meta](https://meta.com/) • [CodeSandbox](https://codesandbox.io/) • [Obsidian Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) • [Replit](https://replit.com/) • [Slite](https://slite.com/) • [Notion](https://notion.so/) • [HackerRank](https://www.hackerrank.com/)
-<<<<<<< HEAD
 ```
-=======
-```
->>>>>>> 91fc29bf (removed firebase and added support for rooms without firebase)
->>>>>>> upstream/master

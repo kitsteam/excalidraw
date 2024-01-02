@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   excalidraw:
+    stdin_open: true
     build:
       context: .
       target: production
@@ -21,7 +22,7 @@ services:
       target: production
     ports:
       - "5011:8080"
-    # restart: always
+    restart: always
     environment:
       STORAGE_URI: redis://:${REDIS_PASSWORD}@redis:6379
       STORAGE_TTL: 2592000000
