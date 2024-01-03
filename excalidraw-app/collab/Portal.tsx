@@ -19,10 +19,11 @@ import { newElementWith } from "../../packages/excalidraw/element/mutateElement"
 import { BroadcastedExcalidrawElement } from "./reconciliation";
 import { encryptData } from "../../packages/excalidraw/data/encryption";
 import { PRECEDING_ELEMENT_KEY } from "../../packages/excalidraw/constants";
+import { Socket } from "socket.io-client";
 
 class Portal {
   collab: TCollabClass;
-  socket: any | null = null;
+  socket: typeof Socket | null = null;
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initialized
   roomId: string | null = null;
   roomKey: string | null = null;

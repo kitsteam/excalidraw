@@ -17,6 +17,7 @@ import {
 import Portal from "../collab/Portal";
 import { reconcileElements } from "../collab/reconciliation";
 import { StoredScene } from "./StorageBackend";
+import { Socket } from "socket.io-client";
 
 const apiPath = '/api/v2'
 const scenePath = '/scenes/'
@@ -42,7 +43,7 @@ const SCENE_VERSION_LENGTH_BYTES = 4
 // to prevent modifying upstream files and ease futur maintenance of this fork
 
 const httpStorageSceneVersionCache = new WeakMap<
-  any,
+  typeof Socket,
   number
 >();
 
@@ -123,7 +124,7 @@ export const saveToHttpStorage = async (
 export const loadFromHttpStorage = async (
   roomId: string,
   roomKey: string,
-  socket: any | null,
+  socket: typeof Socket | null,
 ): Promise<readonly ExcalidrawElement[] | null> => {
   const getResponse = await fetch(
     `${httpStorageBackendUrl}/rooms/${roomId}`,
