@@ -69,9 +69,9 @@ const Start: React.FC = () => {
               <a href="/"><h1 className="fw-bold">Excalidraw</h1></a>
 
               <ul className="list-border kits-list">
-                <li>Zeichne im Sketchnote-Stil!</li>
-                <li>Füge Bilder hinzu!</li>
-                <li>Arbeite im Team!</li>
+                <li className="list-group-item pb-2">Zeichne im Sketchnote-Stil!</li>
+                <li className="list-group-item pb-2">Füge Bilder hinzu!</li>
+                <li className="list-group-item pb-2">Arbeite im Team!</li>
               </ul>
 
               <DialogActionButton
