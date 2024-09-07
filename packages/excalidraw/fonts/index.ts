@@ -12,7 +12,7 @@ import { FONT_FAMILY } from "../constants";
 import {
   LOCAL_FONT_PROTOCOL,
   FONT_METADATA,
-  RANGES,
+  //RANGES,
   type FontMetadata,
 } from "./metadata";
 import { ExcalidrawFont, type Font } from "./ExcalidrawFont";
@@ -24,14 +24,14 @@ import Cascadia from "./assets/CascadiaCode-Regular.woff2";
 import ComicShanns from "./assets/ComicShanns-Regular.woff2";
 import LiberationSans from "./assets/LiberationSans-Regular.woff2";
 
-import LilitaLatin from "https://fonts.gstatic.com/s/lilitaone/v15/i7dPIFZ9Zz-WBtRtedDbYEF8RXi4EwQ.woff2";
-import LilitaLatinExt from "https://fonts.gstatic.com/s/lilitaone/v15/i7dPIFZ9Zz-WBtRtedDbYE98RXi4EwSsbg.woff2";
+// import LilitaLatin from "https://fonts.gstatic.com/s/lilitaone/v15/i7dPIFZ9Zz-WBtRtedDbYEF8RXi4EwQ.woff2";
+// import LilitaLatinExt from "https://fonts.gstatic.com/s/lilitaone/v15/i7dPIFZ9Zz-WBtRtedDbYE98RXi4EwSsbg.woff2";
 
-import NunitoLatin from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2";
-import NunitoLatinExt from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTo3j6zbXWjgevT5.woff2";
-import NunitoCyrilic from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTA3j6zbXWjgevT5.woff2";
-import NunitoCyrilicExt from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTk3j6zbXWjgevT5.woff2";
-import NunitoVietnamese from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTs3j6zbXWjgevT5.woff2";
+// import NunitoLatin from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2";
+// import NunitoLatinExt from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTo3j6zbXWjgevT5.woff2";
+// import NunitoCyrilic from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTA3j6zbXWjgevT5.woff2";
+// import NunitoCyrilicExt from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTk3j6zbXWjgevT5.woff2";
+// import NunitoVietnamese from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTs3j6zbXWjgevT5.woff2";
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
@@ -240,37 +240,37 @@ export class Fonts {
       uri: ComicShanns,
     });
 
-    _register(
-      "Lilita One",
-      FONT_METADATA[FONT_FAMILY["Lilita One"]],
-      { uri: LilitaLatinExt, descriptors: { unicodeRange: RANGES.LATIN_EXT } },
-      { uri: LilitaLatin, descriptors: { unicodeRange: RANGES.LATIN } },
-    );
+    // _register(
+    //   "Lilita One",
+    //   FONT_METADATA[FONT_FAMILY["Lilita One"]],
+    //   { uri: LilitaLatinExt, descriptors: { unicodeRange: RANGES.LATIN_EXT } },
+    //   { uri: LilitaLatin, descriptors: { unicodeRange: RANGES.LATIN } },
+    // );
 
-    _register(
-      "Nunito",
-      FONT_METADATA[FONT_FAMILY.Nunito],
-      {
-        uri: NunitoCyrilicExt,
-        descriptors: { unicodeRange: RANGES.CYRILIC_EXT, weight: "500" },
-      },
-      {
-        uri: NunitoCyrilic,
-        descriptors: { unicodeRange: RANGES.CYRILIC, weight: "500" },
-      },
-      {
-        uri: NunitoVietnamese,
-        descriptors: { unicodeRange: RANGES.VIETNAMESE, weight: "500" },
-      },
-      {
-        uri: NunitoLatinExt,
-        descriptors: { unicodeRange: RANGES.LATIN_EXT, weight: "500" },
-      },
-      {
-        uri: NunitoLatin,
-        descriptors: { unicodeRange: RANGES.LATIN, weight: "500" },
-      },
-    );
+    // _register(
+    //   "Nunito",
+    //   FONT_METADATA[FONT_FAMILY.Nunito],
+    //   {
+    //     uri: NunitoCyrilicExt,
+    //     descriptors: { unicodeRange: RANGES.CYRILIC_EXT, weight: "500" },
+    //   },
+    //   {
+    //     uri: NunitoCyrilic,
+    //     descriptors: { unicodeRange: RANGES.CYRILIC, weight: "500" },
+    //   },
+    //   {
+    //     uri: NunitoVietnamese,
+    //     descriptors: { unicodeRange: RANGES.VIETNAMESE, weight: "500" },
+    //   },
+    //   {
+    //     uri: NunitoLatinExt,
+    //     descriptors: { unicodeRange: RANGES.LATIN_EXT, weight: "500" },
+    //   },
+    //   {
+    //     uri: NunitoLatin,
+    //     descriptors: { unicodeRange: RANGES.LATIN, weight: "500" },
+    //   },
+    // );
 
     Fonts._initialized = true;
 

@@ -1,5 +1,5 @@
-const OSS_FONTS_CDN =
-  "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/fonts/oss/";
+// const OSS_FONTS_CDN =
+//   "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/fonts/oss/";
 
 /**
  * Custom vite plugin to convert url woff2 imports into a text.
@@ -51,9 +51,7 @@ module.exports.woff2BrowserPlugin = () => {
 
       @font-face {
         font-family: "Assistant";
-        src: url(${OSS_FONTS_CDN}Assistant-Regular-DVxZuzxb.woff2)
-            format("woff2"),
-          url(./Assistant-Regular.woff2) format("woff2");
+        src: url(./Assistant-Regular-DVxZuzxb.woff2) format("woff2");
         font-weight: 400;
         style: normal;
         display: swap;
@@ -61,9 +59,7 @@ module.exports.woff2BrowserPlugin = () => {
 
       @font-face {
         font-family: "Assistant";
-        src: url(${OSS_FONTS_CDN}Assistant-Medium-DrcxCXg3.woff2)
-            format("woff2"),
-          url(./Assistant-Medium.woff2) format("woff2");
+        src: url(./Assistant-Medium-DrcxCXg3.woff2) format("woff2");
         font-weight: 500;
         style: normal;
         display: swap;
@@ -71,9 +67,7 @@ module.exports.woff2BrowserPlugin = () => {
 
       @font-face {
         font-family: "Assistant";
-        src: url(${OSS_FONTS_CDN}Assistant-SemiBold-SCI4bEL9.woff2)
-            format("woff2"),
-          url(./Assistant-SemiBold.woff2) format("woff2");
+        src: url(./Assistant-SemiBold-SCI4bEL9.woff2) format("woff2");
         font-weight: 600;
         style: normal;
         display: swap;
@@ -81,9 +75,7 @@ module.exports.woff2BrowserPlugin = () => {
 
       @font-face {
         font-family: "Assistant";
-        src: url(${OSS_FONTS_CDN}Assistant-Bold-gm-uSS1B.woff2)
-            format("woff2"),
-          url(./Assistant-Bold.woff2) format("woff2");
+        src: url(./Assistant-Bold-gm-uSS1B.woff2) format("woff2");
         font-weight: 700;
         style: normal;
         display: swap;
@@ -97,7 +89,6 @@ module.exports.woff2BrowserPlugin = () => {
           `<script>
         // point into our CDN in prod, fallback to root (excalidraw.com) domain in case of issues
         window.EXCALIDRAW_ASSET_PATH = [
-          "${OSS_FONTS_CDN}",
           "/",
         ];
       </script>
@@ -105,21 +96,21 @@ module.exports.woff2BrowserPlugin = () => {
       <!-- Preload all default fonts and Virgil for backwards compatibility to avoid swap on init -->
       <link
         rel="preload"
-        href="${OSS_FONTS_CDN}Excalifont-Regular-C9eKQy_N.woff2"
+        href="./Excalifont-Regular-C9eKQy_N.woff2"
         as="font"
         type="font/woff2"
         crossorigin="anonymous"
       />
       <link
         rel="preload"
-        href="${OSS_FONTS_CDN}Virgil-Regular-hO16qHwV.woff2"
+        href="./Virgil-Regular-hO16qHwV.woff2"
         as="font"
         type="font/woff2"
         crossorigin="anonymous"
       />
       <link
         rel="preload"
-        href="${OSS_FONTS_CDN}ComicShanns-Regular-D0c8wzsC.woff2"
+        href="./ComicShanns-Regular-D0c8wzsC.woff2"
         as="font"
         type="font/woff2"
         crossorigin="anonymous"
