@@ -304,7 +304,7 @@ describe("Test Linear Elements", () => {
       );
 
       // update roundness
-      fireEvent.click(screen.getByTitle("Round"));
+      fireEvent.click(screen.getByTitle("Rund"));
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
         `9`,

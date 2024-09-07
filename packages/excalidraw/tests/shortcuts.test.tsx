@@ -22,7 +22,7 @@ describe("shortcuts", () => {
     const confirmDialog = document.querySelector(".confirm-dialog")!;
     expect(confirmDialog).not.toBe(null);
 
-    fireEvent.click(confirmDialog.querySelector('[aria-label="Confirm"]')!);
+    fireEvent.click(confirmDialog.querySelector('[aria-label="Bestätigen"]')!);
 
     await waitFor(() => {
       expect(window.h.elements[0].isDeleted).toBe(true);

@@ -40,6 +40,8 @@ exports[`exportToSvg > with default arguments 1`] = `
   "exportPadding": undefined,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "featureFlagLibraryButton": false,
+  "featureFlagWelcomeScreen": false,
   "fileHandle": null,
   "followedBy": Set {},
   "frameRendering": {

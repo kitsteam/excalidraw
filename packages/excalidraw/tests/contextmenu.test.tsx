@@ -319,9 +319,9 @@ describe("contextMenu element", () => {
     mouse.up(20, 20);
 
     // Change some styles of second rectangle
-    togglePopover("Stroke");
+    togglePopover("Strich");
     UI.clickOnTestId("color-red");
-    togglePopover("Background");
+    togglePopover("Hintergrund");
     UI.clickOnTestId("color-blue");
     // Fill style
     fireEvent.click(screen.getByTitle("Cross-hatch"));
@@ -339,7 +339,7 @@ describe("contextMenu element", () => {
     // closing the background popover as this blocks
     // context menu from rendering after we started focussing
     // the popover once rendered :/
-    togglePopover("Background");
+    togglePopover("Hintergrund");
 
     mouse.reset();
 

@@ -9,6 +9,7 @@ services:
     container_name: excalidraw
     ports:
       - "3000:3000"
+      - "4173:4173" # Vitest UI
     restart: on-failure
     healthcheck:
       disable: true

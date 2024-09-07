@@ -24,7 +24,7 @@ describe("actionStyles", () => {
   afterEach(async () => {
     // https://github.com/floating-ui/floating-ui/issues/1908#issuecomment-1301553793
     // affects node v16+
-    await act(async () => {});
+    await act(async () => { });
   });
 
   it("should copy & paste styles via keyboard", async () => {
@@ -37,9 +37,9 @@ describe("actionStyles", () => {
     mouse.up(20, 20);
 
     // Change some styles of second rectangle
-    togglePopover("Stroke");
+    togglePopover("Strich");
     UI.clickOnTestId("color-red");
-    togglePopover("Background");
+    togglePopover("Hintergrund");
     UI.clickOnTestId("color-blue");
     // Fill style
     fireEvent.click(screen.getByTitle("Cross-hatch"));
