@@ -12,8 +12,7 @@ export const AppFooter = React.memo(() => {
           alignItems: "center",
         }}
       >
-        (
-        <EncryptedIcon />)
+        <EncryptedIcon />
       </div>
     </Footer>
   );
