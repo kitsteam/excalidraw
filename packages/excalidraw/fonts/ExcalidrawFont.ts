@@ -6,10 +6,11 @@ export interface Font {
   fontFace: FontFace;
   getContent(): Promise<string>;
 }
-export const UNPKG_PROD_URL = `https://unpkg.com/${import.meta.env.VITE_PKG_NAME
+export const UNPKG_PROD_URL = `https://unpkg.com/${
+  import.meta.env.VITE_PKG_NAME
     ? `${import.meta.env.VITE_PKG_NAME}@${import.meta.env.PKG_VERSION}` // should be provided by vite during package build
     : "@excalidraw/excalidraw" // fallback to latest package version (i.e. for app)
-  }/dist/prod/`;
+}/dist/prod/`;
 
 export class ExcalidrawFont implements Font {
   public readonly urls: URL[];
@@ -77,7 +78,8 @@ export class ExcalidrawFont implements Font {
     }
 
     console.error(
-      `Failed to fetch font "${this.fontFace.family
+      `Failed to fetch font "${
+        this.fontFace.family
       }" from urls "${this.urls.toString()}`,
       JSON.stringify(errorMessages, undefined, 2),
     );
