@@ -16,7 +16,7 @@ on:
     types: [published]
   pull_request:
     branches:
-      - 'remove-external-resources'
+      - "remove-external-resources"
 
 env:
   REGISTRY: ghcr.io
