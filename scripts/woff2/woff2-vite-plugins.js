@@ -49,37 +49,22 @@ module.exports.woff2BrowserPlugin = () => {
       if (!isDev && id.endsWith("/excalidraw/fonts/assets/fonts.css")) {
         return `/* WARN: The following content is generated during excalidraw-app build */
 
-      @font-face {
-        font-family: "Assistant";
-        src: url(./Assistant-Regular-DVxZuzxb.woff2) format("woff2");
-        font-weight: 400;
-        style: normal;
-        display: swap;
-      }
-
-      @font-face {
-        font-family: "Assistant";
-        src: url(./Assistant-Medium-DrcxCXg3.woff2) format("woff2");
-        font-weight: 500;
-        style: normal;
-        display: swap;
-      }
-
-      @font-face {
-        font-family: "Assistant";
-        src: url(./Assistant-SemiBold-SCI4bEL9.woff2) format("woff2");
-        font-weight: 600;
-        style: normal;
-        display: swap;
-      }
-
-      @font-face {
-        font-family: "Assistant";
-        src: url(./Assistant-Bold-gm-uSS1B.woff2) format("woff2");
-        font-weight: 700;
-        style: normal;
-        display: swap;
-      }`;
+        @font-face {
+          font-family: "FiraSans";
+          src: url("FiraSans-Regular.otf") format("opentype");
+        }
+        
+        @font-face {
+          font-family: "FiraSans";
+          font-weight: light;
+          src: url("FiraSans-Light.otf") format("opentype");
+        }
+        
+        @font-face {
+          font-family: "FiraSans";
+          font-weight: bold;
+          src: url("FiraSans-Bold.otf") format("opentype");
+        }`;
       }
 
       // using EXCALIDRAW_ASSET_PATH as a SSOT
@@ -96,21 +81,21 @@ module.exports.woff2BrowserPlugin = () => {
       <!-- Preload all default fonts and Virgil for backwards compatibility to avoid swap on init -->
       <link
         rel="preload"
-        href="./Excalifont-Regular-C9eKQy_N.woff2"
+        href="Excalifont-Regular-C9eKQy_N.woff2"
         as="font"
         type="font/woff2"
         crossorigin="anonymous"
       />
       <link
         rel="preload"
-        href="./Virgil-Regular-hO16qHwV.woff2"
+        href="Virgil-Regular-hO16qHwV.woff2"
         as="font"
         type="font/woff2"
         crossorigin="anonymous"
       />
       <link
         rel="preload"
-        href="./ComicShanns-Regular-D0c8wzsC.woff2"
+        href="ComicShanns-Regular-D0c8wzsC.woff2"
         as="font"
         type="font/woff2"
         crossorigin="anonymous"

@@ -15,7 +15,7 @@
     user-select: none;
 
     & h3 {
-      font-family: "Assistant";
+      font-family: "FiraSans";
       font-style: normal;
       font-weight: 700;
       font-size: 1.313rem;
@@ -28,7 +28,7 @@
       }
     }
 
-    & > h3 {
+    &>h3 {
       display: none;
 
       @include isMobile {
@@ -61,7 +61,7 @@
       }
 
       &__filename {
-        & > input {
+        &>input {
           margin-top: 1rem;
         }
       }
@@ -75,8 +75,7 @@
         justify-content: center;
         align-items: center;
 
-        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
-          left center;
+        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==") left center;
 
         border: 1px solid var(--ImageExportModal-preview-border);
         border-radius: 12px;
@@ -84,7 +83,7 @@
         overflow: hidden;
         padding: 1rem;
 
-        & > canvas {
+        &>canvas {
           max-width: calc(100% - 2rem);
           max-height: calc(100% - 2rem);
 
@@ -135,7 +134,7 @@
           flex-direction: row;
           align-items: center;
 
-          font-family: "Assistant";
+          font-family: "FiraSans";
           font-weight: 600;
           font-size: 1rem;
           line-height: 150%;

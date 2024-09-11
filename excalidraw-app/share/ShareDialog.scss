@@ -81,7 +81,7 @@
       border: none;
       border-radius: 0.6875rem;
 
-      font-family: "Assistant";
+      font-family: "FiraSans";
       font-style: normal;
       font-weight: 600;
       font-size: 0.75rem;
@@ -90,7 +90,7 @@
       background: var(--color-success-lighter);
       color: var(--color-success);
 
-      & > svg {
+      &>svg {
         width: 0.875rem;
         height: 0.875rem;
       }
@@ -100,7 +100,7 @@
     }
 
     &__picker {
-      font-family: "Assistant";
+      font-family: "FiraSans";
 
       &__illustration {
         display: flex;
@@ -181,7 +181,7 @@
           margin: 0;
         }
 
-        & p + p {
+        & p+p {
           margin-top: 1em;
         }
       }
