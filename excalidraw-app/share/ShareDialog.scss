@@ -90,7 +90,7 @@
       background: var(--color-success-lighter);
       color: var(--color-success);
 
-      &>svg {
+      & > svg {
         width: 0.875rem;
         height: 0.875rem;
       }
@@ -181,7 +181,7 @@
           margin: 0;
         }
 
-        & p+p {
+        & p + p {
           margin-top: 1em;
         }
       }
