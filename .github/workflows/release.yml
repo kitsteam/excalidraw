@@ -14,9 +14,6 @@ name: Create and publish a Docker image
 on:
   release:
     types: [published]
-  pull_request:
-    branches:
-      - "remove-external-resources"
 
 env:
   REGISTRY: ghcr.io
