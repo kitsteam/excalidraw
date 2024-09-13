@@ -30,7 +30,7 @@ describe("<Excalidraw/>", () => {
         clientY: 1,
       });
       const contextMenu = document.querySelector(".context-menu");
-      fireEvent.click(queryByText(contextMenu as HTMLElement, "Zen mode")!);
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Zen-Modus")!);
       expect(h.state.zenModeEnabled).toBe(true);
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
@@ -102,7 +102,9 @@ describe("<Excalidraw/>", () => {
         clientY: 1,
       });
       const contextMenu = document.querySelector(".context-menu");
-      fireEvent.click(queryByText(contextMenu as HTMLElement, "Toggle grid")!);
+      fireEvent.click(
+        queryByText(contextMenu as HTMLElement, "Raster anzeigen/ausblenden")!,
+      );
       expect(h.state.gridModeEnabled).toBe(true);
     });
 

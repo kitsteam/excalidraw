@@ -1297,7 +1297,7 @@ describe("history", () => {
         fireEvent.click(
           queryByText(
             document.querySelector(".context-menu") as HTMLElement,
-            "Bind text to the container",
+            "Text an Container binden",
           )!,
         );
 
@@ -2065,10 +2065,10 @@ describe("history", () => {
         elements: h.elements.map((el) =>
           el.id === "KPrBI4g_v9qUB1XxYLgSz"
             ? {
-              ...el,
-              x: 600,
-              y: 0,
-            }
+                ...el,
+                x: 600,
+                y: 0,
+              }
             : el,
         ),
         storeAction: StoreAction.UPDATE,
@@ -4760,7 +4760,7 @@ describe("history", () => {
         });
       });
 
-      it("should unbind remotely deleted bindable elements from arrow when the arrow is added through the history", async () => { });
+      it("should unbind remotely deleted bindable elements from arrow when the arrow is added through the history", async () => {});
 
       it("should update bound element points when rectangle was remotely moved and arrow is added back through the history", async () => {
         // bind arrow to rect1 and rect2

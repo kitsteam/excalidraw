@@ -847,7 +847,7 @@ describe("textWysiwyg", () => {
       });
       const contextMenu = document.querySelector(".context-menu");
       fireEvent.click(
-        queryByText(contextMenu as HTMLElement, "Bind text to the container")!,
+        queryByText(contextMenu as HTMLElement, "Text an Container binden")!,
       );
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(rectangle.boundElements).toStrictEqual([
@@ -978,7 +978,7 @@ describe("textWysiwyg", () => {
         clientY: 30,
       });
       const contextMenu = document.querySelector(".context-menu");
-      fireEvent.click(queryByText(contextMenu as HTMLElement, "Unbind text")!);
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Text lösen")!);
       expect(h.elements[0].boundElements).toEqual([]);
       expect((h.elements[1] as ExcalidrawTextElement).containerId).toEqual(
         null,
@@ -1218,7 +1218,7 @@ describe("textWysiwyg", () => {
       let contextMenu = document.querySelector(".context-menu");
 
       fireEvent.click(
-        queryByText(contextMenu as HTMLElement, "Bind text to the container")!,
+        queryByText(contextMenu as HTMLElement, "Text an Container binden")!,
       );
 
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text).toBe(
@@ -1230,7 +1230,7 @@ describe("textWysiwyg", () => {
         clientY: 30,
       });
       contextMenu = document.querySelector(".context-menu");
-      fireEvent.click(queryByText(contextMenu as HTMLElement, "Unbind text")!);
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Text lösen")!);
       expect(h.elements[0].boundElements).toEqual([]);
       expect(getOriginalContainerHeightFromCache(container.id)).toBe(null);
 
@@ -1469,7 +1469,7 @@ describe("textWysiwyg", () => {
 
       const contextMenu = document.querySelector(".context-menu");
       fireEvent.click(
-        queryByText(contextMenu as HTMLElement, "Wrap text in a container")!,
+        queryByText(contextMenu as HTMLElement, "Text in Container einbetten")!,
       );
       expect(h.elements.length).toBe(3);
 

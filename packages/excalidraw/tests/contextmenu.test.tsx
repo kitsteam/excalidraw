@@ -303,7 +303,7 @@ describe("contextMenu element", () => {
     });
     const contextMenu = UI.queryContextMenu();
     expect(copiedStyles).toBe("{}");
-    fireEvent.click(queryByText(contextMenu!, "Copy styles")!);
+    fireEvent.click(queryByText(contextMenu!, "Formatierung kopieren")!);
     expect(copiedStyles).not.toBe("{}");
     const element = JSON.parse(copiedStyles)[0];
     expect(element).toEqual(API.getSelectedElement());
@@ -324,15 +324,15 @@ describe("contextMenu element", () => {
     togglePopover("Hintergrund");
     UI.clickOnTestId("color-blue");
     // Fill style
-    fireEvent.click(screen.getByTitle("Cross-hatch"));
+    fireEvent.click(screen.getByTitle("Kreuzschraffiert"));
     // Stroke width
-    fireEvent.click(screen.getByTitle("Bold"));
+    fireEvent.click(screen.getByTitle("Fett"));
     // Stroke style
-    fireEvent.click(screen.getByTitle("Dotted"));
+    fireEvent.click(screen.getByTitle("Gepunktet"));
     // Roughness
-    fireEvent.click(screen.getByTitle("Cartoonist"));
+    fireEvent.click(screen.getByTitle("Karikaturist"));
     // Opacity
-    fireEvent.change(screen.getByLabelText("Opacity"), {
+    fireEvent.change(screen.getByLabelText("Deckkraft"), {
       target: { value: "60" },
     });
 
@@ -351,7 +351,7 @@ describe("contextMenu element", () => {
     });
 
     let contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Copy styles")!);
+    fireEvent.click(queryByText(contextMenu!, "Formatierung kopieren")!);
     const secondRect = JSON.parse(copiedStyles)[0];
     expect(secondRect.id).toBe(h.elements[1].id);
 
@@ -363,7 +363,7 @@ describe("contextMenu element", () => {
       clientY: 10,
     });
     contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Paste styles")!);
+    fireEvent.click(queryByText(contextMenu!, "Formatierung übernehmen")!);
 
     const firstRect = API.getSelectedElement();
     expect(firstRect.id).toBe(h.elements[0].id);
@@ -403,7 +403,7 @@ describe("contextMenu element", () => {
       clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Add to library")!);
+    fireEvent.click(queryByText(contextMenu!, "Zur Bibliothek hinzufügen")!);
 
     await waitFor(async () => {
       const libraryItems = await h.app.library.getLatestLibrary();
@@ -422,7 +422,7 @@ describe("contextMenu element", () => {
       clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Duplicate")!);
+    fireEvent.click(queryByText(contextMenu!, "Duplizieren")!);
     expect(h.elements).toHaveLength(2);
     const {
       id: _id0,
@@ -464,7 +464,7 @@ describe("contextMenu element", () => {
     });
     const contextMenu = UI.queryContextMenu();
     const elementsBefore = h.elements;
-    fireEvent.click(queryByText(contextMenu!, "Send backward")!);
+    fireEvent.click(queryByText(contextMenu!, "Nach hinten")!);
     expect(elementsBefore[0].id).toEqual(h.elements[1].id);
     expect(elementsBefore[1].id).toEqual(h.elements[0].id);
   });
@@ -486,7 +486,7 @@ describe("contextMenu element", () => {
     });
     const contextMenu = UI.queryContextMenu();
     const elementsBefore = h.elements;
-    fireEvent.click(queryByText(contextMenu!, "Bring forward")!);
+    fireEvent.click(queryByText(contextMenu!, "Nach vorne")!);
     expect(elementsBefore[0].id).toEqual(h.elements[1].id);
     expect(elementsBefore[1].id).toEqual(h.elements[0].id);
   });
@@ -508,7 +508,7 @@ describe("contextMenu element", () => {
     });
     const contextMenu = UI.queryContextMenu();
     const elementsBefore = h.elements;
-    fireEvent.click(queryByText(contextMenu!, "Send to back")!);
+    fireEvent.click(queryByText(contextMenu!, "In den Hintergrund")!);
     expect(elementsBefore[1].id).toEqual(h.elements[0].id);
   });
 
@@ -529,7 +529,7 @@ describe("contextMenu element", () => {
     });
     const contextMenu = UI.queryContextMenu();
     const elementsBefore = h.elements;
-    fireEvent.click(queryByText(contextMenu!, "Bring to front")!);
+    fireEvent.click(queryByText(contextMenu!, "In den Vordergrund")!);
     expect(elementsBefore[0].id).toEqual(h.elements[1].id);
   });
 
@@ -553,7 +553,7 @@ describe("contextMenu element", () => {
       clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Group selection")!);
+    fireEvent.click(queryByText(contextMenu!, "Auswahl gruppieren")!);
     const selectedGroupIds = Object.keys(h.state.selectedGroupIds);
     expect(h.elements[0].groupIds).toEqual(selectedGroupIds);
     expect(h.elements[1].groupIds).toEqual(selectedGroupIds);
@@ -585,7 +585,7 @@ describe("contextMenu element", () => {
 
     const contextMenu = UI.queryContextMenu();
     expect(contextMenu).not.toBeNull();
-    fireEvent.click(queryByText(contextMenu!, "Ungroup selection")!);
+    fireEvent.click(queryByText(contextMenu!, "Gruppierung aufheben")!);
 
     const selectedGroupIds = Object.keys(h.state.selectedGroupIds);
     expect(selectedGroupIds).toHaveLength(0);

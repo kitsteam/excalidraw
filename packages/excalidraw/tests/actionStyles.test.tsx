@@ -24,7 +24,7 @@ describe("actionStyles", () => {
   afterEach(async () => {
     // https://github.com/floating-ui/floating-ui/issues/1908#issuecomment-1301553793
     // affects node v16+
-    await act(async () => { });
+    await act(async () => {});
   });
 
   it("should copy & paste styles via keyboard", async () => {
@@ -42,15 +42,15 @@ describe("actionStyles", () => {
     togglePopover("Hintergrund");
     UI.clickOnTestId("color-blue");
     // Fill style
-    fireEvent.click(screen.getByTitle("Cross-hatch"));
+    fireEvent.click(screen.getByTitle("Kreuzschraffiert"));
     // Stroke width
-    fireEvent.click(screen.getByTitle("Bold"));
+    fireEvent.click(screen.getByTitle("Fett"));
     // Stroke style
-    fireEvent.click(screen.getByTitle("Dotted"));
+    fireEvent.click(screen.getByTitle("Gepunktet"));
     // Roughness
-    fireEvent.click(screen.getByTitle("Cartoonist"));
+    fireEvent.click(screen.getByTitle("Karikaturist"));
     // Opacity
-    fireEvent.change(screen.getByLabelText("Opacity"), {
+    fireEvent.change(screen.getByLabelText("Deckkraft"), {
       target: { value: "60" },
     });
 
