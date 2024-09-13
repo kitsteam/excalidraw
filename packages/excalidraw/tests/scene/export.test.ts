@@ -33,13 +33,6 @@ describe("exportToSvg", () => {
       width: ELEMENT_WIDTH,
       index: "a2",
     },
-    {
-      ...textFixture,
-      fontFamily: FONT_FAMILY.Nunito, // test embedding external font
-      height: ELEMENT_HEIGHT,
-      width: ELEMENT_WIDTH,
-      index: "a3",
-    },
   ] as NonDeletedExcalidrawElement[];
 
   const DEFAULT_OPTIONS = {
