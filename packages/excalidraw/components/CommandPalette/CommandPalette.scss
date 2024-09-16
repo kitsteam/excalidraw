@@ -40,7 +40,7 @@ $verticalBreakpoint: 861px;
       justify-content: center;
       align-items: center;
       height: 16px;
-      font-size: 10px;
+      font-size: 15px;
       gap: 0.25rem;
 
       .shortcut-wrapper {
@@ -52,8 +52,8 @@ $verticalBreakpoint: 861px;
       }
 
       .shortcut-key {
-        padding: 0px 4px;
-        height: 16px;
+        padding: 0cqh 6px;
+        height: 24px;
         border-radius: 4px;
         display: flex;
         justify-content: center;
