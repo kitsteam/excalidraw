@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
 import * as InteractiveScene from "../renderer/interactiveScene";
@@ -9,13 +8,13 @@ import {
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
+  unmountComponent,
 } from "./test-utils";
 import type { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
 import { vi } from "vitest";
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveScene,
@@ -51,8 +50,10 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+        `5`,
+      );
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -83,8 +84,10 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+        `5`,
+      );
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
 
       expect(h.state.selectionElement).toBeNull();
 
@@ -116,8 +119,10 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+        `5`,
+      );
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -148,8 +153,10 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+        `5`,
+      );
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -184,8 +191,10 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+        `5`,
+      );
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -225,8 +234,10 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
-      expect(renderStaticScene).toHaveBeenCalledTimes(5);
+      expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+        `5`,
+      );
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -245,8 +256,10 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
-      expect(renderStaticScene).toHaveBeenCalledTimes(5);
+      expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+        `5`,
+      );
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -265,8 +278,10 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
-      expect(renderStaticScene).toHaveBeenCalledTimes(5);
+      expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+        `5`,
+      );
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -292,8 +307,10 @@ describe("Test dragCreate", () => {
         key: KEYS.ENTER,
       });
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+        `6`,
+      );
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -319,8 +336,10 @@ describe("Test dragCreate", () => {
         key: KEYS.ENTER,
       });
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+        `6`,
+      );
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });

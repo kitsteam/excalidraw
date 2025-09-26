@@ -1,12 +1,11 @@
-import ReactDOM from "react-dom";
-import { render } from "../tests/test-utils";
+import { render, unmountComponent } from "../tests/test-utils";
 import { reseed } from "../random";
 import { UI, Keyboard, Pointer } from "../tests/helpers/ui";
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { KEYS } from "../keys";
 
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -23,7 +22,7 @@ beforeEach(async () => {
   // The bounds of hand-drawn linear elements may change after flipping, so
   // removing this style for testing
   UI.clickTool("arrow");
-  UI.clickByTitle("Architekt");
+  UI.clickByTitle("Architect");
   UI.clickTool("selection");
 });
 

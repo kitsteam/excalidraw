@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { AppClassProperties, AppState, Point, Primitive } from "../types";
-import type { StoreActionType } from "../store";
+import type { AppClassProperties, AppState, Primitive } from "../types";
+import type { CaptureUpdateActionType } from "../store";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
@@ -53,6 +53,9 @@ import {
   sharpArrowIcon,
   roundArrowIcon,
   elbowArrowIcon,
+  ArrowheadCrowfootIcon,
+  ArrowheadCrowfootOneIcon,
+  ArrowheadCrowfootOneOrManyIcon,
 } from "../components/icons";
 import {
   ARROW_TYPE,
@@ -86,6 +89,7 @@ import type {
   FontFamilyValues,
   TextAlign,
   VerticalAlign,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
 import { getLanguage, t } from "../i18n";
 import { KEYS } from "../keys";
@@ -105,16 +109,19 @@ import {
   tupleToCoors,
 } from "../utils";
 import { register } from "./register";
-import { StoreAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 import { Fonts, getLineHeight } from "../fonts";
 import {
   bindLinearElement,
   bindPointToSnapToElementOutline,
   calculateFixedPointForElbowArrowBinding,
   getHoveredElementForBinding,
+  updateBoundElements,
 } from "../element/binding";
-import { mutateElbowArrow } from "../element/routing";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import type { LocalPoint } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw/math";
+import { Range } from "../components/Range";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -133,7 +140,7 @@ export const changeProperty = (
   return elements.map((element) => {
     if (
       selectedElementIds.get(element.id) ||
-      element.id === appState.editingElement?.id
+      element.id === appState.editingTextElement?.id
     ) {
       return callback(element);
     }
@@ -148,13 +155,13 @@ export const getFormValue = function <T extends Primitive>(
   isRelevantElement: true | ((element: ExcalidrawElement) => boolean),
   defaultValue: T | ((isSomeElementSelected: boolean) => T),
 ): T {
-  const editingElement = appState.editingElement;
+  const editingTextElement = appState.editingTextElement;
   const nonDeletedElements = getNonDeletedElements(elements);
 
   let ret: T | null = null;
 
-  if (editingElement) {
-    ret = getAttribute(editingElement);
+  if (editingTextElement) {
+    ret = getAttribute(editingTextElement);
   }
 
   if (!ret) {
@@ -214,33 +221,47 @@ const changeFontSize = (
 ) => {
   const newFontSizes = new Set<number>();
 
+  const updatedElements = changeProperty(
+    elements,
+    appState,
+    (oldElement) => {
+      if (isTextElement(oldElement)) {
+        const newFontSize = getNewFontSize(oldElement);
+        newFontSizes.add(newFontSize);
+
+        let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
+          fontSize: newFontSize,
+        });
+        redrawTextBoundingBox(
+          newElement,
+          app.scene.getContainerElement(oldElement),
+          app.scene.getNonDeletedElementsMap(),
+        );
+
+        newElement = offsetElementAfterFontResize(oldElement, newElement);
+
+        return newElement;
+      }
+      return oldElement;
+    },
+    true,
+  );
+
+  // Update arrow elements after text elements have been updated
+  const updatedElementsMap = arrayToMap(updatedElements);
+  getSelectedElements(elements, appState, {
+    includeBoundTextElement: true,
+  }).forEach((element) => {
+    if (isTextElement(element)) {
+      updateBoundElements(
+        element,
+        updatedElementsMap as NonDeletedSceneElementsMap,
+      );
+    }
+  });
+
   return {
-    elements: changeProperty(
-      elements,
-      appState,
-      (oldElement) => {
-        if (isTextElement(oldElement)) {
-          const newFontSize = getNewFontSize(oldElement);
-          newFontSizes.add(newFontSize);
-
-          let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
-            fontSize: newFontSize,
-          });
-          redrawTextBoundingBox(
-            newElement,
-            app.scene.getContainerElement(oldElement),
-            app.scene.getNonDeletedElementsMap(),
-          );
-
-          newElement = offsetElementAfterFontResize(oldElement, newElement);
-
-          return newElement;
-        }
-
-        return oldElement;
-      },
-      true,
-    ),
+    elements: updatedElements,
     appState: {
       ...appState,
       // update state only if we've set all select text elements to
@@ -250,7 +271,7 @@ const changeFontSize = (
           ? [...newFontSizes][0]
           : fallbackValue ?? appState.currentItemFontSize,
     },
-    storeAction: StoreAction.CAPTURE,
+    captureUpdate: CaptureUpdateAction.IMMEDIATELY,
   };
 };
 
@@ -280,9 +301,9 @@ export const actionChangeStrokeColor = register({
         ...appState,
         ...value,
       },
-      storeAction: !!value.currentItemStrokeColor
-        ? StoreAction.CAPTURE
-        : StoreAction.NONE,
+      captureUpdate: !!value.currentItemStrokeColor
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => (
@@ -326,9 +347,9 @@ export const actionChangeBackgroundColor = register({
         ...appState,
         ...value,
       },
-      storeAction: !!value.currentItemBackgroundColor
-        ? StoreAction.CAPTURE
-        : StoreAction.NONE,
+      captureUpdate: !!value.currentItemBackgroundColor
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => (
@@ -372,7 +393,7 @@ export const actionChangeFillStyle = register({
         }),
       ),
       appState: { ...appState, currentItemFillStyle: value },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
@@ -445,7 +466,7 @@ export const actionChangeStrokeWidth = register({
         }),
       ),
       appState: { ...appState, currentItemStrokeWidth: value },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -500,7 +521,7 @@ export const actionChangeSloppiness = register({
         }),
       ),
       appState: { ...appState, currentItemRoughness: value },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -551,7 +572,7 @@ export const actionChangeStrokeStyle = register({
         }),
       ),
       appState: { ...appState, currentItemStrokeStyle: value },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -606,29 +627,16 @@ export const actionChangeOpacity = register({
         true,
       ),
       appState: { ...appState, currentItemOpacity: value },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
-    <label className="control-label">
-      {t("labels.opacity")}
-      <input
-        type="range"
-        min="0"
-        max="100"
-        step="10"
-        onChange={(event) => updateData(+event.target.value)}
-        value={
-          getFormValue(
-            elements,
-            appState,
-            (element) => element.opacity,
-            true,
-            appState.currentItemOpacity,
-          ) ?? undefined
-        }
-      />
-    </label>
+    <Range
+      updateData={updateData}
+      elements={elements}
+      appState={appState}
+      testId="opacity"
+    />
   ),
 });
 
@@ -794,22 +802,23 @@ export const actionChangeFontFamily = register({
           ...appState,
           ...nextAppState,
         },
-        storeAction: StoreAction.UPDATE,
+        captureUpdate: CaptureUpdateAction.NEVER,
       };
     }
 
     const { currentItemFontFamily, currentHoveredFontFamily } = value;
 
-    let nexStoreAction: StoreActionType = StoreAction.NONE;
+    let nextCaptureUpdateAction: CaptureUpdateActionType =
+      CaptureUpdateAction.EVENTUALLY;
     let nextFontFamily: FontFamilyValues | undefined;
     let skipOnHoverRender = false;
 
     if (currentItemFontFamily) {
       nextFontFamily = currentItemFontFamily;
-      nexStoreAction = StoreAction.CAPTURE;
+      nextCaptureUpdateAction = CaptureUpdateAction.IMMEDIATELY;
     } else if (currentHoveredFontFamily) {
       nextFontFamily = currentHoveredFontFamily;
-      nexStoreAction = StoreAction.NONE;
+      nextCaptureUpdateAction = CaptureUpdateAction.EVENTUALLY;
 
       const selectedTextElements = getSelectedElements(elements, appState, {
         includeBoundTextElement: true,
@@ -842,7 +851,7 @@ export const actionChangeFontFamily = register({
         ...appState,
         ...nextAppState,
       },
-      storeAction: nexStoreAction,
+      captureUpdate: nextCaptureUpdateAction,
     };
 
     if (nextFontFamily && !skipOnHoverRender) {
@@ -850,7 +859,7 @@ export const actionChangeFontFamily = register({
         ExcalidrawTextElement,
         ExcalidrawElement | null
       >();
-      let uniqueGlyphs = new Set<string>();
+      let uniqueChars = new Set<string>();
       let skipFontFaceCheck = false;
 
       const fontsCache = Array.from(Fonts.loadedFontsCache.values());
@@ -898,8 +907,8 @@ export const actionChangeFontFamily = register({
               }
 
               if (!skipFontFaceCheck) {
-                uniqueGlyphs = new Set([
-                  ...uniqueGlyphs,
+                uniqueChars = new Set([
+                  ...uniqueChars,
                   ...Array.from(newElement.originalText),
                 ]);
               }
@@ -919,12 +928,9 @@ export const actionChangeFontFamily = register({
       const fontString = `10px ${getFontFamilyString({
         fontFamily: nextFontFamily,
       })}`;
-      const glyphs = Array.from(uniqueGlyphs.values()).join();
+      const chars = Array.from(uniqueChars.values()).join();
 
-      if (
-        skipFontFaceCheck ||
-        window.document.fonts.check(fontString, glyphs)
-      ) {
+      if (skipFontFaceCheck || window.document.fonts.check(fontString, chars)) {
         // we either skip the check (have at least one font face loaded) or do the check and find out all the font faces have loaded
         for (const [element, container] of elementContainerMapping) {
           // trigger synchronous redraw
@@ -936,8 +942,8 @@ export const actionChangeFontFamily = register({
           );
         }
       } else {
-        // otherwise try to load all font faces for the given glyphs and redraw elements once our font faces loaded
-        window.document.fonts.load(fontString, glyphs).then((fontFaces) => {
+        // otherwise try to load all font faces for the given chars and redraw elements once our font faces loaded
+        window.document.fonts.load(fontString, chars).then((fontFaces) => {
           for (const [element, container] of elementContainerMapping) {
             // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
             const latestElement = app.scene.getElement(element.id);
@@ -1076,19 +1082,20 @@ export const actionChangeFontFamily = register({
               // open, populate the cache from scratch
               cachedElementsRef.current.clear();
 
-              const { editingElement } = appState;
+              const { editingTextElement } = appState;
 
-              if (editingElement?.type === "text") {
-                // retrieve the latest version from the scene, as `editingElement` isn't mutated
-                const latestEditingElement = app.scene.getElement(
-                  editingElement.id,
+              // still check type to be safe
+              if (editingTextElement?.type === "text") {
+                // retrieve the latest version from the scene, as `editingTextElement` isn't mutated
+                const latesteditingTextElement = app.scene.getElement(
+                  editingTextElement.id,
                 );
 
                 // inside the wysiwyg editor
                 cachedElementsRef.current.set(
-                  editingElement.id,
+                  editingTextElement.id,
                   newElementWith(
-                    latestEditingElement || editingElement,
+                    latesteditingTextElement || editingTextElement,
                     {},
                     true,
                   ),
@@ -1169,7 +1176,7 @@ export const actionChangeTextAlign = register({
         ...appState,
         currentItemTextAlign: value,
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
@@ -1259,7 +1266,7 @@ export const actionChangeVerticalAlign = register({
       appState: {
         ...appState,
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
@@ -1344,7 +1351,7 @@ export const actionChangeRoundness = register({
         ...appState,
         currentItemRoundness: value,
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
@@ -1406,58 +1413,64 @@ const getArrowheadOptions = (flip: boolean) => {
       icon: <ArrowheadArrowIcon flip={flip} />,
     },
     {
-      value: "bar",
-      text: t("labels.arrowhead_bar"),
-      keyBinding: "e",
-      icon: <ArrowheadBarIcon flip={flip} />,
-    },
-    {
-      value: "dot",
-      text: t("labels.arrowhead_circle"),
-      keyBinding: null,
-      icon: <ArrowheadCircleIcon flip={flip} />,
-      showInPicker: false,
-    },
-    {
-      value: "circle",
-      text: t("labels.arrowhead_circle"),
-      keyBinding: "r",
-      icon: <ArrowheadCircleIcon flip={flip} />,
-      showInPicker: false,
-    },
-    {
-      value: "circle_outline",
-      text: t("labels.arrowhead_circle_outline"),
-      keyBinding: null,
-      icon: <ArrowheadCircleOutlineIcon flip={flip} />,
-      showInPicker: false,
-    },
-    {
       value: "triangle",
       text: t("labels.arrowhead_triangle"),
       icon: <ArrowheadTriangleIcon flip={flip} />,
-      keyBinding: "t",
+      keyBinding: "e",
     },
     {
       value: "triangle_outline",
       text: t("labels.arrowhead_triangle_outline"),
       icon: <ArrowheadTriangleOutlineIcon flip={flip} />,
-      keyBinding: null,
-      showInPicker: false,
+      keyBinding: "r",
+    },
+    {
+      value: "circle",
+      text: t("labels.arrowhead_circle"),
+      keyBinding: "a",
+      icon: <ArrowheadCircleIcon flip={flip} />,
+    },
+    {
+      value: "circle_outline",
+      text: t("labels.arrowhead_circle_outline"),
+      keyBinding: "s",
+      icon: <ArrowheadCircleOutlineIcon flip={flip} />,
     },
     {
       value: "diamond",
       text: t("labels.arrowhead_diamond"),
       icon: <ArrowheadDiamondIcon flip={flip} />,
-      keyBinding: null,
-      showInPicker: false,
+      keyBinding: "d",
     },
     {
       value: "diamond_outline",
       text: t("labels.arrowhead_diamond_outline"),
       icon: <ArrowheadDiamondOutlineIcon flip={flip} />,
-      keyBinding: null,
-      showInPicker: false,
+      keyBinding: "f",
+    },
+    {
+      value: "bar",
+      text: t("labels.arrowhead_bar"),
+      keyBinding: "z",
+      icon: <ArrowheadBarIcon flip={flip} />,
+    },
+    {
+      value: "crowfoot_one",
+      text: t("labels.arrowhead_crowfoot_one"),
+      icon: <ArrowheadCrowfootOneIcon flip={flip} />,
+      keyBinding: "c",
+    },
+    {
+      value: "crowfoot_many",
+      text: t("labels.arrowhead_crowfoot_many"),
+      icon: <ArrowheadCrowfootIcon flip={flip} />,
+      keyBinding: "x",
+    },
+    {
+      value: "crowfoot_one_or_many",
+      text: t("labels.arrowhead_crowfoot_one_or_many"),
+      icon: <ArrowheadCrowfootOneOrManyIcon flip={flip} />,
+      keyBinding: "v",
     },
   ] as const;
 };
@@ -1497,7 +1510,7 @@ export const actionChangeArrowhead = register({
           ? "currentItemStartArrowhead"
           : "currentItemEndArrowhead"]: value.type,
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
@@ -1521,6 +1534,7 @@ export const actionChangeArrowhead = register({
               appState.currentItemStartArrowhead,
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
+            numberOfOptionsToAlwaysShow={4}
           />
           <IconPicker
             label="arrowhead_end"
@@ -1537,6 +1551,7 @@ export const actionChangeArrowhead = register({
               appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
+            numberOfOptionsToAlwaysShow={4}
           />
         </div>
       </fieldset>
@@ -1549,164 +1564,165 @@ export const actionChangeArrowType = register({
   label: "Change arrow types",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (!isArrowElement(el)) {
-          return el;
-        }
-        const newElement = newElementWith(el, {
-          roundness:
-            value === ARROW_TYPE.round
-              ? {
-                  type: ROUNDNESS.PROPORTIONAL_RADIUS,
-                }
-              : null,
-          elbowed: value === ARROW_TYPE.elbow,
-          points:
-            value === ARROW_TYPE.elbow || el.elbowed
-              ? [el.points[0], el.points[el.points.length - 1]]
-              : el.points,
-        });
+    const newElements = changeProperty(elements, appState, (el) => {
+      if (!isArrowElement(el)) {
+        return el;
+      }
+      const newElement = newElementWith(el, {
+        roundness:
+          value === ARROW_TYPE.round
+            ? {
+                type: ROUNDNESS.PROPORTIONAL_RADIUS,
+              }
+            : null,
+        elbowed: value === ARROW_TYPE.elbow,
+        points:
+          value === ARROW_TYPE.elbow || el.elbowed
+            ? [el.points[0], el.points[el.points.length - 1]]
+            : el.points,
+      });
 
-        if (isElbowArrow(newElement)) {
-          const elementsMap = app.scene.getNonDeletedElementsMap();
+      if (isElbowArrow(newElement)) {
+        const elementsMap = app.scene.getNonDeletedElementsMap();
 
-          app.dismissLinearEditor();
+        app.dismissLinearEditor();
 
-          const startGlobalPoint =
-            LinearElementEditor.getPointAtIndexGlobalCoordinates(
-              newElement,
-              0,
-              elementsMap,
-            );
-          const endGlobalPoint =
-            LinearElementEditor.getPointAtIndexGlobalCoordinates(
-              newElement,
-              -1,
-              elementsMap,
-            );
-          const startHoveredElement =
-            !newElement.startBinding &&
-            getHoveredElementForBinding(
-              tupleToCoors(startGlobalPoint),
-              elements,
-              elementsMap,
-              true,
-            );
-          const endHoveredElement =
-            !newElement.endBinding &&
-            getHoveredElementForBinding(
-              tupleToCoors(endGlobalPoint),
-              elements,
-              elementsMap,
-              true,
-            );
-          const startElement = startHoveredElement
-            ? startHoveredElement
-            : newElement.startBinding &&
-              (elementsMap.get(
-                newElement.startBinding.elementId,
-              ) as ExcalidrawBindableElement);
-          const endElement = endHoveredElement
-            ? endHoveredElement
-            : newElement.endBinding &&
-              (elementsMap.get(
-                newElement.endBinding.elementId,
-              ) as ExcalidrawBindableElement);
+        const startGlobalPoint =
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            newElement,
+            0,
+            elementsMap,
+          );
+        const endGlobalPoint =
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            newElement,
+            -1,
+            elementsMap,
+          );
+        const startHoveredElement =
+          !newElement.startBinding &&
+          getHoveredElementForBinding(
+            tupleToCoors(startGlobalPoint),
+            elements,
+            elementsMap,
+            appState.zoom,
+            false,
+            true,
+          );
+        const endHoveredElement =
+          !newElement.endBinding &&
+          getHoveredElementForBinding(
+            tupleToCoors(endGlobalPoint),
+            elements,
+            elementsMap,
+            appState.zoom,
+            false,
+            true,
+          );
+        const startElement = startHoveredElement
+          ? startHoveredElement
+          : newElement.startBinding &&
+            (elementsMap.get(
+              newElement.startBinding.elementId,
+            ) as ExcalidrawBindableElement);
+        const endElement = endHoveredElement
+          ? endHoveredElement
+          : newElement.endBinding &&
+            (elementsMap.get(
+              newElement.endBinding.elementId,
+            ) as ExcalidrawBindableElement);
 
-          const finalStartPoint = startHoveredElement
-            ? bindPointToSnapToElementOutline(
-                startGlobalPoint,
-                endGlobalPoint,
-                startHoveredElement,
-                elementsMap,
-              )
-            : startGlobalPoint;
-          const finalEndPoint = endHoveredElement
-            ? bindPointToSnapToElementOutline(
-                endGlobalPoint,
-                startGlobalPoint,
-                endHoveredElement,
-                elementsMap,
-              )
-            : endGlobalPoint;
-
-          startHoveredElement &&
-            bindLinearElement(
+        const finalStartPoint = startHoveredElement
+          ? bindPointToSnapToElementOutline(
               newElement,
               startHoveredElement,
               "start",
-              elementsMap,
-            );
-          endHoveredElement &&
-            bindLinearElement(
+            )
+          : startGlobalPoint;
+        const finalEndPoint = endHoveredElement
+          ? bindPointToSnapToElementOutline(
               newElement,
               endHoveredElement,
               "end",
-              elementsMap,
-            );
+            )
+          : endGlobalPoint;
 
-          mutateElbowArrow(
+        startHoveredElement &&
+          bindLinearElement(
             newElement,
+            startHoveredElement,
+            "start",
             elementsMap,
-            [finalStartPoint, finalEndPoint].map(
-              (point) =>
-                [point[0] - newElement.x, point[1] - newElement.y] as Point,
-            ),
-            [0, 0],
-            {
-              ...(startElement && newElement.startBinding
-                ? {
-                    startBinding: {
-                      // @ts-ignore TS cannot discern check above
-                      ...newElement.startBinding!,
-                      ...calculateFixedPointForElbowArrowBinding(
-                        newElement,
-                        startElement,
-                        "start",
-                        elementsMap,
-                      ),
-                    },
-                  }
-                : {}),
-              ...(endElement && newElement.endBinding
-                ? {
-                    endBinding: {
-                      // @ts-ignore TS cannot discern check above
-                      ...newElement.endBinding,
-                      ...calculateFixedPointForElbowArrowBinding(
-                        newElement,
-                        endElement,
-                        "end",
-                        elementsMap,
-                      ),
-                    },
-                  }
-                : {}),
-            },
           );
-        } else {
-          mutateElement(
-            newElement,
-            {
-              startBinding: newElement.startBinding
-                ? { ...newElement.startBinding, fixedPoint: null }
-                : null,
-              endBinding: newElement.endBinding
-                ? { ...newElement.endBinding, fixedPoint: null }
-                : null,
-            },
-            false,
-          );
-        }
+        endHoveredElement &&
+          bindLinearElement(newElement, endHoveredElement, "end", elementsMap);
 
-        return newElement;
-      }),
-      appState: {
-        ...appState,
-        currentItemArrowType: value,
-      },
-      storeAction: StoreAction.CAPTURE,
+        mutateElement(newElement, {
+          points: [finalStartPoint, finalEndPoint].map(
+            (p): LocalPoint =>
+              pointFrom(p[0] - newElement.x, p[1] - newElement.y),
+          ),
+          ...(startElement && newElement.startBinding
+            ? {
+                startBinding: {
+                  // @ts-ignore TS cannot discern check above
+                  ...newElement.startBinding!,
+                  ...calculateFixedPointForElbowArrowBinding(
+                    newElement,
+                    startElement,
+                    "start",
+                    elementsMap,
+                  ),
+                },
+              }
+            : {}),
+          ...(endElement && newElement.endBinding
+            ? {
+                endBinding: {
+                  // @ts-ignore TS cannot discern check above
+                  ...newElement.endBinding,
+                  ...calculateFixedPointForElbowArrowBinding(
+                    newElement,
+                    endElement,
+                    "end",
+                    elementsMap,
+                  ),
+                },
+              }
+            : {}),
+        });
+
+        LinearElementEditor.updateEditorMidPointsCache(
+          newElement,
+          elementsMap,
+          app.state,
+        );
+      }
+
+      return newElement;
+    });
+
+    const newState = {
+      ...appState,
+      currentItemArrowType: value,
+    };
+
+    // Change the arrow type and update any other state settings for
+    // the arrow.
+    const selectedId = appState.selectedLinearElement?.elementId;
+    if (selectedId) {
+      const selected = newElements.find((el) => el.id === selectedId);
+      if (selected) {
+        newState.selectedLinearElement = new LinearElementEditor(
+          selected as ExcalidrawLinearElement,
+        );
+      }
+    }
+
+    return {
+      elements: newElements,
+      appState: newState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {

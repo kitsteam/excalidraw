@@ -1,19 +1,18 @@
 import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import type { ExcalidrawProps } from "../types";
-import { getFontString, updateActiveTool } from "../utils";
+import { escapeDoubleQuotes, getFontString, updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { newTextElement } from "./newElement";
-import { wrapText } from "./textElement";
+import { wrapText } from "./textWrapping";
 import { isIframeElement } from "./typeChecks";
 import type {
   ExcalidrawElement,
   ExcalidrawIframeLikeElement,
   IframeData,
 } from "./types";
-import { sanitizeHTMLAttribute } from "../data/url";
 import type { MarkRequired } from "../utility-types";
-import { StoreAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 
 type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 
@@ -45,6 +44,12 @@ const RE_GENERIC_EMBED =
 const RE_GIPHY =
   /giphy.com\/(?:clips|embed|gifs)\/[a-zA-Z0-9]*?-?([a-zA-Z0-9]+)(?:[^a-zA-Z0-9]|$)/;
 
+const RE_REDDIT =
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?reddit\.com\/r\/([a-zA-Z0-9_]+)\/comments\/([a-zA-Z0-9_]+)\/([a-zA-Z0-9_]+)\/?(?:\?[^#\s]*)?(?:#[^\s]*)?$/;
+
+const RE_REDDIT_EMBED =
+  /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
+
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
   "youtu.be",
@@ -59,6 +64,7 @@ const ALLOWED_DOMAINS = new Set([
   "stackblitz.com",
   "val.town",
   "giphy.com",
+  "reddit.com",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -71,6 +77,7 @@ const ALLOW_SAME_ORIGIN = new Set([
   "x.com",
   "*.simplepdf.eu",
   "stackblitz.com",
+  "reddit.com",
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -201,7 +208,7 @@ export const getEmbedLink = (
     // Note that we don't attempt to parse the username as it can consist of
     // non-latin1 characters, and the username in the url can be set to anything
     // without affecting the embed.
-    const safeURL = sanitizeHTMLAttribute(
+    const safeURL = escapeDoubleQuotes(
       `https://twitter.com/x/status/${postId}`,
     );
 
@@ -218,9 +225,27 @@ export const getEmbedLink = (
     return ret;
   }
 
+  if (RE_REDDIT.test(link)) {
+    const [, page, postId, title] = link.match(RE_REDDIT)!;
+    const safeURL = escapeDoubleQuotes(
+      `https://reddit.com/r/${page}/comments/${postId}/${title}`,
+    );
+    const ret: IframeDataWithSandbox = {
+      type: "document",
+      srcdoc: (theme: string) =>
+        createSrcDoc(
+          `<blockquote class="reddit-embed-bq" data-embed-theme="${theme}"><a href="${safeURL}"></a><br></blockquote><script async="" src="https://embed.reddit.com/widgets.js" charset="UTF-8"></script>`,
+        ),
+      intrinsicSize: { w: 480, h: 480 },
+      sandbox: { allowSameOrigin },
+    };
+    embeddedLinkCache.set(originalLink, ret);
+    return ret;
+  }
+
   if (RE_GH_GIST.test(link)) {
     const [, user, gistId] = link.match(RE_GH_GIST)!;
-    const safeURL = sanitizeHTMLAttribute(
+    const safeURL = escapeDoubleQuotes(
       `https://gist.github.com/${user}/${gistId}`,
     );
     const ret: IframeDataWithSandbox = {
@@ -315,7 +340,7 @@ export const actionSetEmbeddableAsActiveTool = register({
           type: "embeddable",
         }),
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
 });
@@ -359,6 +384,11 @@ export const maybeParseEmbedSrc = (str: string): string => {
   const twitterMatch = str.match(RE_TWITTER_EMBED);
   if (twitterMatch && twitterMatch.length === 2) {
     return twitterMatch[1];
+  }
+
+  const redditMatch = str.match(RE_REDDIT_EMBED);
+  if (redditMatch && redditMatch.length === 2) {
+    return redditMatch[1];
   }
 
   const gistMatch = str.match(RE_GH_GIST_EMBED);

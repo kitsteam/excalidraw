@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import {
   render,
   fireEvent,
@@ -11,6 +10,7 @@ import {
   queryAllByText,
   waitFor,
   togglePopover,
+  unmountComponent,
 } from "./test-utils";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
@@ -22,6 +22,7 @@ import { copiedStyles } from "../actions/actionStyles";
 import { API } from "./helpers/api";
 import { setDateTimeForTests } from "../utils";
 import { vi } from "vitest";
+import type { ActionName } from "../actions/types";
 
 const checkpoint = (name: string) => {
   expect(renderStaticScene.mock.calls.length).toMatchSnapshot(
@@ -37,8 +38,7 @@ const checkpoint = (name: string) => {
 
 const mouse = new Pointer("mouse");
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 beforeEach(() => {
@@ -115,10 +115,11 @@ describe("contextMenu element", () => {
     const contextMenu = UI.queryContextMenu();
     const contextMenuOptions =
       contextMenu?.querySelectorAll(".context-menu li");
-    const expectedShortcutNames: ShortcutName[] = [
+    const expectedContextMenuItems: ActionName[] = [
       "cut",
       "copy",
       "paste",
+      "wrapSelectionInFrame",
       "copyStyles",
       "pasteStyles",
       "deleteSelectedElements",
@@ -131,14 +132,15 @@ describe("contextMenu element", () => {
       "bringToFront",
       "duplicateSelection",
       "hyperlink",
+      "copyElementLink",
       "toggleElementLock",
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenuOptions?.length).toBe(expectedShortcutNames.length);
-    expectedShortcutNames.forEach((shortcutName) => {
+    expect(contextMenuOptions?.length).toBe(expectedContextMenuItems.length);
+    expectedContextMenuItems.forEach((item) => {
       expect(
-        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+        contextMenu?.querySelector(`li[data-testid="${item}"]`),
       ).not.toBeNull();
     });
   });
@@ -211,6 +213,7 @@ describe("contextMenu element", () => {
       "cut",
       "copy",
       "paste",
+      "wrapSelectionInFrame",
       "copyStyles",
       "pasteStyles",
       "deleteSelectedElements",
@@ -263,13 +266,15 @@ describe("contextMenu element", () => {
     const contextMenu = UI.queryContextMenu();
     const contextMenuOptions =
       contextMenu?.querySelectorAll(".context-menu li");
-    const expectedShortcutNames: ShortcutName[] = [
+    const expectedContextMenuItems: ActionName[] = [
       "cut",
       "copy",
       "paste",
+      "wrapSelectionInFrame",
       "copyStyles",
       "pasteStyles",
       "deleteSelectedElements",
+      "copyElementLink",
       "ungroup",
       "addToLibrary",
       "flipHorizontal",
@@ -283,10 +288,10 @@ describe("contextMenu element", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenuOptions?.length).toBe(expectedShortcutNames.length);
-    expectedShortcutNames.forEach((shortcutName) => {
+    expect(contextMenuOptions?.length).toBe(expectedContextMenuItems.length);
+    expectedContextMenuItems.forEach((item) => {
       expect(
-        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+        contextMenu?.querySelector(`li[data-testid="${item}"]`),
       ).not.toBeNull();
     });
   });
@@ -303,7 +308,7 @@ describe("contextMenu element", () => {
     });
     const contextMenu = UI.queryContextMenu();
     expect(copiedStyles).toBe("{}");
-    fireEvent.click(queryByText(contextMenu!, "Formatierung kopieren")!);
+    fireEvent.click(queryByText(contextMenu!, "Copy styles")!);
     expect(copiedStyles).not.toBe("{}");
     const element = JSON.parse(copiedStyles)[0];
     expect(element).toEqual(API.getSelectedElement());
@@ -319,27 +324,27 @@ describe("contextMenu element", () => {
     mouse.up(20, 20);
 
     // Change some styles of second rectangle
-    togglePopover("Strich");
+    togglePopover("Stroke");
     UI.clickOnTestId("color-red");
-    togglePopover("Hintergrund");
+    togglePopover("Background");
     UI.clickOnTestId("color-blue");
     // Fill style
-    fireEvent.click(screen.getByTitle("Kreuzschraffiert"));
+    fireEvent.click(screen.getByTitle("Cross-hatch"));
     // Stroke width
-    fireEvent.click(screen.getByTitle("Fett"));
+    fireEvent.click(screen.getByTitle("Bold"));
     // Stroke style
-    fireEvent.click(screen.getByTitle("Gepunktet"));
+    fireEvent.click(screen.getByTitle("Dotted"));
     // Roughness
-    fireEvent.click(screen.getByTitle("Karikaturist"));
+    fireEvent.click(screen.getByTitle("Cartoonist"));
     // Opacity
-    fireEvent.change(screen.getByLabelText("Deckkraft"), {
+    fireEvent.change(screen.getByTestId("opacity"), {
       target: { value: "60" },
     });
 
     // closing the background popover as this blocks
     // context menu from rendering after we started focussing
     // the popover once rendered :/
-    togglePopover("Hintergrund");
+    togglePopover("Background");
 
     mouse.reset();
 
@@ -351,7 +356,7 @@ describe("contextMenu element", () => {
     });
 
     let contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Formatierung kopieren")!);
+    fireEvent.click(queryByText(contextMenu!, "Copy styles")!);
     const secondRect = JSON.parse(copiedStyles)[0];
     expect(secondRect.id).toBe(h.elements[1].id);
 
@@ -363,7 +368,7 @@ describe("contextMenu element", () => {
       clientY: 10,
     });
     contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Formatierung übernehmen")!);
+    fireEvent.click(queryByText(contextMenu!, "Paste styles")!);
 
     const firstRect = API.getSelectedElement();
     expect(firstRect.id).toBe(h.elements[0].id);
@@ -403,7 +408,7 @@ describe("contextMenu element", () => {
       clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Zur Bibliothek hinzufügen")!);
+    fireEvent.click(queryByText(contextMenu!, "Add to library")!);
 
     await waitFor(async () => {
       const libraryItems = await h.app.library.getLatestLibrary();
@@ -422,7 +427,7 @@ describe("contextMenu element", () => {
       clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Duplizieren")!);
+    fireEvent.click(queryByText(contextMenu!, "Duplicate")!);
     expect(h.elements).toHaveLength(2);
     const {
       id: _id0,
@@ -464,7 +469,7 @@ describe("contextMenu element", () => {
     });
     const contextMenu = UI.queryContextMenu();
     const elementsBefore = h.elements;
-    fireEvent.click(queryByText(contextMenu!, "Nach hinten")!);
+    fireEvent.click(queryByText(contextMenu!, "Send backward")!);
     expect(elementsBefore[0].id).toEqual(h.elements[1].id);
     expect(elementsBefore[1].id).toEqual(h.elements[0].id);
   });
@@ -486,7 +491,7 @@ describe("contextMenu element", () => {
     });
     const contextMenu = UI.queryContextMenu();
     const elementsBefore = h.elements;
-    fireEvent.click(queryByText(contextMenu!, "Nach vorne")!);
+    fireEvent.click(queryByText(contextMenu!, "Bring forward")!);
     expect(elementsBefore[0].id).toEqual(h.elements[1].id);
     expect(elementsBefore[1].id).toEqual(h.elements[0].id);
   });
@@ -508,7 +513,7 @@ describe("contextMenu element", () => {
     });
     const contextMenu = UI.queryContextMenu();
     const elementsBefore = h.elements;
-    fireEvent.click(queryByText(contextMenu!, "In den Hintergrund")!);
+    fireEvent.click(queryByText(contextMenu!, "Send to back")!);
     expect(elementsBefore[1].id).toEqual(h.elements[0].id);
   });
 
@@ -529,7 +534,7 @@ describe("contextMenu element", () => {
     });
     const contextMenu = UI.queryContextMenu();
     const elementsBefore = h.elements;
-    fireEvent.click(queryByText(contextMenu!, "In den Vordergrund")!);
+    fireEvent.click(queryByText(contextMenu!, "Bring to front")!);
     expect(elementsBefore[0].id).toEqual(h.elements[1].id);
   });
 
@@ -553,7 +558,7 @@ describe("contextMenu element", () => {
       clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Auswahl gruppieren")!);
+    fireEvent.click(queryByText(contextMenu!, "Group selection")!);
     const selectedGroupIds = Object.keys(h.state.selectedGroupIds);
     expect(h.elements[0].groupIds).toEqual(selectedGroupIds);
     expect(h.elements[1].groupIds).toEqual(selectedGroupIds);
@@ -585,7 +590,7 @@ describe("contextMenu element", () => {
 
     const contextMenu = UI.queryContextMenu();
     expect(contextMenu).not.toBeNull();
-    fireEvent.click(queryByText(contextMenu!, "Gruppierung aufheben")!);
+    fireEvent.click(queryByText(contextMenu!, "Ungroup selection")!);
 
     const selectedGroupIds = Object.keys(h.state.selectedGroupIds);
     expect(selectedGroupIds).toHaveLength(0);

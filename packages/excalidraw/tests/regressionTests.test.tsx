@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import type { ExcalidrawElement } from "../element/types";
 import { CODES, KEYS } from "../keys";
 import { Excalidraw } from "../index";
@@ -14,6 +13,7 @@ import {
   render,
   screen,
   togglePopover,
+  unmountComponent,
 } from "./test-utils";
 import { FONT_FAMILY } from "../constants";
 import { vi } from "vitest";
@@ -43,8 +43,7 @@ const checkpoint = (name: string) => {
   );
 };
 beforeEach(async () => {
-  // Unmount ReactDOM from root
-  ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+  unmountComponent();
 
   localStorage.clear();
   renderStaticScene.mockClear();
@@ -159,11 +158,11 @@ describe("regression tests", () => {
 
     mouse.down(10, 10);
     mouse.up(10, 10);
-    togglePopover("Hintergrund");
+    togglePopover("Background");
     UI.clickOnTestId("color-yellow");
     UI.clickOnTestId("color-red");
 
-    togglePopover("Strich");
+    togglePopover("Stroke");
     UI.clickOnTestId("color-blue");
     expect(API.getSelectedElement().backgroundColor).toBe("#ffc9c9");
     expect(API.getSelectedElement().strokeColor).toBe("#1971c2");
@@ -969,7 +968,7 @@ describe("regression tests", () => {
       UI.clickTool("rectangle");
       // change background color since default is transparent
       // and transparent elements can't be selected by clicking inside of them
-      togglePopover("Hintergrund");
+      togglePopover("Background");
       UI.clickOnTestId("color-red");
       mouse.down();
       mouse.up(1000, 1000);

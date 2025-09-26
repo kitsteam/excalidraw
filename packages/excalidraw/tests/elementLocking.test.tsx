@@ -1,7 +1,6 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import { Excalidraw } from "../index";
-import { render } from "../tests/test-utils";
+import { render, unmountComponent } from "../tests/test-utils";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { KEYS } from "../keys";
 import { API } from "../tests/helpers/api";
@@ -9,7 +8,7 @@ import { actionSelectAll } from "../actions";
 import { t } from "../i18n";
 import { mutateElement } from "../element/mutateElement";
 
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const mouse = new Pointer("mouse");
 const h = window.h;
@@ -232,8 +231,8 @@ describe("element locking", () => {
     API.setElements([container, text]);
     API.setSelectedElements([container]);
     Keyboard.keyPress(KEYS.ENTER);
-    expect(h.state.editingElement?.id).not.toBe(text.id);
-    expect(h.state.editingElement?.id).toBe(h.elements[1].id);
+    expect(h.state.editingTextElement?.id).not.toBe(text.id);
+    expect(h.state.editingTextElement?.id).toBe(h.elements[1].id);
   });
 
   it("should ignore locked text under cursor when clicked with text tool", () => {
@@ -253,9 +252,9 @@ describe("element locking", () => {
       ".excalidraw-textEditorContainer > textarea",
     ) as HTMLTextAreaElement;
     expect(editor).not.toBe(null);
-    expect(h.state.editingElement?.id).not.toBe(text.id);
+    expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(2);
-    expect(h.state.editingElement?.id).toBe(h.elements[1].id);
+    expect(h.state.editingTextElement?.id).toBe(h.elements[1].id);
   });
 
   it("should ignore text under cursor when double-clicked with selection tool", () => {
@@ -275,9 +274,9 @@ describe("element locking", () => {
       ".excalidraw-textEditorContainer > textarea",
     ) as HTMLTextAreaElement;
     expect(editor).not.toBe(null);
-    expect(h.state.editingElement?.id).not.toBe(text.id);
+    expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(2);
-    expect(h.state.editingElement?.id).toBe(h.elements[1].id);
+    expect(h.state.editingTextElement?.id).toBe(h.elements[1].id);
   });
 
   it("locking should include bound text", () => {
@@ -348,9 +347,9 @@ describe("element locking", () => {
       ".excalidraw-textEditorContainer > textarea",
     ) as HTMLTextAreaElement;
     expect(editor).not.toBe(null);
-    expect(h.state.editingElement?.id).not.toBe(text.id);
+    expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(3);
-    expect(h.state.editingElement?.id).toBe(h.elements[2].id);
+    expect(h.state.editingTextElement?.id).toBe(h.elements[2].id);
   });
 
   it("bound text shouldn't be editable via text tool", () => {
@@ -382,8 +381,8 @@ describe("element locking", () => {
       ".excalidraw-textEditorContainer > textarea",
     ) as HTMLTextAreaElement;
     expect(editor).not.toBe(null);
-    expect(h.state.editingElement?.id).not.toBe(text.id);
+    expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(3);
-    expect(h.state.editingElement?.id).toBe(h.elements[2].id);
+    expect(h.state.editingTextElement?.id).toBe(h.elements[2].id);
   });
 });

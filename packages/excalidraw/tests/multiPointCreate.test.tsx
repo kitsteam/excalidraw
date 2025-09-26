@@ -1,10 +1,10 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import {
   render,
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
+  unmountComponent,
 } from "./test-utils";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
@@ -14,8 +14,7 @@ import type { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
 import { vi } from "vitest";
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,
@@ -115,8 +114,8 @@ describe("multi point mode in linear elements", () => {
       key: KEYS.ENTER,
     });
 
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`9`);
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`9`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`7`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;
@@ -158,8 +157,8 @@ describe("multi point mode in linear elements", () => {
     fireEvent.keyDown(document, {
       key: KEYS.ENTER,
     });
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`9`);
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`9`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`7`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;

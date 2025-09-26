@@ -5,40 +5,40 @@ exports[`Test <App/> > should show error modal when using brave and measureText 
   data-testid="brave-measure-text-error"
 >
   <p>
-    Sieht so aus, als ob Du den Brave-Browser verwendest und die 
+    Looks like you are using Brave browser with the 
     <span
       style="font-weight: 600;"
     >
-      aggressive Blockierung von Fingerabdrücken
+      Aggressively Block Fingerprinting
     </span>
-     aktiviert hast.
+     setting enabled.
   </p>
   <p>
-    Dies könnte dazu führen, dass die 
+    This could result in breaking the 
     <span
       style="font-weight: 600;"
     >
-      Textelemente
+      Text Elements
     </span>
-     in Ihren Zeichnungen zerstört werden.
+     in your drawings.
   </p>
   <p>
-    Wir empfehlen dringend, diese Einstellung zu deaktivieren. Dazu kannst Du 
+    We strongly recommend disabling this setting. You can follow 
     <a
       href="http://docs.excalidraw.com/docs/@excalidraw/excalidraw/faq#turning-off-aggresive-block-fingerprinting-in-brave-browser"
     >
-      diesen Schritten
+      these steps
     </a>
-     folgen.
+     on how to do so.
   </p>
   <p>
-    Wenn die Deaktivierung dieser Einstellung die fehlerhafte Anzeige von Textelementen nicht behebt, öffne bitte ein 
+    If disabling this setting doesn't fix the display of text elements, please open an 
     <a
       href="https://github.com/excalidraw/excalidraw/issues/new"
     >
-      Ticket
+      issue
     </a>
-     auf unserem GitHub oder schreibe uns auf 
+     on our GitHub, or write us on 
     <a
       href="https://discord.gg/UexuTaE"
     >

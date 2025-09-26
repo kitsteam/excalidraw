@@ -7,7 +7,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
   <div
     class="welcome-screen-center__heading welcome-screen-decor excalifont"
   >
-    Alle Daten werden lokal in Deinem Browser gespeichert.
+    All your data is saved locally in your browser.
   </div>
   <div
     class="welcome-screen-menu"
@@ -39,7 +39,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
       <div
         class="welcome-screen-menu-item__text"
       >
-        Öffnen
+        Open
       </div>
       <div
         class="welcome-screen-menu-item__shortcut"
@@ -94,7 +94,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
       <div
         class="welcome-screen-menu-item__text"
       >
-        Hilfe
+        Help
       </div>
       <div
         class="welcome-screen-menu-item__shortcut"
@@ -149,7 +149,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
       <div
         class="welcome-screen-menu-item__text"
       >
-        Live-Zusammenarbeit...
+        Live collaboration...
       </div>
     </button>
   </div>

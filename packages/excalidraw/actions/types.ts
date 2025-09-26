@@ -10,8 +10,7 @@ import type {
   BinaryFiles,
   UIAppState,
 } from "../types";
-import type { MarkOptional } from "../utility-types";
-import type { StoreActionType } from "../store";
+import type { CaptureUpdateActionType } from "../store";
 
 export type ActionSource =
   | "ui"
@@ -24,12 +23,9 @@ export type ActionSource =
 export type ActionResult =
   | {
       elements?: readonly ExcalidrawElement[] | null;
-      appState?: MarkOptional<
-        AppState,
-        "offsetTop" | "offsetLeft" | "width" | "height"
-      > | null;
+      appState?: Partial<AppState> | null;
       files?: BinaryFiles | null;
-      storeAction: StoreActionType;
+      captureUpdate: CaptureUpdateActionType;
       replaceFiles?: boolean;
     }
   | false;
@@ -138,7 +134,12 @@ export type ActionName =
   | "wrapTextInContainer"
   | "commandPalette"
   | "autoResize"
-  | "elementStats";
+  | "elementStats"
+  | "searchMenu"
+  | "copyElementLink"
+  | "linkToElement"
+  | "cropEditor"
+  | "wrapSelectionInFrame";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -192,7 +193,8 @@ export interface Action {
           | "history"
           | "menu"
           | "collab"
-          | "hyperlink";
+          | "hyperlink"
+          | "search_menu";
         action?: string;
         predicate?: (
           appState: Readonly<AppState>,

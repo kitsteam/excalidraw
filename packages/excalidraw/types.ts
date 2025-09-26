@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import type React from "react";
 import type {
   PointerType,
@@ -24,7 +25,6 @@ import type {
   ExcalidrawNonSelectionElement,
 } from "./element/types";
 import type { Action } from "./actions/types";
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { LinearElementEditor } from "./element/linearElementEditor";
 import type { SuggestedBinding } from "./element/binding";
 import type { ImportedDataState } from "./data/types";
@@ -41,9 +41,8 @@ import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { Merge, MaybePromise, ValueOf, MakeBrand } from "./utility-types";
-import type { StoreActionType } from "./store";
-
-export type Point = Readonly<RoughPoint>;
+import type { CaptureUpdateActionType } from "./store";
+import type { UserIdleState } from "./constants";
 
 export type SocketId = string & { _brand: "SocketId" };
 
@@ -109,6 +108,11 @@ export type BinaryFileData = {
    * Epoch timestamp in milliseconds.
    */
   lastRetrieved?: number;
+  /**
+   * indicates the version of the file. This can be used to determine whether
+   * the file dataURL has changed e.g. as part of restore due to schema update.
+   */
+  version?: number;
 };
 
 export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
@@ -159,6 +163,7 @@ type _CommonCanvasAppState = {
   width: AppState["width"];
   height: AppState["height"];
   viewModeEnabled: AppState["viewModeEnabled"];
+  openDialog: AppState["openDialog"];
   editingGroupId: AppState["editingGroupId"]; // TODO: move to interactive canvas if possible
   selectedElementIds: AppState["selectedElementIds"]; // TODO: move to interactive canvas if possible
   frameToHighlight: AppState["frameToHighlight"]; // TODO: move to interactive canvas if possible
@@ -179,6 +184,9 @@ export type StaticCanvasAppState = Readonly<
     gridStep: AppState["gridStep"];
     frameRendering: AppState["frameRendering"];
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
+    hoveredElementIds: AppState["hoveredElementIds"];
+    // Cropping
+    croppingElementId: AppState["croppingElementId"];
   }
 >;
 
@@ -200,7 +208,12 @@ export type InteractiveCanvasAppState = Readonly<
     // SnapLines
     snapLines: AppState["snapLines"];
     zenModeEnabled: AppState["zenModeEnabled"];
-    editingElement: AppState["editingElement"];
+    editingTextElement: AppState["editingTextElement"];
+    // Cropping
+    isCropping: AppState["isCropping"];
+    croppingElementId: AppState["croppingElementId"];
+    // Search matches
+    searchMatches: AppState["searchMatches"];
   }
 >;
 
@@ -220,6 +233,7 @@ export type ObservedElementsAppState = {
   editingLinearElementId: LinearElementEditor["elementId"] | null;
   // Right now it's coupled to `editingLinearElement`, ideally it should not be really needed as we already have selectedElementIds & editingLinearElementId
   selectedLinearElementId: LinearElementEditor["elementId"] | null;
+  croppingElementId: AppState["croppingElementId"];
 };
 
 export interface AppState {
@@ -270,13 +284,9 @@ export interface AppState {
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   /**
-   * currently set for:
-   * - text elements while in wysiwyg
-   * - newly created linear elements while in line editor (not set for existing
-   *   elements in line editor)
-   * - and new images while being placed on canvas
+   * set when a new text is created or when an existing text is being edited
    */
-  editingElement: NonDeletedExcalidrawElement | null;
+  editingTextElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
   activeTool: {
     /**
@@ -327,16 +337,10 @@ export interface AppState {
   openDialog:
     | null
     | { name: "imageExport" | "help" | "jsonExport" }
-    | {
-        name: "settings";
-        source:
-          | "tool" // when magicframe tool is selected
-          | "generation" // when magicframe generate button is clicked
-          | "settings"; // when AI settings dialog is explicitly invoked
-        tab: "text-to-diagram" | "diagram-to-code";
-      }
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
-    | { name: "commandPalette" };
+    | { name: "commandPalette" }
+    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
+
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -348,6 +352,7 @@ export interface AppState {
 
   lastPointerDownWith: PointerType;
   selectedElementIds: Readonly<{ [id: string]: true }>;
+  hoveredElementIds: Readonly<{ [id: string]: true }>;
   previousSelectedElementIds: { [id: string]: true };
   selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
@@ -401,7 +406,24 @@ export interface AppState {
   userToFollow: UserToFollow | null;
   /** the socket ids of the users following the current user */
   followedBy: Set<SocketId>;
+
+  /** image cropping */
+  isCropping: boolean;
+  croppingElementId: ExcalidrawElement["id"] | null;
+
+  searchMatches: readonly SearchMatch[];
 }
+
+type SearchMatch = {
+  id: string;
+  focus: boolean;
+  matchedLines: {
+    offsetX: number;
+    offsetY: number;
+    width: number;
+    height: number;
+  }[];
+};
 
 export type UIAppState = Omit<
   AppState,
@@ -494,6 +516,22 @@ export interface ExcalidrawProps {
     data: ClipboardData,
     event: ClipboardEvent | null,
   ) => Promise<boolean> | boolean;
+  /**
+   * Called when element(s) are duplicated so you can listen or modify as
+   * needed.
+   *
+   * Called when duplicating via mouse-drag, keyboard, paste, library insert
+   * etc.
+   *
+   * Returned elements will be used in place of the next elements
+   * (you should return all elements, including deleted, and not mutate
+   * the element if changes are made)
+   */
+  onDuplicate?: (
+    nextElements: readonly ExcalidrawElement[],
+    /** excludes the duplicated elements */
+    prevElements: readonly ExcalidrawElement[],
+  ) => ExcalidrawElement[] | void;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -517,6 +555,7 @@ export interface ExcalidrawProps {
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
+  generateLinkForSelection?: (id: string, type: "element" | "group") => string;
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
     event: CustomEvent<{
@@ -552,14 +591,8 @@ export type SceneData = {
   elements?: ImportedDataState["elements"];
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
-  storeAction?: StoreActionType;
+  captureUpdate?: CaptureUpdateActionType;
 };
-
-export enum UserIdleState {
-  ACTIVE = "active",
-  AWAY = "away",
-  IDLE = "idle",
-}
 
 export type ExportOpts = {
   saveFileToDisk?: boolean;
@@ -657,6 +690,13 @@ export type AppClassProperties = {
   dismissLinearEditor: App["dismissLinearEditor"];
   flowChartCreator: App["flowChartCreator"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
+  setPlugins: App["setPlugins"];
+  plugins: App["plugins"];
+  getEditorUIOffsets: App["getEditorUIOffsets"];
+  visibleElements: App["visibleElements"];
+  excalidrawContainerValue: App["excalidrawContainerValue"];
+
+  onPointerUpEmitter: App["onPointerUpEmitter"];
 };
 
 export type PointerDownState = Readonly<{
@@ -844,3 +884,15 @@ export type PendingExcalidrawElements = ExcalidrawElement[];
 export type NullableGridSize =
   | (AppState["gridSize"] & MakeBrand<"NullableGridSize">)
   | null;
+
+export type GenerateDiagramToCode = (props: {
+  frame: ExcalidrawMagicFrameElement;
+  children: readonly ExcalidrawElement[];
+}) => MaybePromise<{ html: string }>;
+
+export type Offsets = Partial<{
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}>;

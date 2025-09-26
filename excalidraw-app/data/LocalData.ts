@@ -19,21 +19,25 @@ import {
   setMany,
   get,
 } from "idb-keyval";
-import { clearAppStateForLocalStorage } from "../../packages/excalidraw/appState";
-import type { LibraryPersistedData } from "../../packages/excalidraw/data/library";
-import type { ImportedDataState } from "../../packages/excalidraw/data/types";
-import { clearElementsForLocalStorage } from "../../packages/excalidraw/element";
+import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/appState";
+import {
+  CANVAS_SEARCH_TAB,
+  DEFAULT_SIDEBAR,
+} from "@excalidraw/excalidraw/constants";
+import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
+import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+import { clearElementsForLocalStorage } from "@excalidraw/excalidraw/element";
 import type {
   ExcalidrawElement,
   FileId,
-} from "../../packages/excalidraw/element/types";
+} from "@excalidraw/excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
-} from "../../packages/excalidraw/types";
-import type { MaybePromise } from "../../packages/excalidraw/utility-types";
-import { debounce } from "../../packages/excalidraw/utils";
+} from "@excalidraw/excalidraw/types";
+import type { MaybePromise } from "@excalidraw/excalidraw/utility-types";
+import { debounce } from "@excalidraw/excalidraw/utils";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { FileManager } from "./FileManager";
 import { Locker } from "./Locker";
@@ -66,13 +70,22 @@ const saveDataStateToLocalStorage = (
   appState: AppState,
 ) => {
   try {
+    const _appState = clearAppStateForLocalStorage(appState);
+
+    if (
+      _appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
+      _appState.openSidebar.tab === CANVAS_SEARCH_TAB
+    ) {
+      _appState.openSidebar = null;
+    }
+
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
       JSON.stringify(clearElementsForLocalStorage(elements)),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-      JSON.stringify(clearAppStateForLocalStorage(appState)),
+      JSON.stringify(_appState),
     );
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
   } catch (error: any) {
@@ -170,8 +183,8 @@ export class LocalData {
       );
     },
     async saveFiles({ addedFiles }) {
-      const savedFiles = new Map<FileId, true>();
-      const erroredFiles = new Map<FileId, true>();
+      const savedFiles = new Map<FileId, BinaryFileData>();
+      const erroredFiles = new Map<FileId, BinaryFileData>();
 
       // before we use `storage` event synchronization, let's update the flag
       // optimistically. Hopefully nothing fails, and an IDB read executed
@@ -182,10 +195,10 @@ export class LocalData {
         [...addedFiles].map(async ([id, fileData]) => {
           try {
             await set(id, fileData, filesStore);
-            savedFiles.set(id, true);
+            savedFiles.set(id, fileData);
           } catch (error: any) {
             console.error(error);
-            erroredFiles.set(id, true);
+            erroredFiles.set(id, fileData);
           }
         }),
       );

@@ -1,15 +1,14 @@
-version: "3.8"
-
 services:
   excalidraw:
     stdin_open: true
     build:
       context: .
       target: development
+      args:
+        - NODE_ENV=development
     container_name: excalidraw
     ports:
       - "3000:3000"
-      - "4173:4173" # Vitest UI
     restart: on-failure
     healthcheck:
       disable: true
@@ -23,6 +22,11 @@ services:
     build:
       context: https://github.com/kitsteam/excalidraw-storage-backend.git#main
       target: production
+      # When testing locally, you can also checkout the repository and start the backend manually:
+      # context: ../kits/excalidraw-storage-backend
+      # target: development
+    volumes:
+      - ../kits/excalidraw-storage-backend/:/home/node/app
     stdin_open: true
     container_name: excalidraw-storage-backend
     ports:

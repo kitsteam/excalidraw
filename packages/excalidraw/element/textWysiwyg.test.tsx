@@ -1,7 +1,11 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import { Excalidraw } from "../index";
-import { GlobalTestState, render, screen } from "../tests/test-utils";
+import {
+  GlobalTestState,
+  render,
+  screen,
+  unmountComponent,
+} from "../tests/test-utils";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { CODES, KEYS } from "../keys";
 import {
@@ -19,9 +23,9 @@ import type {
 import { API } from "../tests/helpers/api";
 import { getOriginalContainerHeightFromCache } from "./containerCache";
 import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
+import { pointFrom } from "@excalidraw/math";
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const tab = "    ";
 const mouse = new Pointer("mouse");
@@ -41,10 +45,7 @@ describe("textWysiwyg", () => {
         type: "line",
         width: 100,
         height: 0,
-        points: [
-          [0, 0],
-          [100, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(100, 0)],
       });
       const textSize = 20;
       const text = API.createElement({
@@ -61,9 +62,9 @@ describe("textWysiwyg", () => {
 
       Keyboard.keyPress(KEYS.ENTER);
 
-      expect(h.state.editingElement?.id).toBe(text.id);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(
-        (h.state.editingElement as ExcalidrawTextElement).containerId,
+        (h.state.editingTextElement as ExcalidrawTextElement).containerId,
       ).toBe(null);
     });
 
@@ -105,7 +106,7 @@ describe("textWysiwyg", () => {
 
       Keyboard.keyPress(KEYS.ENTER);
 
-      expect(h.state.editingElement?.id).toBe(boundText2.id);
+      expect(h.state.editingTextElement?.id).toBe(boundText2.id);
     });
 
     it("should not create bound text on ENTER if text exists at container center", () => {
@@ -133,7 +134,7 @@ describe("textWysiwyg", () => {
 
       Keyboard.keyPress(KEYS.ENTER);
 
-      expect(h.state.editingElement?.id).toBe(text.id);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
     });
 
     it("should edit existing bound text on ENTER even if higher z-index unbound text exists at container center", () => {
@@ -174,7 +175,7 @@ describe("textWysiwyg", () => {
 
       Keyboard.keyPress(KEYS.ENTER);
 
-      expect(h.state.editingElement?.id).toBe(boundText.id);
+      expect(h.state.editingTextElement?.id).toBe(boundText.id);
     });
 
     it("should edit text under cursor when clicked with text tool", async () => {
@@ -195,7 +196,7 @@ describe("textWysiwyg", () => {
       const editor = await getTextEditor(textEditorSelector, false);
 
       expect(editor).not.toBe(null);
-      expect(h.state.editingElement?.id).toBe(text.id);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(h.elements.length).toBe(1);
     });
 
@@ -217,7 +218,7 @@ describe("textWysiwyg", () => {
       const editor = await getTextEditor(textEditorSelector, false);
 
       expect(editor).not.toBe(null);
-      expect(h.state.editingElement?.id).toBe(text.id);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(h.elements.length).toBe(1);
     });
 
@@ -286,7 +287,7 @@ describe("textWysiwyg", () => {
       mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
       const editor = await getTextEditor(textEditorSelector);
       expect(editor).not.toBe(null);
-      expect(h.state.editingElement?.id).toBe(text.id);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(h.elements.length).toBe(1);
 
       const nextText = `${wrappedText} is great!`;
@@ -847,7 +848,7 @@ describe("textWysiwyg", () => {
       });
       const contextMenu = document.querySelector(".context-menu");
       fireEvent.click(
-        queryByText(contextMenu as HTMLElement, "Text an Container binden")!,
+        queryByText(contextMenu as HTMLElement, "Bind text to the container")!,
       );
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(rectangle.boundElements).toStrictEqual([
@@ -881,7 +882,7 @@ describe("textWysiwyg", () => {
 
       expect(await getTextEditor(textEditorSelector, false)).toBe(null);
 
-      expect(h.state.editingElement).toBe(null);
+      expect(h.state.editingTextElement).toBe(null);
 
       expect(text.fontFamily).toEqual(FONT_FAMILY.Excalifont);
 
@@ -919,7 +920,7 @@ describe("textWysiwyg", () => {
 
       Keyboard.exitTextEditor(editor);
       text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      expect(text.text).toBe("Hello \nWorld!");
+      expect(text.text).toBe("Hello\nWorld!");
       expect(text.originalText).toBe("Hello World!");
       expect(text.y).toBe(
         rectangle.y + h.elements[0].height / 2 - text.height / 2,
@@ -978,7 +979,7 @@ describe("textWysiwyg", () => {
         clientY: 30,
       });
       const contextMenu = document.querySelector(".context-menu");
-      fireEvent.click(queryByText(contextMenu as HTMLElement, "Text lösen")!);
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Unbind text")!);
       expect(h.elements[0].boundElements).toEqual([]);
       expect((h.elements[1] as ExcalidrawTextElement).containerId).toEqual(
         null,
@@ -1035,8 +1036,8 @@ describe("textWysiwyg", () => {
 
       editor.select();
 
-      fireEvent.click(screen.getByTitle("Links"));
-      fireEvent.click(screen.getByTitle("Untere Kanten"));
+      fireEvent.click(screen.getByTitle("Left"));
+      fireEvent.click(screen.getByTitle("Align bottom"));
       Keyboard.exitTextEditor(editor);
 
       // should left align horizontally and bottom vertically after resize
@@ -1054,8 +1055,8 @@ describe("textWysiwyg", () => {
 
       editor.select();
 
-      fireEvent.click(screen.getByTitle("Rechts"));
-      fireEvent.click(screen.getByTitle("Obere Kanten"));
+      fireEvent.click(screen.getByTitle("Right"));
+      fireEvent.click(screen.getByTitle("Align top"));
 
       Keyboard.exitTextEditor(editor);
 
@@ -1218,11 +1219,11 @@ describe("textWysiwyg", () => {
       let contextMenu = document.querySelector(".context-menu");
 
       fireEvent.click(
-        queryByText(contextMenu as HTMLElement, "Text an Container binden")!,
+        queryByText(contextMenu as HTMLElement, "Bind text to the container")!,
       );
 
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text).toBe(
-        "Online \nwhitebo\nard \ncollabo\nration \nmade \neasy",
+        "Online\nwhiteboa\nrd\ncollabor\nation\nmade\neasy",
       );
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
@@ -1230,7 +1231,7 @@ describe("textWysiwyg", () => {
         clientY: 30,
       });
       contextMenu = document.querySelector(".context-menu");
-      fireEvent.click(queryByText(contextMenu as HTMLElement, "Text lösen")!);
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Unbind text")!);
       expect(h.elements[0].boundElements).toEqual([]);
       expect(getOriginalContainerHeightFromCache(container.id)).toBe(null);
 
@@ -1280,7 +1281,7 @@ describe("textWysiwyg", () => {
       ).toEqual(FONT_FAMILY["Comic Shanns"]);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
 
-      fireEvent.click(screen.getByTitle(/Sehr groß/i));
+      fireEvent.click(screen.getByTitle(/Very large/i));
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontSize,
       ).toEqual(36);
@@ -1315,7 +1316,7 @@ describe("textWysiwyg", () => {
       ).toEqual(FONT_FAMILY.Nunito);
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
-      ).toEqual(1.25);
+      ).toEqual(1.35);
     });
 
     describe("should align correctly", () => {
@@ -1333,8 +1334,8 @@ describe("textWysiwyg", () => {
       });
 
       it("when top left", async () => {
-        fireEvent.click(screen.getByTitle("Links"));
-        fireEvent.click(screen.getByTitle("Obere Kanten"));
+        fireEvent.click(screen.getByTitle("Left"));
+        fireEvent.click(screen.getByTitle("Align top"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
             15,
@@ -1344,8 +1345,8 @@ describe("textWysiwyg", () => {
       });
 
       it("when top center", async () => {
-        fireEvent.click(screen.getByTitle("Zentriert"));
-        fireEvent.click(screen.getByTitle("Obere Kanten"));
+        fireEvent.click(screen.getByTitle("Center"));
+        fireEvent.click(screen.getByTitle("Align top"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
             30,
@@ -1355,8 +1356,8 @@ describe("textWysiwyg", () => {
       });
 
       it("when top right", async () => {
-        fireEvent.click(screen.getByTitle("Rechts"));
-        fireEvent.click(screen.getByTitle("Obere Kanten"));
+        fireEvent.click(screen.getByTitle("Right"));
+        fireEvent.click(screen.getByTitle("Align top"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
@@ -1367,8 +1368,8 @@ describe("textWysiwyg", () => {
       });
 
       it("when center left", async () => {
-        fireEvent.click(screen.getByTitle("Vertikal zentrieren"));
-        fireEvent.click(screen.getByTitle("Links"));
+        fireEvent.click(screen.getByTitle("Center vertically"));
+        fireEvent.click(screen.getByTitle("Left"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
             15,
@@ -1378,8 +1379,8 @@ describe("textWysiwyg", () => {
       });
 
       it("when center center", async () => {
-        fireEvent.click(screen.getByTitle("Zentriert"));
-        fireEvent.click(screen.getByTitle("Vertikal zentrieren"));
+        fireEvent.click(screen.getByTitle("Center"));
+        fireEvent.click(screen.getByTitle("Center vertically"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
@@ -1390,8 +1391,8 @@ describe("textWysiwyg", () => {
       });
 
       it("when center right", async () => {
-        fireEvent.click(screen.getByTitle("Rechts"));
-        fireEvent.click(screen.getByTitle("Vertikal zentrieren"));
+        fireEvent.click(screen.getByTitle("Right"));
+        fireEvent.click(screen.getByTitle("Center vertically"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
@@ -1402,8 +1403,8 @@ describe("textWysiwyg", () => {
       });
 
       it("when bottom left", async () => {
-        fireEvent.click(screen.getByTitle("Links"));
-        fireEvent.click(screen.getByTitle("Untere Kanten"));
+        fireEvent.click(screen.getByTitle("Left"));
+        fireEvent.click(screen.getByTitle("Align bottom"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
@@ -1414,8 +1415,8 @@ describe("textWysiwyg", () => {
       });
 
       it("when bottom center", async () => {
-        fireEvent.click(screen.getByTitle("Zentriert"));
-        fireEvent.click(screen.getByTitle("Untere Kanten"));
+        fireEvent.click(screen.getByTitle("Center"));
+        fireEvent.click(screen.getByTitle("Align bottom"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
             30,
@@ -1425,8 +1426,8 @@ describe("textWysiwyg", () => {
       });
 
       it("when bottom right", async () => {
-        fireEvent.click(screen.getByTitle("Rechts"));
-        fireEvent.click(screen.getByTitle("Untere Kanten"));
+        fireEvent.click(screen.getByTitle("Right"));
+        fireEvent.click(screen.getByTitle("Align bottom"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
             45,
@@ -1447,7 +1448,7 @@ describe("textWysiwyg", () => {
       );
 
       editor.select();
-      fireEvent.click(screen.getByTitle("Links"));
+      fireEvent.click(screen.getByTitle("Left"));
 
       Keyboard.exitTextEditor(editor);
 
@@ -1469,7 +1470,7 @@ describe("textWysiwyg", () => {
 
       const contextMenu = document.querySelector(".context-menu");
       fireEvent.click(
-        queryByText(contextMenu as HTMLElement, "Text in Container einbetten")!,
+        queryByText(contextMenu as HTMLElement, "Wrap text in a container")!,
       );
       expect(h.elements.length).toBe(3);
 
@@ -1531,7 +1532,7 @@ describe("textWysiwyg", () => {
         (h.elements[1] as ExcalidrawTextElementWithContainer).verticalAlign,
       ).toBe(VERTICAL_ALIGN.MIDDLE);
 
-      fireEvent.click(screen.getByTitle("Untere Kanten"));
+      fireEvent.click(screen.getByTitle("Align bottom"));
 
       Keyboard.exitTextEditor(editor);
 

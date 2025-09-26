@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import * as Popover from "@radix-ui/react-popover";
-import { copyTextToSystemClipboard } from "../../packages/excalidraw/clipboard";
-import { trackEvent } from "../../packages/excalidraw/analytics";
-import { getFrame } from "../../packages/excalidraw/utils";
-import { useI18n } from "../../packages/excalidraw/i18n";
-import { KEYS } from "../../packages/excalidraw/keys";
-import { Dialog } from "../../packages/excalidraw/components/Dialog";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { copyTextToSystemClipboard } from "@excalidraw/excalidraw/clipboard";
+import { trackEvent } from "@excalidraw/excalidraw/analytics";
+import { getFrame } from "@excalidraw/excalidraw/utils";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
+import { KEYS } from "@excalidraw/excalidraw/keys";
+import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
 import {
   copyIcon,
   LinkIcon,
@@ -14,16 +13,16 @@ import {
   share,
   shareIOS,
   shareWindows,
-  tablerCheckIcon,
-} from "../../packages/excalidraw/components/icons";
-import { TextField } from "../../packages/excalidraw/components/TextField";
-import { FilledButton } from "../../packages/excalidraw/components/FilledButton";
+} from "@excalidraw/excalidraw/components/icons";
+import { TextField } from "@excalidraw/excalidraw/components/TextField";
+import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
 import type { CollabAPI } from "../collab/Collab";
 import { activeRoomLinkAtom } from "../collab/Collab";
-import { atom, useAtom, useAtomValue } from "jotai";
+import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
+import { useCopyStatus } from "@excalidraw/excalidraw/hooks/useCopiedIndicator";
+import { atom, useAtom, useAtomValue } from "../app-jotai";
 
 import "./ShareDialog.scss";
-import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
 import type { FileExtension } from "qr-code-styling";
 import QRCodeStyling from "qr-code-styling";
 
@@ -89,10 +88,11 @@ const ActiveRoomDialog = ({
   handleClose: () => void;
 }) => {
   const { t } = useI18n();
-  const [justCopied, setJustCopied] = useState(false);
+  const [, setJustCopied] = useState(false);
   const timerRef = useRef<number>(0);
   const ref = useRef<HTMLInputElement>(null);
   const isShareSupported = "share" in navigator;
+  const { onCopy, copyStatus } = useCopyStatus();
 
   const qrRef = useCallback(
     (node: HTMLDivElement) => {
@@ -172,26 +172,16 @@ const ActiveRoomDialog = ({
             onClick={shareRoomLink}
           />
         )}
-        <Popover.Root open={justCopied}>
-          <Popover.Trigger asChild>
-            <FilledButton
-              size="large"
-              label="Link kopieren"
-              icon={copyIcon}
-              onClick={copyRoomLink}
-            />
-          </Popover.Trigger>
-          <Popover.Content
-            onOpenAutoFocus={(event) => event.preventDefault()}
-            onCloseAutoFocus={(event) => event.preventDefault()}
-            className="ShareDialog__popover"
-            side="top"
-            align="end"
-            sideOffset={5.5}
-          >
-            {tablerCheckIcon} copied
-          </Popover.Content>
-        </Popover.Root>
+        <FilledButton
+          size="large"
+          label={t("buttons.copyLink")}
+          icon={copyIcon}
+          status={copyStatus}
+          onClick={() => {
+            copyRoomLink();
+            onCopy();
+          }}
+        />
       </div>
       <div className="ShareDialog__active__qrCode">
         <div className="ShareDialog__qrContainer" ref={qrRef} />

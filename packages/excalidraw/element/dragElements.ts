@@ -10,17 +10,19 @@ import type {
   NullableGridSize,
   PointerDownState,
 } from "../types";
-import { getBoundTextElement, getMinTextElementWidth } from "./textElement";
-import { getGridPoint } from "../math";
+import { getBoundTextElement } from "./textElement";
 import type Scene from "../scene/Scene";
 import {
   isArrowElement,
   isElbowArrow,
   isFrameLikeElement,
+  isImageElement,
   isTextElement,
 } from "./typeChecks";
 import { getFontString } from "../utils";
 import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
+import { getGridPoint } from "../snapping";
+import { getMinTextElementWidth } from "./textMeasurements";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -35,22 +37,26 @@ export const dragSelectedElements = (
 ) => {
   if (
     _selectedElements.length === 1 &&
-    isArrowElement(_selectedElements[0]) &&
     isElbowArrow(_selectedElements[0]) &&
     (_selectedElements[0].startBinding || _selectedElements[0].endBinding)
   ) {
     return;
   }
 
-  const selectedElements = _selectedElements.filter(
-    (el) =>
-      !(
-        isArrowElement(el) &&
-        isElbowArrow(el) &&
-        el.startBinding &&
-        el.endBinding
-      ),
-  );
+  const selectedElements = _selectedElements.filter((element) => {
+    if (isElbowArrow(element) && element.startBinding && element.endBinding) {
+      const startElement = _selectedElements.find(
+        (el) => el.id === element.startBinding?.elementId,
+      );
+      const endElement = _selectedElements.find(
+        (el) => el.id === element.endBinding?.elementId,
+      );
+
+      return startElement && endElement;
+    }
+
+    return true;
+  });
 
   // we do not want a frame and its elements to be selected at the same time
   // but when it happens (due to some bug), we want to avoid updating element
@@ -84,10 +90,8 @@ export const dragSelectedElements = (
 
   elementsToUpdate.forEach((element) => {
     updateElementCoords(pointerDownState, element, adjustedOffset);
-    if (
+    if (!isArrowElement(element)) {
       // skip arrow labels since we calculate its position during render
-      !isArrowElement(element)
-    ) {
       const textElement = getBoundTextElement(
         element,
         scene.getNonDeletedElementsMap(),
@@ -95,10 +99,10 @@ export const dragSelectedElements = (
       if (textElement) {
         updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }
+      updateBoundElements(element, scene.getElementsMapIncludingDeleted(), {
+        simultaneouslyUpdated: Array.from(elementsToUpdate),
+      });
     }
-    updateBoundElements(element, scene.getElementsMapIncludingDeleted(), {
-      simultaneouslyUpdated: Array.from(elementsToUpdate),
-    });
   });
 };
 
@@ -159,26 +163,42 @@ export const getDragOffsetXY = (
   return [x - x1, y - y1];
 };
 
-export const dragNewElement = (
-  newElement: NonDeletedExcalidrawElement,
-  elementType: AppState["activeTool"]["type"],
-  originX: number,
-  originY: number,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  shouldMaintainAspectRatio: boolean,
-  shouldResizeFromCenter: boolean,
-  zoom: NormalizedZoomValue,
+export const dragNewElement = ({
+  newElement,
+  elementType,
+  originX,
+  originY,
+  x,
+  y,
+  width,
+  height,
+  shouldMaintainAspectRatio,
+  shouldResizeFromCenter,
+  zoom,
+  widthAspectRatio = null,
+  originOffset = null,
+  informMutation = true,
+}: {
+  newElement: NonDeletedExcalidrawElement;
+  elementType: AppState["activeTool"]["type"];
+  originX: number;
+  originY: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  shouldMaintainAspectRatio: boolean;
+  shouldResizeFromCenter: boolean;
+  zoom: NormalizedZoomValue;
   /** whether to keep given aspect ratio when `isResizeWithSidesSameLength` is
       true */
-  widthAspectRatio?: number | null,
-  originOffset: {
+  widthAspectRatio?: number | null;
+  originOffset?: {
     x: number;
     y: number;
-  } | null = null,
-) => {
+  } | null;
+  informMutation?: boolean;
+}) => {
   if (shouldMaintainAspectRatio && newElement.type !== "selection") {
     if (widthAspectRatio) {
       height = width / widthAspectRatio;
@@ -242,12 +262,25 @@ export const dragNewElement = (
   }
 
   if (width !== 0 && height !== 0) {
-    mutateElement(newElement, {
-      x: newX + (originOffset?.x ?? 0),
-      y: newY + (originOffset?.y ?? 0),
-      width,
-      height,
-      ...textAutoResize,
-    });
+    let imageInitialDimension = null;
+    if (isImageElement(newElement)) {
+      imageInitialDimension = {
+        initialWidth: width,
+        initialHeight: height,
+      };
+    }
+
+    mutateElement(
+      newElement,
+      {
+        x: newX + (originOffset?.x ?? 0),
+        y: newY + (originOffset?.y ?? 0),
+        width,
+        height,
+        ...textAutoResize,
+        ...imageInitialDimension,
+      },
+      informMutation,
+    );
   }
 };

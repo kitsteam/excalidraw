@@ -8,7 +8,7 @@ import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
 import type { StatsInputProperty } from "./utils";
 import { SMALLEST_DELTA } from "./utils";
-import { StoreAction } from "../../store";
+import { CaptureUpdateAction } from "../../store";
 import type Scene from "../../scene/Scene";
 
 import "./DragInput.scss";
@@ -132,26 +132,49 @@ const StatsDragInput = <
         originalAppState: appState,
         setInputValue: (value) => setInputValue(String(value)),
       });
-      app.syncActionResult({ storeAction: StoreAction.CAPTURE });
+      app.syncActionResult({
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
     }
   };
 
-  const handleInputValueRef = useRef(handleInputValue);
-  handleInputValueRef.current = handleInputValue;
+  const callbacksRef = useRef<
+    Partial<{
+      handleInputValue: typeof handleInputValue;
+      onPointerUp: (event: PointerEvent) => void;
+      onPointerMove: (event: PointerEvent) => void;
+    }>
+  >({});
+  callbacksRef.current.handleInputValue = handleInputValue;
 
   // make sure that clicking on canvas (which umounts the component)
   // updates current input value (blur isn't triggered)
   useEffect(() => {
     const input = inputRef.current;
+    const callbacks = callbacksRef.current;
     return () => {
       const nextValue = input?.value;
       if (nextValue) {
-        handleInputValueRef.current(
+        callbacks.handleInputValue?.(
           nextValue,
           stateRef.current.originalElements,
           stateRef.current.originalAppState,
         );
       }
+
+      // generally not needed, but in case `pointerup` doesn't fire and
+      // we don't remove the listeners that way, we should at least remove
+      // on unmount
+      window.removeEventListener(
+        EVENT.POINTER_MOVE,
+        callbacks.onPointerMove!,
+        false,
+      );
+      window.removeEventListener(
+        EVENT.POINTER_UP,
+        callbacks.onPointerUp!,
+        false,
+      );
     };
   }, [
     // we need to track change of `editable` state as mount/unmount
@@ -248,28 +271,33 @@ const StatsDragInput = <
               };
             };
 
+            const onPointerUp = () => {
+              window.removeEventListener(
+                EVENT.POINTER_MOVE,
+                onPointerMove,
+                false,
+              );
+
+              app.syncActionResult({
+                captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+              });
+
+              lastPointer = null;
+              accumulatedChange = 0;
+              stepChange = 0;
+              originalElements = null;
+              originalElementsMap = null;
+
+              document.body.classList.remove("excalidraw-cursor-resize");
+
+              window.removeEventListener(EVENT.POINTER_UP, onPointerUp, false);
+            };
+
+            callbacksRef.current.onPointerMove = onPointerMove;
+            callbacksRef.current.onPointerUp = onPointerUp;
+
             window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, false);
-            window.addEventListener(
-              EVENT.POINTER_UP,
-              () => {
-                window.removeEventListener(
-                  EVENT.POINTER_MOVE,
-                  onPointerMove,
-                  false,
-                );
-
-                app.syncActionResult({ storeAction: StoreAction.CAPTURE });
-
-                lastPointer = null;
-                accumulatedChange = 0;
-                stepChange = 0;
-                originalElements = null;
-                originalElementsMap = null;
-
-                document.body.classList.remove("excalidraw-cursor-resize");
-              },
-              false,
-            );
+            window.addEventListener(EVENT.POINTER_UP, onPointerUp, false);
           }
         }}
         onPointerEnter={() => {

@@ -1,4 +1,8 @@
-import type { NonDeletedExcalidrawElement } from "../../element/types";
+import type {
+  ExcalidrawTextElement,
+  FractionalIndex,
+  NonDeletedExcalidrawElement,
+} from "../../element/types";
 import * as exportUtils from "../../scene/export";
 import {
   diamondFixture,
@@ -7,8 +11,8 @@ import {
   textFixture,
 } from "../fixtures/elementFixture";
 import { API } from "../helpers/api";
-import { exportToCanvas, exportToSvg } from "../../../utils";
-import { FRAME_STYLE } from "../../constants";
+import { exportToCanvas, exportToSvg } from "@excalidraw/utils";
+import { FONT_FAMILY, FRAME_STYLE } from "../../constants";
 import { prepareElementsForExport } from "../../data";
 
 describe("exportToSvg", () => {
@@ -33,6 +37,13 @@ describe("exportToSvg", () => {
       width: ELEMENT_WIDTH,
       index: "a2",
     },
+    {
+      ...textFixture,
+      fontFamily: FONT_FAMILY.Nunito, // test embedding external font
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a3",
+    },
   ] as NonDeletedExcalidrawElement[];
 
   const DEFAULT_OPTIONS = {
@@ -50,6 +61,28 @@ describe("exportToSvg", () => {
 
     expect(svgElement).toMatchSnapshot();
   });
+
+  it("with a CJK font", async () => {
+    const svgElement = await exportUtils.exportToSvg(
+      [
+        ...ELEMENTS,
+        {
+          ...textFixture,
+          height: ELEMENT_HEIGHT,
+          width: ELEMENT_WIDTH,
+          text: "中国你好！这是一个测试。中国你好！日本こんにちは！これはテストです。한국 안녕하세요! 이것은 테스트입니다.",
+          originalText:
+            "中国你好！这是一个测试。中国你好！日本こんにちは！これはテストです。한국 안녕하세요! 이것은 테스트입니다.",
+          index: "a4" as FractionalIndex,
+        } as ExcalidrawTextElement,
+      ],
+      DEFAULT_OPTIONS,
+      null,
+    );
+
+    expect(svgElement).toMatchSnapshot();
+    // extend the timeout, as it needs to first load the fonts from disk and then perform whole woff2 decode, subset and encode (without workers)
+  }, 30_000);
 
   it("with background color", async () => {
     const BACKGROUND_COLOR = "#abcdef";
@@ -81,7 +114,7 @@ describe("exportToSvg", () => {
     );
 
     expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(
-      `"_themeFilter_1883f3"`,
+      `"invert(93%) hue-rotate(180deg)"`,
     );
   });
 

@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import React from "react";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
@@ -222,6 +223,16 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               ]}
               isOr={false}
             />
+            <Shortcut
+              label={t("helpDialog.cropStart")}
+              shortcuts={[t("helpDialog.doubleClick"), getShortcutKey("Enter")]}
+              isOr={true}
+            />
+            <Shortcut
+              label={t("helpDialog.cropFinish")}
+              shortcuts={[getShortcutKey("Enter"), getShortcutKey("Escape")]}
+              isOr={true}
+            />
             <Shortcut label={t("toolBar.lock")} shortcuts={[KEYS.Q]} />
             <Shortcut
               label={t("helpDialog.preventBinding")}
@@ -289,14 +300,18 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("Alt+/")]}
             />
             <Shortcut
+              label={t("search.title")}
+              shortcuts={[getShortcutFromShortcutName("searchMenu")]}
+            />
+            <Shortcut
               label={t("commandPalette.title")}
               shortcuts={
                 isFirefox
                   ? [getShortcutFromShortcutName("commandPalette")]
                   : [
-                      getShortcutFromShortcutName("commandPalette"),
-                      getShortcutFromShortcutName("commandPalette", 1),
-                    ]
+                    getShortcutFromShortcutName("commandPalette"),
+                    getShortcutFromShortcutName("commandPalette", 1),
+                  ]
               }
             />
           </ShortcutIsland>
@@ -438,9 +453,9 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={
                 isWindows
                   ? [
-                      getShortcutKey("CtrlOrCmd+Y"),
-                      getShortcutKey("CtrlOrCmd+Shift+Z"),
-                    ]
+                    getShortcutKey("CtrlOrCmd+Y"),
+                    getShortcutKey("CtrlOrCmd+Shift+Z"),
+                  ]
                   : [getShortcutKey("CtrlOrCmd+Shift+Z")]
               }
             />

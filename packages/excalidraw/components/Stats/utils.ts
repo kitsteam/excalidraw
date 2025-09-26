@@ -1,19 +1,11 @@
+import type { Radians } from "@excalidraw/math";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
 import {
   bindOrUnbindLinearElements,
   updateBoundElements,
 } from "../../element/binding";
 import { mutateElement } from "../../element/mutateElement";
-import {
-  measureFontSizeFromWidth,
-  rescalePointsInElement,
-} from "../../element/resizeElements";
-import {
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
-  getBoundTextElement,
-  getBoundTextMaxWidth,
-  handleBindTextResize,
-} from "../../element/textElement";
+import { getBoundTextElement } from "../../element/textElement";
 import {
   isFrameLikeElement,
   isLinearElement,
@@ -30,10 +22,8 @@ import {
   getElementsInGroup,
   isInGroup,
 } from "../../groups";
-import { rotate } from "../../math";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
-import { getFontString } from "../../utils";
 
 export type StatsInputProperty =
   | "x"
@@ -120,97 +110,6 @@ export const newOrigin = (
   };
 };
 
-export const resizeElement = (
-  nextWidth: number,
-  nextHeight: number,
-  keepAspectRatio: boolean,
-  origElement: ExcalidrawElement,
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
-  scene: Scene,
-  shouldInformMutation = true,
-) => {
-  const latestElement = elementsMap.get(origElement.id);
-  if (!latestElement) {
-    return;
-  }
-  let boundTextFont: { fontSize?: number } = {};
-  const boundTextElement = getBoundTextElement(latestElement, elementsMap);
-
-  if (boundTextElement) {
-    const minWidth = getApproxMinLineWidth(
-      getFontString(boundTextElement),
-      boundTextElement.lineHeight,
-    );
-    const minHeight = getApproxMinLineHeight(
-      boundTextElement.fontSize,
-      boundTextElement.lineHeight,
-    );
-    nextWidth = Math.max(nextWidth, minWidth);
-    nextHeight = Math.max(nextHeight, minHeight);
-  }
-
-  const { width: oldWidth, height: oldHeight } = latestElement;
-
-  mutateElement(
-    latestElement,
-    {
-      ...newOrigin(
-        latestElement.x,
-        latestElement.y,
-        latestElement.width,
-        latestElement.height,
-        nextWidth,
-        nextHeight,
-        latestElement.angle,
-      ),
-      width: nextWidth,
-      height: nextHeight,
-      ...rescalePointsInElement(origElement, nextWidth, nextHeight, true),
-    },
-    shouldInformMutation,
-  );
-  updateBindings(latestElement, elementsMap, elements, scene, {
-    newSize: {
-      width: nextWidth,
-      height: nextHeight,
-    },
-  });
-
-  if (boundTextElement) {
-    boundTextFont = {
-      fontSize: boundTextElement.fontSize,
-    };
-    if (keepAspectRatio) {
-      const updatedElement = {
-        ...latestElement,
-        width: nextWidth,
-        height: nextHeight,
-      };
-
-      const nextFont = measureFontSizeFromWidth(
-        boundTextElement,
-        elementsMap,
-        getBoundTextMaxWidth(updatedElement, boundTextElement),
-      );
-      boundTextFont = {
-        fontSize: nextFont?.size ?? boundTextElement.fontSize,
-      };
-    }
-  }
-
-  updateBoundElements(latestElement, elementsMap, {
-    oldSize: { width: oldWidth, height: oldHeight },
-  });
-
-  if (boundTextElement && boundTextFont) {
-    mutateElement(boundTextElement, {
-      fontSize: boundTextFont.fontSize,
-    });
-  }
-  handleBindTextResize(latestElement, elementsMap, "e", keepAspectRatio);
-};
-
 export const moveElement = (
   newTopLeftX: number,
   newTopLeftY: number,
@@ -229,23 +128,19 @@ export const moveElement = (
     originalElement.x + originalElement.width / 2,
     originalElement.y + originalElement.height / 2,
   ];
-  const [topLeftX, topLeftY] = rotate(
-    originalElement.x,
-    originalElement.y,
-    cx,
-    cy,
+  const [topLeftX, topLeftY] = pointRotateRads(
+    pointFrom(originalElement.x, originalElement.y),
+    pointFrom(cx, cy),
     originalElement.angle,
   );
 
   const changeInX = newTopLeftX - topLeftX;
   const changeInY = newTopLeftY - topLeftY;
 
-  const [x, y] = rotate(
-    newTopLeftX,
-    newTopLeftY,
-    cx + changeInX,
-    cy + changeInY,
-    -originalElement.angle,
+  const [x, y] = pointRotateRads(
+    pointFrom(newTopLeftX, newTopLeftY),
+    pointFrom(cx + changeInX, cy + changeInY),
+    -originalElement.angle as Radians,
   );
 
   mutateElement(
@@ -305,6 +200,7 @@ export const updateBindings = (
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     newSize?: { width: number; height: number };
+    zoom?: AppState["zoom"];
   },
 ) => {
   if (isLinearElement(latestElement)) {
@@ -315,6 +211,7 @@ export const updateBindings = (
       scene,
       true,
       [],
+      options?.zoom,
     );
   } else {
     updateBoundElements(latestElement, elementsMap, options);

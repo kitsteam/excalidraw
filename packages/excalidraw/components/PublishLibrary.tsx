@@ -7,7 +7,7 @@ import { t } from "../i18n";
 import Trans from "./Trans";
 
 import type { LibraryItems, LibraryItem, UIAppState } from "../types";
-import { exportToCanvas, exportToSvg } from "../../utils/export";
+import { exportToCanvas, exportToSvg } from "@excalidraw/utils/export";
 import {
   EDITOR_LS_KEYS,
   EXPORT_DATA_TYPES,
@@ -133,6 +133,7 @@ const SingleLibraryItem = ({
           exportBackground: true,
         },
         files: null,
+        skipInliningFonts: true,
       });
       node.innerHTML = svg.outerHTML;
     })();

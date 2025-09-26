@@ -1,13 +1,12 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { render } from "./test-utils";
+import { render, unmountComponent } from "./test-utils";
 import { reseed } from "../random";
 import { UI, Keyboard, Pointer } from "./helpers/ui";
 import type {
+  ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
 } from "../element/types";
-import type { Point } from "../types";
 import type { Bounds } from "../element/bounds";
 import { getElementPointsCoords } from "../element/bounds";
 import { Excalidraw } from "../index";
@@ -16,8 +15,12 @@ import { KEYS } from "../keys";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
+import type { LocalPoint } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw/math";
+import { resizeSingleElement } from "../element/resizeElements";
+import { getSizeFromPoints } from "../points";
 
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -53,7 +56,7 @@ beforeEach(async () => {
   // The bounds of hand-drawn linear elements may change after flipping, so
   // removing this style for testing
   UI.clickTool("arrow");
-  UI.clickByTitle("Architekt");
+  UI.clickByTitle("Architect");
   UI.clickTool("selection");
 });
 
@@ -178,12 +181,12 @@ describe("generic element", () => {
 
     UI.resize(rectangle, "e", [40, 0]);
 
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(30);
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(30, 0);
 
     UI.resize(rectangle, "w", [50, 0]);
 
     expect(arrow.endBinding?.elementId).toEqual(rectangle.id);
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(80);
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(80, 0);
   });
 
   it("resizes with a label", async () => {
@@ -217,23 +220,23 @@ describe("generic element", () => {
 });
 
 describe.each(["line", "freedraw"] as const)("%s element", (type) => {
-  const points: Record<typeof type, Point[]> = {
+  const points: Record<typeof type, LocalPoint[]> = {
     line: [
-      [0, 0],
-      [60, -20],
-      [20, 40],
-      [-40, 0],
+      pointFrom(0, 0),
+      pointFrom(60, -20),
+      pointFrom(20, 40),
+      pointFrom(-40, 0),
     ],
     freedraw: [
-      [0, 0],
-      [-2.474600807561444, 41.021700699972],
-      [3.6627956000014024, 47.84174560617245],
-      [40.495224145598115, 47.15909710753482],
+      pointFrom(0, 0),
+      pointFrom(-2.474600807561444, 41.021700699972),
+      pointFrom(3.6627956000014024, 47.84174560617245),
+      pointFrom(40.495224145598115, 47.15909710753482),
     ],
   };
 
   it("resizes", async () => {
-    const element = UI.createElement(type, { points: points[type] });
+    const element = UI.createElement("freedraw", { points: points.freedraw });
     const bounds = getBoundsFromPoints(element);
 
     UI.resize(element, "ne", [30, -60]);
@@ -247,7 +250,7 @@ describe.each(["line", "freedraw"] as const)("%s element", (type) => {
   });
 
   it("flips while resizing", async () => {
-    const element = UI.createElement(type, { points: points[type] });
+    const element = UI.createElement("freedraw", { points: points.freedraw });
     const bounds = getBoundsFromPoints(element);
 
     UI.resize(element, "sw", [140, -80]);
@@ -261,7 +264,7 @@ describe.each(["line", "freedraw"] as const)("%s element", (type) => {
   });
 
   it("resizes with locked aspect ratio", async () => {
-    const element = UI.createElement(type, { points: points[type] });
+    const element = UI.createElement("freedraw", { points: points.freedraw });
     const bounds = getBoundsFromPoints(element);
 
     UI.resize(element, "ne", [30, -60], { shift: true });
@@ -278,7 +281,7 @@ describe.each(["line", "freedraw"] as const)("%s element", (type) => {
   });
 
   it("resizes from center", async () => {
-    const element = UI.createElement(type, { points: points[type] });
+    const element = UI.createElement("freedraw", { points: points.freedraw });
     const bounds = getBoundsFromPoints(element);
 
     UI.resize(element, "nw", [-20, -30], { alt: true });
@@ -292,15 +295,156 @@ describe.each(["line", "freedraw"] as const)("%s element", (type) => {
   });
 });
 
+describe("line element", () => {
+  const points: LocalPoint[] = [
+    pointFrom(0, 0),
+    pointFrom(60, -20),
+    pointFrom(20, 40),
+    pointFrom(-40, 0),
+  ];
+
+  it("resizes", async () => {
+    UI.createElement("line", { points });
+
+    const element = h.elements[0] as ExcalidrawLinearElement;
+
+    const {
+      x: prevX,
+      y: prevY,
+      width: prevWidth,
+      height: prevHeight,
+    } = element;
+
+    const nextWidth = prevWidth + 30;
+    const nextHeight = prevHeight + 30;
+
+    resizeSingleElement(
+      nextWidth,
+      nextHeight,
+      element,
+      element,
+      h.app.scene.getNonDeletedElementsMap(),
+      h.app.scene.getNonDeletedElementsMap(),
+      "ne",
+    );
+
+    expect(element.x).not.toBe(prevX);
+    expect(element.y).not.toBe(prevY);
+
+    expect(element.width).toBe(nextWidth);
+    expect(element.height).toBe(nextHeight);
+
+    expect(element.points[0]).toEqual([0, 0]);
+
+    const { width, height } = getSizeFromPoints(element.points);
+    expect(width).toBe(element.width);
+    expect(height).toBe(element.height);
+  });
+
+  it("flips while resizing", async () => {
+    UI.createElement("line", { points });
+    const element = h.elements[0] as ExcalidrawLinearElement;
+
+    const {
+      width: prevWidth,
+      height: prevHeight,
+      points: prevPoints,
+    } = element;
+
+    const nextWidth = prevWidth * -1;
+    const nextHeight = prevHeight * -1;
+
+    resizeSingleElement(
+      nextWidth,
+      nextHeight,
+      element,
+      element,
+      h.app.scene.getNonDeletedElementsMap(),
+      h.app.scene.getNonDeletedElementsMap(),
+      "se",
+    );
+
+    expect(element.width).toBe(prevWidth);
+    expect(element.height).toBe(prevHeight);
+
+    element.points.forEach((point, idx) => {
+      expect(point[0]).toBeCloseTo(prevPoints[idx][0] * -1);
+      expect(point[1]).toBeCloseTo(prevPoints[idx][1] * -1);
+    });
+  });
+
+  it("resizes with locked aspect ratio", async () => {
+    UI.createElement("line", { points });
+    const element = h.elements[0] as ExcalidrawLinearElement;
+
+    const { width: prevWidth, height: prevHeight } = element;
+
+    UI.resize(element, "ne", [30, -60], { shift: true });
+
+    const scaleHeight = element.width / prevWidth;
+    const scaleWidth = element.height / prevHeight;
+
+    expect(scaleHeight).toBeCloseTo(scaleWidth);
+  });
+
+  it("resizes from center", async () => {
+    UI.createElement("line", {
+      points: [
+        pointFrom(0, 0),
+        pointFrom(338.05644048727373, -180.4761618151104),
+        pointFrom(338.05644048727373, 180.4761618151104),
+        pointFrom(-338.05644048727373, 180.4761618151104),
+        pointFrom(-338.05644048727373, -180.4761618151104),
+      ],
+    });
+    const element = h.elements[0] as ExcalidrawLinearElement;
+
+    const {
+      x: prevX,
+      y: prevY,
+      width: prevWidth,
+      height: prevHeight,
+    } = element;
+
+    const prevSmallestX = Math.min(...element.points.map((p) => p[0]));
+    const prevBiggestX = Math.max(...element.points.map((p) => p[0]));
+
+    resizeSingleElement(
+      prevWidth + 20,
+      prevHeight,
+      element,
+      element,
+      h.app.scene.getNonDeletedElementsMap(),
+      h.app.scene.getNonDeletedElementsMap(),
+      "e",
+      {
+        shouldResizeFromCenter: true,
+      },
+    );
+
+    expect(element.width).toBeCloseTo(prevWidth + 20);
+    expect(element.height).toBeCloseTo(prevHeight);
+
+    expect(element.x).toBeCloseTo(prevX);
+    expect(element.y).toBeCloseTo(prevY);
+
+    const smallestX = Math.min(...element.points.map((p) => p[0]));
+    const biggestX = Math.max(...element.points.map((p) => p[0]));
+
+    expect(prevSmallestX - smallestX).toBeCloseTo(10);
+    expect(biggestX - prevBiggestX).toBeCloseTo(10);
+  });
+});
+
 describe("arrow element", () => {
   it("resizes with a label", async () => {
     const arrow = UI.createElement("arrow", {
       points: [
-        [0, 0],
-        [40, 140],
-        [80, 60], // label's anchor
-        [180, 20],
-        [200, 120],
+        pointFrom(0, 0),
+        pointFrom(40, 140),
+        pointFrom(80, 60), // label's anchor
+        pointFrom(180, 20),
+        pointFrom(200, 120),
       ],
     });
     const label = await UI.editText(arrow, "Hello");
@@ -336,6 +480,61 @@ describe("arrow element", () => {
     );
     expect(label.angle).toBeCloseTo(0);
     expect(label.fontSize).toEqual(20);
+  });
+
+  it("flips the fixed point binding on negative resize for single bindable", () => {
+    const rectangle = UI.createElement("rectangle", {
+      x: -100,
+      y: -75,
+      width: 95,
+      height: 100,
+    });
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.moveTo(-5, 0);
+    mouse.click();
+    mouse.moveTo(120, 200);
+    mouse.click();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+
+    UI.resize(rectangle, "se", [-200, -150]);
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+  });
+
+  it("flips the fixed point binding on negative resize for group selection", () => {
+    const rectangle = UI.createElement("rectangle", {
+      x: -100,
+      y: -75,
+      width: 95,
+      height: 100,
+    });
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.moveTo(-5, 0);
+    mouse.click();
+    mouse.moveTo(120, 200);
+    mouse.click();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+
+    UI.resize([rectangle, arrow], "nw", [300, 350]);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(0);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.25);
   });
 });
 
@@ -611,15 +810,16 @@ describe("image element", () => {
 
     UI.resize(image, "ne", [40, 0]);
 
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(30);
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(31, 0);
 
     const imageWidth = image.width;
     const scale = 20 / image.height;
     UI.resize(image, "nw", [50, 20]);
 
     expect(arrow.endBinding?.elementId).toEqual(image.id);
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(
+    expect(Math.floor(arrow.width + arrow.endBinding!.gap)).toBeCloseTo(
       30 + imageWidth * scale,
+      0,
     );
   });
 });
@@ -688,30 +888,30 @@ describe("multiple selection", () => {
 
   it("resizes with linear elements > 2 points", async () => {
     UI.clickTool("line");
-    UI.clickByTitle("Scharf");
+    UI.clickByTitle("Sharp");
 
     const line = UI.createElement("line", {
       x: 60,
       y: 40,
       points: [
-        [0, 0],
-        [-40, 40],
-        [-60, 0],
-        [0, -40],
-        [40, 20],
-        [0, 40],
+        pointFrom(0, 0),
+        pointFrom(-40, 40),
+        pointFrom(-60, 0),
+        pointFrom(0, -40),
+        pointFrom(40, 20),
+        pointFrom(0, 40),
       ],
     });
     const freedraw = UI.createElement("freedraw", {
       x: 63.56072661326618,
       y: 100,
       points: [
-        [0, 0],
-        [-43.56072661326618, 18.15048126846341],
-        [-43.56072661326618, 29.041198460587566],
-        [-38.115368017204105, 42.652452795512204],
-        [-19.964886748740696, 66.24829266003775],
-        [19.056612930986716, 77.1390098521619],
+        pointFrom(0, 0),
+        pointFrom(-43.56072661326618, 18.15048126846341),
+        pointFrom(-43.56072661326618, 29.041198460587566),
+        pointFrom(-38.115368017204105, 42.652452795512204),
+        pointFrom(-19.964886748740696, 66.24829266003775),
+        pointFrom(19.056612930986716, 77.1390098521619),
       ],
     });
 
@@ -824,15 +1024,14 @@ describe("multiple selection", () => {
 
     expect(leftBoundArrow.x).toBeCloseTo(-110);
     expect(leftBoundArrow.y).toBeCloseTo(50);
-    expect(leftBoundArrow.width).toBeCloseTo(137.5, 0);
+    expect(leftBoundArrow.width).toBeCloseTo(143, 0);
     expect(leftBoundArrow.height).toBeCloseTo(7, 0);
     expect(leftBoundArrow.angle).toEqual(0);
     expect(leftBoundArrow.startBinding).toBeNull();
-    expect(leftBoundArrow.endBinding?.gap).toBeCloseTo(12.352);
+    expect(leftBoundArrow.endBinding?.gap).toBeCloseTo(10);
     expect(leftBoundArrow.endBinding?.elementId).toBe(
       leftArrowBinding.elementId,
     );
-    expect(leftBoundArrow.endBinding?.fixedPoint).toBeNull();
     expect(leftBoundArrow.endBinding?.focus).toBe(leftArrowBinding.focus);
 
     expect(rightBoundArrow.x).toBeCloseTo(210);
@@ -847,8 +1046,9 @@ describe("multiple selection", () => {
     expect(rightBoundArrow.endBinding?.elementId).toBe(
       rightArrowBinding.elementId,
     );
-    expect(rightBoundArrow.endBinding?.fixedPoint).toBeNull();
-    expect(rightBoundArrow.endBinding?.focus).toBe(rightArrowBinding.focus);
+    expect(rightBoundArrow.endBinding?.focus).toBeCloseTo(
+      rightArrowBinding.focus!,
+    );
   });
 
   it("resizes with labeled arrows", async () => {
@@ -861,7 +1061,7 @@ describe("multiple selection", () => {
     const topArrowLabel = await UI.editText(topArrow.get(), "lorem ipsum");
 
     UI.clickTool("text");
-    UI.clickByTitle("Groß");
+    UI.clickByTitle("Large");
     const bottomArrow = UI.createElement("arrow", {
       x: 0,
       y: 80,
@@ -932,7 +1132,7 @@ describe("multiple selection", () => {
     await UI.editText(topText, "lorem ipsum");
 
     UI.clickTool("text");
-    UI.clickByTitle("Groß");
+    UI.clickByTitle("Large");
     const bottomText = UI.createElement("text", { position: 40 });
     await UI.editText(bottomText, "dolor\nsit amet");
 
@@ -1050,13 +1250,13 @@ describe("multiple selection", () => {
       x: 60,
       y: 0,
       points: [
-        [0, 0],
-        [-40, 40],
-        [-20, 60],
-        [20, 20],
-        [40, 40],
-        [-20, 100],
-        [-60, 60],
+        pointFrom(0, 0),
+        pointFrom(-40, 40),
+        pointFrom(-20, 60),
+        pointFrom(20, 20),
+        pointFrom(40, 40),
+        pointFrom(-20, 100),
+        pointFrom(-60, 60),
       ],
     });
 

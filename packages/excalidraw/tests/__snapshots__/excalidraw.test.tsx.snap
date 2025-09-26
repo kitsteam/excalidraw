@@ -40,10 +40,10 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
       </button>
     </div>
     <button
-      aria-label="Hilfe"
+      aria-label="Help"
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="help-menu-item"
-      title="Hilfe"
+      title="Help"
     >
       <div
         class="dropdown-menu-item__icon"
@@ -88,7 +88,7 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
       <div
         class="dropdown-menu-item__text"
       >
-        Hilfe
+        Help
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -110,10 +110,10 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
     style="--padding: 2; z-index: 2;"
   >
     <button
-      aria-label="Öffnen"
+      aria-label="Open"
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="load-button"
-      title="Öffnen"
+      title="Open"
     >
       <div
         class="dropdown-menu-item__icon"
@@ -138,7 +138,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Öffnen
+        Open
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -147,10 +147,10 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       </div>
     </button>
     <button
-      aria-label="Speichern als..."
+      aria-label="Save to..."
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="json-export-button"
-      title="Speichern als..."
+      title="Save to..."
     >
       <div
         class="dropdown-menu-item__icon"
@@ -175,14 +175,14 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Speichern als...
+        Save to...
       </div>
     </button>
     <button
-      aria-label="Exportiere Bild..."
+      aria-label="Export image..."
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="image-export-button"
-      title="Exportiere Bild..."
+      title="Export image..."
     >
       <div
         class="dropdown-menu-item__icon"
@@ -231,7 +231,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Exportiere Bild...
+        Export image...
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -240,10 +240,59 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       </div>
     </button>
     <button
-      aria-label="Hilfe"
+      aria-label="Find on canvas"
+      class="dropdown-menu-item dropdown-menu-item-base"
+      data-testid="search-menu-button"
+      title="Find on canvas"
+    >
+      <div
+        class="dropdown-menu-item__icon"
+      >
+        <svg
+          aria-hidden="true"
+          class=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <g
+            stroke-width="1.5"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"
+            />
+            <path
+              d="M21 21l-6 -6"
+            />
+          </g>
+        </svg>
+      </div>
+      <div
+        class="dropdown-menu-item__text"
+      >
+        Find on canvas
+      </div>
+      <div
+        class="dropdown-menu-item__shortcut"
+      >
+        Ctrl+F
+      </div>
+    </button>
+    <button
+      aria-label="Help"
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="help-menu-item"
-      title="Hilfe"
+      title="Help"
     >
       <div
         class="dropdown-menu-item__icon"
@@ -288,7 +337,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Hilfe
+        Help
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -297,10 +346,10 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       </div>
     </button>
     <button
-      aria-label="Zeichenfläche löschen & Hintergrundfarbe zurücksetzen"
+      aria-label="Reset the canvas"
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="clear-canvas-button"
-      title="Zeichenfläche löschen & Hintergrundfarbe zurücksetzen"
+      title="Reset the canvas"
     >
       <div
         class="dropdown-menu-item__icon"
@@ -325,7 +374,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Zeichenfläche löschen & Hintergrundfarbe zurücksetzen
+        Reset the canvas
       </div>
     </button>
     <div
@@ -378,10 +427,10 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       style="height: 1px; margin: .5rem 0px;"
     />
     <button
-      aria-label="Dunkles Design"
+      aria-label="Dark mode"
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="toggle-dark-mode"
-      title="Dunkles Design"
+      title="Dark mode"
     >
       <div
         class="dropdown-menu-item__icon"
@@ -407,7 +456,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         class="dropdown-menu-item__text"
       >
-        Dunkles Design
+        Dark mode
       </div>
       <div
         class="dropdown-menu-item__shortcut"
@@ -422,7 +471,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         data-testid="canvas-background-label"
         style="font-size: .75rem; margin-bottom: .5rem;"
       >
-        Zeichenflächenhintergrund
+        Canvas background
       </div>
       <div
         style="padding: 0px 0.625rem;"
@@ -499,11 +548,11 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
               aria-controls="radix-:r0:"
               aria-expanded="false"
               aria-haspopup="dialog"
-              aria-label="Zeichenflächenhintergrund"
+              aria-label="Canvas background"
               class="color-picker__button active-color properties-trigger"
               data-state="closed"
               style="--swatch-color: #ffffff;"
-              title="Hintergrundfarbe auswählen"
+              title="Show background color picker"
               type="button"
             >
               <div

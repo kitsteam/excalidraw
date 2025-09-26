@@ -1,12 +1,7 @@
 import clsx from "clsx";
 import React from "react";
 import type { ActionManager } from "../actions/manager";
-import {
-  CLASSES,
-  DEFAULT_SIDEBAR,
-  LIBRARY_SIDEBAR_WIDTH,
-  TOOL_TYPE,
-} from "../constants";
+import { CLASSES, DEFAULT_SIDEBAR, TOOL_TYPE } from "../constants";
 import { showSelectedShapeActions } from "../element";
 import type { NonDeletedExcalidrawElement } from "../element/types";
 import type { Language } from "../i18n";
@@ -41,8 +36,7 @@ import { trackEvent } from "../analytics";
 import { useDevice } from "./App";
 import Footer from "./footer/Footer";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
-import { jotaiScope } from "../jotai";
-import { Provider, useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "../editor-jotai";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
@@ -53,17 +47,17 @@ import { LibraryIcon } from "./icons";
 import { UIAppStateContext } from "../context/ui-appState";
 import { DefaultSidebar } from "./DefaultSidebar";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
-
-import "./LayerUI.scss";
-import "./Toolbar.scss";
 import { mutateElement } from "../element/mutateElement";
 import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
 import { LaserPointerButton } from "./LaserPointerButton";
-import { MagicSettings } from "./MagicSettings";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
+import ElementLinkDialog from "./ElementLinkDialog";
+
+import "./LayerUI.scss";
+import "./Toolbar.scss";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -85,14 +79,7 @@ interface LayerUIProps {
   children?: React.ReactNode;
   app: AppClassProperties;
   isCollaborating: boolean;
-  openAIKey: string | null;
-  isOpenAIKeyPersisted: boolean;
-  onOpenAIAPIKeyChange: (apiKey: string, shouldPersist: boolean) => void;
-  onMagicSettingsConfirm: (
-    apiKey: string,
-    shouldPersist: boolean,
-    source: "tool" | "generation" | "settings",
-  ) => void;
+  generateLinkForSelection?: AppProps["generateLinkForSelection"];
 }
 
 const DefaultMainMenu: React.FC<{
@@ -108,6 +95,7 @@ const DefaultMainMenu: React.FC<{
       {UIOptions.canvasActions.saveAsImage && (
         <MainMenu.DefaultItems.SaveAsImage />
       )}
+      <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
@@ -149,18 +137,14 @@ const LayerUI = ({
   children,
   app,
   isCollaborating,
-  openAIKey,
-  isOpenAIKeyPersisted,
-  onOpenAIAPIKeyChange,
-  onMagicSettingsConfirm,
+  generateLinkForSelection,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
 
-  const [eyeDropperState, setEyeDropperState] = useAtom(
-    activeEyeDropperAtom,
-    jotaiScope,
-  );
+  const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
+
+  const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -230,6 +214,7 @@ const LayerUI = ({
           appState={appState}
           elementsMap={app.scene.getNonDeletedElementsMap()}
           renderAction={actionManager.renderAction}
+          app={app}
         />
       </Island>
     </Section>
@@ -244,7 +229,8 @@ const LayerUI = ({
     const shouldShowStats =
       appState.stats.open &&
       !appState.zenModeEnabled &&
-      !appState.viewModeEnabled;
+      !appState.viewModeEnabled &&
+      appState.openDialog?.name !== "elementLinkSelector";
 
     return (
       <FixedSideContainer side="top">
@@ -253,90 +239,91 @@ const LayerUI = ({
             {renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
-          {!appState.viewModeEnabled && (
-            <Section heading="shapes" className="shapes-section">
-              {(heading: React.ReactNode) => (
-                <div style={{ position: "relative" }}>
-                  {renderWelcomeScreen && (
-                    <tunnels.WelcomeScreenToolbarHintTunnel.Out />
-                  )}
-                  <Stack.Col gap={4} align="start">
-                    <Stack.Row
-                      gap={1}
-                      className={clsx("App-toolbar-container", {
-                        "zen-mode": appState.zenModeEnabled,
-                      })}
-                    >
-                      <Island
-                        padding={1}
-                        className={clsx("App-toolbar", {
+          {!appState.viewModeEnabled &&
+            appState.openDialog?.name !== "elementLinkSelector" && (
+              <Section heading="shapes" className="shapes-section">
+                {(heading: React.ReactNode) => (
+                  <div style={{ position: "relative" }}>
+                    {renderWelcomeScreen && (
+                      <tunnels.WelcomeScreenToolbarHintTunnel.Out />
+                    )}
+                    <Stack.Col gap={4} align="start">
+                      <Stack.Row
+                        gap={1}
+                        className={clsx("App-toolbar-container", {
                           "zen-mode": appState.zenModeEnabled,
                         })}
                       >
-                        <HintViewer
-                          appState={appState}
-                          isMobile={device.editor.isMobile}
-                          device={device}
-                          app={app}
-                        />
-                        {heading}
-                        <Stack.Row gap={1}>
-                          <PenModeButton
-                            zenModeEnabled={appState.zenModeEnabled}
-                            checked={appState.penMode}
-                            onChange={() => onPenModeToggle(null)}
-                            title={t("toolBar.penMode")}
-                            penDetected={appState.penDetected}
-                          />
-                          <LockButton
-                            checked={appState.activeTool.locked}
-                            onChange={onLockToggle}
-                            title={t("toolBar.lock")}
-                          />
-
-                          <div className="App-toolbar__divider" />
-
-                          <HandButton
-                            checked={isHandToolActive(appState)}
-                            onChange={() => onHandToolToggle()}
-                            title={t("toolBar.hand")}
-                            isMobile
-                          />
-
-                          <ShapesSwitcher
+                        <Island
+                          padding={1}
+                          className={clsx("App-toolbar", {
+                            "zen-mode": appState.zenModeEnabled,
+                          })}
+                        >
+                          <HintViewer
                             appState={appState}
-                            activeTool={appState.activeTool}
-                            UIOptions={UIOptions}
+                            isMobile={device.editor.isMobile}
+                            device={device}
                             app={app}
                           />
-                        </Stack.Row>
-                      </Island>
-                      {isCollaborating && (
-                        <Island
-                          style={{
-                            marginLeft: 8,
-                            alignSelf: "center",
-                            height: "fit-content",
-                          }}
-                        >
-                          <LaserPointerButton
-                            title={t("toolBar.laser")}
-                            checked={
-                              appState.activeTool.type === TOOL_TYPE.laser
-                            }
-                            onChange={() =>
-                              app.setActiveTool({ type: TOOL_TYPE.laser })
-                            }
-                            isMobile
-                          />
+                          {heading}
+                          <Stack.Row gap={1}>
+                            <PenModeButton
+                              zenModeEnabled={appState.zenModeEnabled}
+                              checked={appState.penMode}
+                              onChange={() => onPenModeToggle(null)}
+                              title={t("toolBar.penMode")}
+                              penDetected={appState.penDetected}
+                            />
+                            <LockButton
+                              checked={appState.activeTool.locked}
+                              onChange={onLockToggle}
+                              title={t("toolBar.lock")}
+                            />
+
+                            <div className="App-toolbar__divider" />
+
+                            <HandButton
+                              checked={isHandToolActive(appState)}
+                              onChange={() => onHandToolToggle()}
+                              title={t("toolBar.hand")}
+                              isMobile
+                            />
+
+                            <ShapesSwitcher
+                              appState={appState}
+                              activeTool={appState.activeTool}
+                              UIOptions={UIOptions}
+                              app={app}
+                            />
+                          </Stack.Row>
                         </Island>
-                      )}
-                    </Stack.Row>
-                  </Stack.Col>
-                </div>
-              )}
-            </Section>
-          )}
+                        {isCollaborating && (
+                          <Island
+                            style={{
+                              marginLeft: 8,
+                              alignSelf: "center",
+                              height: "fit-content",
+                            }}
+                          >
+                            <LaserPointerButton
+                              title={t("toolBar.laser")}
+                              checked={
+                                appState.activeTool.type === TOOL_TYPE.laser
+                              }
+                              onChange={() =>
+                                app.setActiveTool({ type: TOOL_TYPE.laser })
+                              }
+                              isMobile
+                            />
+                          </Island>
+                        )}
+                      </Stack.Row>
+                    </Stack.Col>
+                  </div>
+                )}
+              </Section>
+            )}
           <div
             className={clsx(
               "layer-ui__wrapper__top-right zen-mode-transition",
@@ -353,6 +340,7 @@ const LayerUI = ({
             )}
             {renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&
+              appState.openDialog?.name !== "elementLinkSelector" &&
               // hide button when sidebar docked
               (!isSidebarDocked ||
                 appState.openSidebar?.name !== DEFAULT_SIDEBAR.name) && (
@@ -388,7 +376,7 @@ const LayerUI = ({
     );
   };
 
-  const isSidebarDocked = useAtomValue(isSidebarDockedAtom, jotaiScope);
+  const isSidebarDocked = useAtomValue(isSidebarDockedAtom);
 
   const layerUIJSX = (
     <>
@@ -482,26 +470,20 @@ const LayerUI = ({
           }}
         />
       )}
-      {appState.openDialog?.name === "settings" && (
-        <MagicSettings
-          openAIKey={openAIKey}
-          isPersisted={isOpenAIKeyPersisted}
-          onChange={onOpenAIAPIKeyChange}
-          onConfirm={(apiKey, shouldPersist) => {
-            const source =
-              appState.openDialog?.name === "settings"
-                ? appState.openDialog?.source
-                : "settings";
-            setAppState({ openDialog: null }, () => {
-              onMagicSettingsConfirm(apiKey, shouldPersist, source);
+      <ActiveConfirmDialog />
+      {appState.openDialog?.name === "elementLinkSelector" && (
+        <ElementLinkDialog
+          sourceElementId={appState.openDialog.sourceElementId}
+          onClose={() => {
+            setAppState({
+              openDialog: null,
             });
           }}
-          onClose={() => {
-            setAppState({ openDialog: null });
-          }}
+          elementsMap={app.scene.getNonDeletedElementsMap()}
+          appState={appState}
+          generateLinkForSelection={generateLinkForSelection}
         />
       )}
-      <ActiveConfirmDialog />
       <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
       {renderJSONExportDialog()}
@@ -544,7 +526,7 @@ const LayerUI = ({
               appState.openSidebar &&
               isSidebarDocked &&
               device.editor.canFitSidebar
-                ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
+                ? { width: `calc(100% - var(--right-sidebar-width))` }
                 : {}
             }
           >
@@ -578,11 +560,11 @@ const LayerUI = ({
 
   return (
     <UIAppStateContext.Provider value={appState}>
-      <Provider scope={tunnels.jotaiScope}>
+      <TunnelsJotaiProvider>
         <TunnelsContext.Provider value={tunnels}>
           {layerUIJSX}
         </TunnelsContext.Provider>
-      </Provider>
+      </TunnelsJotaiProvider>
     </UIAppStateContext.Provider>
   );
 };

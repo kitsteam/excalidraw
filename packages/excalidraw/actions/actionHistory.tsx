@@ -5,12 +5,12 @@ import { t } from "../i18n";
 import type { History } from "../history";
 import { HistoryChangedEvent } from "../history";
 import type { AppClassProperties, AppState } from "../types";
-import { KEYS } from "../keys";
+import { KEYS, matchKey } from "../keys";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
 import type { SceneElementsMap } from "../element/types";
 import type { Store } from "../store";
-import { StoreAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 import { useEmitter } from "../hooks/useEmitter";
 
 const executeHistoryAction = (
@@ -21,7 +21,7 @@ const executeHistoryAction = (
   if (
     !appState.multiElement &&
     !appState.resizingElement &&
-    !appState.editingElement &&
+    !appState.editingTextElement &&
     !appState.newElement &&
     !appState.selectedElementsAreBeingDragged &&
     !appState.selectionElement &&
@@ -30,7 +30,7 @@ const executeHistoryAction = (
     const result = updater();
 
     if (!result) {
-      return { storeAction: StoreAction.NONE };
+      return { captureUpdate: CaptureUpdateAction.EVENTUALLY };
     }
 
     const [nextElementsMap, nextAppState] = result;
@@ -39,11 +39,11 @@ const executeHistoryAction = (
     return {
       appState: nextAppState,
       elements: nextElements,
-      storeAction: StoreAction.UPDATE,
+      captureUpdate: CaptureUpdateAction.NEVER,
     };
   }
 
-  return { storeAction: StoreAction.NONE };
+  return { captureUpdate: CaptureUpdateAction.EVENTUALLY };
 };
 
 type ActionCreator = (history: History, store: Store) => Action;
@@ -63,9 +63,7 @@ export const createUndoAction: ActionCreator = (history, store) => ({
       ),
     ),
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] &&
-    event.key.toLowerCase() === KEYS.Z &&
-    !event.shiftKey,
+    event[KEYS.CTRL_OR_CMD] && matchKey(event, KEYS.Z) && !event.shiftKey,
   PanelComponent: ({ updateData, data }) => {
     const { isUndoStackEmpty } = useEmitter<HistoryChangedEvent>(
       history.onHistoryChangedEmitter,
@@ -104,10 +102,8 @@ export const createRedoAction: ActionCreator = (history, store) => ({
       ),
     ),
   keyTest: (event) =>
-    (event[KEYS.CTRL_OR_CMD] &&
-      event.shiftKey &&
-      event.key.toLowerCase() === KEYS.Z) ||
-    (isWindows && event.ctrlKey && !event.shiftKey && event.key === KEYS.Y),
+    (event[KEYS.CTRL_OR_CMD] && event.shiftKey && matchKey(event, KEYS.Z)) ||
+    (isWindows && event.ctrlKey && !event.shiftKey && matchKey(event, KEYS.Y)),
   PanelComponent: ({ updateData, data }) => {
     const { isRedoStackEmpty } = useEmitter(
       history.onHistoryChangedEmitter,

@@ -2,10 +2,10 @@
 .env.development.local
 .env.development
 .env.local
-.env
 .env.production.local
 .env.test.local
 .envrc
+.env
 .eslintcache
 .history
 .idea

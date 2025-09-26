@@ -15,6 +15,7 @@ import {
   LoadIcon,
   MoonIcon,
   save,
+  searchIcon,
   SunIcon,
   TrashIcon,
   usersIcon,
@@ -27,12 +28,12 @@ import {
   actionLoadScene,
   actionSaveToActiveFile,
   actionShortcuts,
+  actionToggleSearchMenu,
   actionToggleTheme,
 } from "../../actions";
 import clsx from "clsx";
-import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
-import { jotaiScope } from "../../jotai";
+import { useSetAtom } from "../../editor-jotai";
 import { useUIAppState } from "../../context/ui-appState";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
@@ -40,7 +41,6 @@ import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemConten
 import { THEME } from "../../constants";
 import type { Theme } from "../../element/types";
 import { trackEvent } from "../../analytics";
-
 import "./DefaultItems.scss";
 
 export const LoadScene = () => {
@@ -145,6 +145,27 @@ export const CommandPalette = (opts?: { className?: string }) => {
 };
 CommandPalette.displayName = "CommandPalette";
 
+export const SearchMenu = (opts?: { className?: string }) => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+
+  return (
+    <DropdownMenuItem
+      icon={searchIcon}
+      data-testid="search-menu-button"
+      onSelect={() => {
+        actionManager.executeAction(actionToggleSearchMenu);
+      }}
+      shortcut={getShortcutFromShortcutName("searchMenu")}
+      aria-label={t("search.title")}
+      className={opts?.className}
+    >
+      {t("search.title")}
+    </DropdownMenuItem>
+  );
+};
+SearchMenu.displayName = "SearchMenu";
+
 export const Help = () => {
   const { t } = useI18n();
 
@@ -167,10 +188,7 @@ Help.displayName = "Help";
 export const ClearCanvas = () => {
   const { t } = useI18n();
 
-  const setActiveConfirmDialog = useSetAtom(
-    activeConfirmDialogAtom,
-    jotaiScope,
-  );
+  const setActiveConfirmDialog = useSetAtom(activeConfirmDialogAtom);
   const actionManager = useExcalidrawActionManager();
 
   if (!actionManager.isActionEnabled(actionClearCanvas)) {
