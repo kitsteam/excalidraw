@@ -322,6 +322,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.resetErrorIndicator();
 
       if (this.isCollaborating() && storedElements) {
+        // Auto-recovery: backend is available again
+        if (!this.canPersistToBackend) {
+          this.canPersistToBackend = true;
+        }
+
         this.handleRemoteSceneUpdate(this._reconcileElements(storedElements));
       }
     } catch (error: any) {
@@ -734,6 +739,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         // Mirror save error handling: show dialog + warning indicator
         // Use a more appropriate message for load/connection failures
         const errorMessage = t("errors.cannotResolveCollabServer");
+
+        // Close WebSocket connection to prevent working without persistence
+        this.portal.close();
 
         // stop any queued autosave attempts until user retries or session restarts
         this.canPersistToBackend = false;
