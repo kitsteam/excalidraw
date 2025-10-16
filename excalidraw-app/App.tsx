@@ -113,7 +113,6 @@ import {
   GithubIcon,
   usersIcon,
   share,
-  youtubeIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
