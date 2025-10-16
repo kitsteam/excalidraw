@@ -53,9 +53,9 @@ export const createServerUrl = (
 const HTTP_STORAGE_BACKEND_URL = import.meta.env
   .VITE_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME
   ? createServerUrl(
-    import.meta.env.VITE_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME,
-    apiPath,
-  )
+      import.meta.env.VITE_APP_HTTP_STORAGE_BACKEND_URL_PART_NAME,
+      apiPath,
+    )
   : `${import.meta.env.VITE_APP_HTTP_STORAGE_BACKEND_URL}${apiPath}`;
 const SCENE_VERSION_LENGTH_BYTES = 4;
 
@@ -105,7 +105,9 @@ export const saveToHttpStorage = async (
   }
 
   const sceneVersion = getSceneVersion(elements);
-  const getResponse = await fetch(`${HTTP_STORAGE_BACKEND_URL}/rooms/${roomId}`);
+  const getResponse = await fetch(
+    `${HTTP_STORAGE_BACKEND_URL}/rooms/${roomId}`,
+  );
 
   if (!getResponse.ok && getResponse.status !== 404) {
     return false;
