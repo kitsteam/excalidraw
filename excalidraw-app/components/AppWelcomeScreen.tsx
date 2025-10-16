@@ -35,8 +35,9 @@ export const AppWelcomeScreen: React.FC<{
           )}
           {!isExcalidrawPlusSignedUser && import.meta.env.VITE_APP_PLUS_LP && (
             <WelcomeScreen.Center.MenuItemLink
-              href={`${import.meta.env.VITE_APP_PLUS_LP
-                }/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest`}
+              href={`${
+                import.meta.env.VITE_APP_PLUS_LP
+              }/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest`}
               shortcut={null}
               icon={loginIcon}
             >

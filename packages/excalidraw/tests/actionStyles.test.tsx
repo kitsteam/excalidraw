@@ -24,7 +24,7 @@ describe("actionStyles", () => {
   afterEach(async () => {
     // https://github.com/floating-ui/floating-ui/issues/1908#issuecomment-1301553793
     // affects node v16+
-    await act(async () => { });
+    await act(async () => {});
   });
 
   it("should copy & paste styles via keyboard", async () => {
