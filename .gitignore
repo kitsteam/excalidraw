@@ -32,3 +32,6 @@ html
 examples/**/bundle.*
 meta*.json
 assets/
+docker-compose.override.yml
+CLAUDE.md
+.claude/

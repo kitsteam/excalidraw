@@ -127,6 +127,17 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   excalidrawAPI: CollabProps["excalidrawAPI"];
   activeIntervalId: number | null;
   idleTimeoutId: number | null;
+  /**
+   * When a storage load fails during room initialization, we temporarily
+   * suppress autosaves to the backend to avoid spamming failing requests.
+   * Manual saves (e.g., from stopCollaboration) are still allowed.
+   */
+  private canPersistToBackend = true;
+  /**
+   * Tracks whether the room has been successfully initialized at least once.
+   * Used to force reload on first initialization failure.
+   */
+  private hasSuccessfullyInitialized = false;
 
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
@@ -318,6 +329,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.resetErrorIndicator();
 
       if (this.isCollaborating() && storedElements) {
+        // Auto-recovery: backend is available again
+        if (!this.canPersistToBackend) {
+          this.canPersistToBackend = true;
+        }
+
         this.handleRemoteSceneUpdate(this._reconcileElements(storedElements));
       }
     } catch (error: any) {
@@ -428,7 +444,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           !element.isDeleted &&
           (opts.forceFetchFiles
             ? element.status !== "pending" ||
-            Date.now() - element.updated > 10000
+              Date.now() - element.updated > 10000
             : element.status === "saved")
         );
       })
@@ -463,6 +479,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ) => {
+    // ensure we resume autosaves for a new/renewed session
+    this.canPersistToBackend = true;
     if (!this.state.username) {
       import("@excalidraw/random-username").then(({ getRandomUsername }) => {
         const username = getRandomUsername();
@@ -699,9 +717,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     roomLinkData,
   }:
     | {
-      fetchScene: true;
-      roomLinkData: { roomId: string; roomKey: string } | null;
-    }
+        fetchScene: true;
+        roomLinkData: { roomId: string; roomKey: string } | null;
+      }
     | { fetchScene: false; roomLinkData?: null }) => {
     clearTimeout(this.socketInitializationTimer!);
     if (this.portal.socket && this.fallbackInitializationHandler) {
@@ -725,13 +743,51 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             getSceneVersion(elements),
           );
 
+          this.hasSuccessfullyInitialized = true;
+
           return {
             elements,
             scrollToContent: true,
           };
         }
       } catch (error: any) {
-        // log the error and move on. other peers will sync us the scene.
+        // Mirror save error handling: show dialog + warning indicator
+        // Use a more appropriate message for load/connection failures
+        const errorMessage = t("errors.cannotResolveCollabServer");
+
+        // Close WebSocket connection to prevent working without persistence
+        this.portal.close();
+
+        // stop any queued autosave attempts until user retries or session restarts
+        this.canPersistToBackend = false;
+        this.queueSaveToFirebase.cancel();
+
+        // Force reload on first initialization failure to prevent working with stale data
+        if (!this.hasSuccessfullyInitialized) {
+          console.error("Initial room join failed, forcing reload:", error);
+          alert(errorMessage);
+          window.location.reload();
+          return null; // Never reached, but TypeScript needs a return value
+        }
+
+        if (
+          !this.state.dialogNotifiedErrors[errorMessage] ||
+          !this.isCollaborating()
+        ) {
+          this.setErrorDialog(errorMessage);
+          this.setState({
+            dialogNotifiedErrors: {
+              ...this.state.dialogNotifiedErrors,
+              [errorMessage]: true,
+            },
+          });
+        }
+
+        if (this.isCollaborating()) {
+          this.setErrorIndicator(errorMessage);
+        }
+
+        // log the underlying error for diagnostics; other peers may sync the scene.
         console.error(error);
       } finally {
         this.portal.socketInitialized = true;
@@ -952,7 +1008,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   queueSaveToFirebase = throttle(
     () => {
-      if (this.portal.socketInitialized) {
+      if (this.portal.socketInitialized && this.canPersistToBackend) {
         this.saveCollabRoomToFirebase(
           getSyncableElements(
             this.excalidrawAPI.getSceneElementsIncludingDeleted(),

@@ -18,4 +18,5 @@ export const AppFooter = React.memo(
         </div>
       </Footer>
     );
-  });
+  },
+);
