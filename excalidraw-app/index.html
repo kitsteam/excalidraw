@@ -92,9 +92,10 @@
       }
     </style>
 
-    <!-- Warmup the connection for Google fonts -->
+    <!-- DEACTIVATED: Google Fonts preconnect disabled for self-hosted setup (fonts are bundled locally)
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    -->
 
     <!------------------------------------------------------------------------->
     <% if (typeof PROD != 'undefined' && PROD == true) { %>
@@ -119,6 +120,11 @@
 
     <!-- Following placeholder is replaced during the build step -->
     <!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->
+
+    <script>
+      // Set asset path to local root so fonts are loaded from the self-hosted bundle
+      window.EXCALIDRAW_ASSET_PATH = "/";
+    </script>
 
     <!-- Register Assistant as the UI font, before the scene inits -->
     <link
