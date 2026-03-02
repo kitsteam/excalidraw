@@ -54,30 +54,6 @@ export type ShareDialogProps = {
   type: ShareDialogType;
 };
 
-const qrCode = new QRCodeStyling({
-  width: 200,
-  height: 200,
-  type: "svg",
-  image: "",
-  dotsOptions: {
-    color: "#000000",
-    type: "dots",
-  },
-  cornersSquareOptions: {
-    type: "square",
-  },
-  cornersDotOptions: {
-    type: "dot",
-  },
-  backgroundOptions: {
-    color: "#fff",
-  },
-  imageOptions: {
-    crossOrigin: "anonymous",
-    margin: 20,
-  },
-});
-
 const ActiveRoomDialog = ({
   collabAPI,
   activeRoomLink,
@@ -93,22 +69,6 @@ const ActiveRoomDialog = ({
   const ref = useRef<HTMLInputElement>(null);
   const isShareSupported = "share" in navigator;
   const { onCopy, copyStatus } = useCopyStatus();
-
-  const qrRef = useCallback(
-    (node: HTMLDivElement) => {
-      if (node !== null) {
-        qrCode.append(node);
-        qrCode.update({ data: ref?.current?.value });
-      }
-    },
-    [ref],
-  );
-
-  const onQRDownloadClick = (extension: FileExtension) => {
-    qrCode.download({
-      extension,
-    });
-  };
 
   const copyRoomLink = async () => {
     try {

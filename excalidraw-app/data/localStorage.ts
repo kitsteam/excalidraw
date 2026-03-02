@@ -7,6 +7,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState } from "@excalidraw/excalidraw/types";
 
 import { STORAGE_KEYS } from "../app_constants";
+
 import type { KitsLastUsedState } from "../../packages/excalidraw/data/types";
 
 export const saveUsernameToLocalStorage = (username: string) => {

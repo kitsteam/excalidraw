@@ -1,4 +1,3 @@
-import type OpenColor from "open-color";
 import "./Kits.scss";
 import "./Card.scss";
 

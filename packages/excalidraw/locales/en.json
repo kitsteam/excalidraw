@@ -118,6 +118,7 @@
     "flipHorizontal": "Flip horizontal",
     "flipVertical": "Flip vertical",
     "viewMode": "View mode",
+    "visualDebug": "Visual debug",
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",

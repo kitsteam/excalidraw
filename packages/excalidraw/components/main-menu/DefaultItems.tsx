@@ -37,7 +37,7 @@ import DropdownMenuItemCheckbox from "../dropdownMenu/DropdownMenuItemCheckbox";
 import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
 import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
 import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
-import { GithubIcon, DiscordIcon, XBrandIcon, settingsIcon } from "../icons";
+import { GithubIcon, settingsIcon } from "../icons";
 import {
   boltIcon,
   DeviceDesktopIcon,

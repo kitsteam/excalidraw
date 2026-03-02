@@ -32,6 +32,7 @@ import { PureComponent } from "react";
 import { bumpElementVersions } from "@excalidraw/excalidraw/data/restore";
 
 import { getStorageBackend, storageBackend } from "excalidraw-app/data/config";
+import { createServerUrl } from "excalidraw-app/data/httpStorage";
 
 import type {
   ReconciledExcalidrawElement,
@@ -77,6 +78,7 @@ import {
 import { LocalData } from "../data/LocalData";
 import {
   importUsernameFromLocalStorage,
+  saveLastUsedRoomsToLocalStorage,
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
 import { resetBrowserStateVersions } from "../data/tabSync";

@@ -9,14 +9,17 @@
   --button-gray-1: #{$color-gray-2};
   --button-gray-2: #{$color-gray-4};
   --button-gray-3: #{$color-gray-5};
+  --button-color: var(--color-gray-80);
+  --button-color-active: #fff;
+  --button-bg: var(--color-gray-20);
   --mobile-action-button-bg: rgba(255, 255, 255, 0.35);
   --mobile-color-border: var(--default-border-color);
-  --button-special-active-bg-color: #{$color-green-0};
+  --button-special-active-bg-color: var(--color-primary);
   --dialog-border-color: var(--color-gray-20);
   --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
   --focus-highlight-color: #{$color-blue-2};
-  --icon-fill-color: var(--color-on-surface);
-  --icon-green-fill-color: #{$color-green-9};
+  --icon-fill-color: var(--color-gray-80);
+  --icon-green-fill-color: var(--color-primary);
   --default-bg-color: #fff;
   --input-bg-color: #fff;
   --input-border-color: #{$color-gray-4};
@@ -100,7 +103,7 @@
   --color-gray-90: #1e1e1e;
   --color-gray-100: #121212;
 
-  --white: #{$oc-white};
+  --white: #fff;
   --color-disabled: var(--color-gray-40);
 
   --color-warning: #fceeca;
@@ -147,9 +150,9 @@
   --border-radius-md: 0.375rem;
   --border-radius-lg: 0.5rem;
 
-  --color-surface-high: #f1f0ff;
-  --color-surface-mid: #f6f6f9;
-  --color-surface-low: #ececf4;
+  --color-surface-high: var(--color-gray-20);
+  --color-surface-mid: white;
+  --color-surface-low: white;
   --color-surface-lowest: #ffffff;
   --color-on-surface: #1b1b1f;
   --color-brand-hover: var(--color-primary-darker);
@@ -188,19 +191,22 @@
     --button-gray-1: #363636;
     --button-gray-2: #272727;
     --button-gray-3: #222;
+    --button-color: var(--color-gray-20);
+    --button-color-active: #fff;
     --mobile-action-button-bg: var(--island-bg-color);
     --mobile-color-border: rgba(255, 255, 255, 0.85);
-    --button-special-active-bg-color: #204624;
+    --button-special-active-bg-color: #fff;
     --dialog-border-color: var(--color-gray-80);
     --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path fill="%23ced4da" d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
     --focus-highlight-color: #{$color-blue-6};
+    --icon-fill-color: #fff;
     --icon-green-fill-color: var(--color-primary);
     --default-bg-color: #121212;
     --input-bg-color: #121212;
     --input-border-color: #2e2e2e;
     --input-hover-bg-color: #181818;
     --input-label-color: #{$color-gray-2};
-    --island-bg-color: #232329;
+    --island-bg-color: #262627;
     --island-bg-color-alt: hsl(240, 12%, 12%);
     --keybinding-color: var(--color-gray-60);
     --link-color: #{$color-blue-4};
@@ -209,10 +215,13 @@
     --popup-text-color: #{$color-gray-4};
     --popup-text-inverted-color: #2c2c2c;
     --select-highlight-color: #{$color-blue-4};
-    --shadow-island: 0px 0px 0.9310142993927002px 0px rgba(0, 0, 0, 0.17),
-      0px 0px 3.1270833015441895px 0px rgba(0, 0, 0, 0.08),
-      0px 7px 14px 0px rgba(0, 0, 0, 0.05);
-
+    --text-primary-color: var(--color-gray-30);
+    --button-hover-bg: var(--color-gray-60);
+    --default-border-color: var(--color-gray-80);
+    --shadow-island: 0px 13px 33px rgba(0, 0, 0, 0.07),
+      0px 4.13px 9.94853px rgba(0, 0, 0, 0.0456112),
+      0px 1.13px 4.13211px rgba(0, 0, 0, 0.035),
+      0px 0.769896px 1.4945px rgba(0, 0, 0, 0.0243888);
     --modal-shadow: 0px 100px 80px rgba(0, 0, 0, 0.07),
       0px 41.7776px 33.4221px rgba(0, 0, 0, 0.0503198),
       0px 22.3363px 17.869px rgba(0, 0, 0, 0.0417275),
@@ -222,8 +231,8 @@
     --button-hover-bg: var(--color-gray-80);
     --avatar-border-color: var(--color-gray-85);
 
-    --scrollbar-thumb: #{$oc-gray-8};
-    --scrollbar-thumb-hover: #{$oc-gray-7};
+    --scrollbar-thumb: #{$color-gray-8};
+    --scrollbar-thumb-hover: #{$color-gray-7};
 
     --color-primary: #00a3d3;
     --color-primary-darker: #0067a7;
@@ -263,7 +272,7 @@
 
     --color-logo-text: #e2dfff;
 
-    --color-surface-high: #2e2d39;
+    --color-surface-high: hsl(245, 10%, 21%);
     --color-surface-low: hsl(240, 8%, 15%);
     --color-surface-mid: hsl(240 6% 10%);
     --color-surface-lowest: hsl(0, 0%, 7%);

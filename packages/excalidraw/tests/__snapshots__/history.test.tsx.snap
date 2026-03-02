@@ -12594,6 +12594,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "featureFlagLibraryButton": false,
+  "featureFlagWelcomeScreen": false,
   "fileHandle": null,
   "followedBy": Set {},
   "frameRendering": {
@@ -12799,6 +12801,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "featureFlagLibraryButton": false,
+  "featureFlagWelcomeScreen": false,
   "fileHandle": null,
   "followedBy": Set {},
   "frameRendering": {
@@ -13098,6 +13102,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "featureFlagLibraryButton": false,
+  "featureFlagWelcomeScreen": false,
   "fileHandle": null,
   "followedBy": Set {},
   "frameRendering": {
@@ -13394,6 +13400,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "featureFlagLibraryButton": false,
+  "featureFlagWelcomeScreen": false,
   "fileHandle": null,
   "followedBy": Set {},
   "frameRendering": {
@@ -15559,6 +15567,8 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "featureFlagLibraryButton": false,
+  "featureFlagWelcomeScreen": false,
   "fileHandle": null,
   "followedBy": Set {},
   "frameRendering": {

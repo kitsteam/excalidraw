@@ -2,9 +2,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { registerSW } from "virtual:pwa-register";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Start from "./start/Start";
 
 import "../excalidraw-app/sentry";
+
+import Start from "./start/Start";
 
 import ExcalidrawApp from "./App";
 

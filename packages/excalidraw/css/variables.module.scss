@@ -34,10 +34,10 @@ $color-blue-8: #1971c2;
     .ToolIcon_type_radio,
     .ToolIcon_type_checkbox {
       &:checked + .ToolIcon__icon {
-        --icon-fill-color: #{$oc-white};
+        --icon-fill-color: #{#fff};
 
         svg {
-          fill: #{$oc-white};
+          fill: #{#fff};
         }
       }
     }
@@ -47,10 +47,10 @@ $color-blue-8: #1971c2;
   .ToolIcon_type_checkbox {
     &:checked + .ToolIcon__icon {
       background: var(--color-primary-light);
-      --keybinding-color: #{$oc-white};
+      --keybinding-color: #{#fff};
 
       svg {
-        color: #{$oc-white};
+        color: #{#fff};
       }
     }
   }
