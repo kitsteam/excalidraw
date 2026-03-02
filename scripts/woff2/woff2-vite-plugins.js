@@ -9,7 +9,7 @@ const OSS_FONTS_FALLBACK = "/";
  */
 module.exports.woff2BrowserPlugin = () => {
   let isDev;
-  let isActive = false;
+  const isActive = false;
 
   return {
     name: "woff2BrowserPlugin",
