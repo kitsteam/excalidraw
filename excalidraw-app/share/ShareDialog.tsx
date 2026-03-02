@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { copyTextToSystemClipboard } from "@excalidraw/excalidraw/clipboard";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
-import { getFrame } from "@excalidraw/excalidraw/utils";
-import { useI18n } from "@excalidraw/excalidraw/i18n";
-import { KEYS } from "@excalidraw/excalidraw/keys";
+import { copyTextToSystemClipboard } from "@excalidraw/excalidraw/clipboard";
 import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
+import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
+import { TextField } from "@excalidraw/excalidraw/components/TextField";
 import {
   copyIcon,
   LinkIcon,
@@ -14,17 +12,19 @@ import {
   shareIOS,
   shareWindows,
 } from "@excalidraw/excalidraw/components/icons";
-import { TextField } from "@excalidraw/excalidraw/components/TextField";
-import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
-import type { CollabAPI } from "../collab/Collab";
-import { activeRoomLinkAtom } from "../collab/Collab";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 import { useCopyStatus } from "@excalidraw/excalidraw/hooks/useCopiedIndicator";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
+import { KEYS, getFrame } from "@excalidraw/common";
+import { useEffect, useRef, useState } from "react";
+
 import { atom, useAtom, useAtomValue } from "../app-jotai";
+import { activeRoomLinkAtom } from "../collab/Collab";
 
 import "./ShareDialog.scss";
-import type { FileExtension } from "qr-code-styling";
-import QRCodeStyling from "qr-code-styling";
+import { QRCode } from "./QRCode";
+
+import type { CollabAPI } from "../collab/Collab";
 
 type OnExportToBackend = () => void;
 type ShareDialogType = "share" | "collaborationOnly";
@@ -54,30 +54,6 @@ export type ShareDialogProps = {
   type: ShareDialogType;
 };
 
-const qrCode = new QRCodeStyling({
-  width: 200,
-  height: 200,
-  type: "svg",
-  image: "",
-  dotsOptions: {
-    color: "#000000",
-    type: "dots",
-  },
-  cornersSquareOptions: {
-    type: "square",
-  },
-  cornersDotOptions: {
-    type: "dot",
-  },
-  backgroundOptions: {
-    color: "#fff",
-  },
-  imageOptions: {
-    crossOrigin: "anonymous",
-    margin: 20,
-  },
-});
-
 const ActiveRoomDialog = ({
   collabAPI,
   activeRoomLink,
@@ -93,22 +69,6 @@ const ActiveRoomDialog = ({
   const ref = useRef<HTMLInputElement>(null);
   const isShareSupported = "share" in navigator;
   const { onCopy, copyStatus } = useCopyStatus();
-
-  const qrRef = useCallback(
-    (node: HTMLDivElement) => {
-      if (node !== null) {
-        qrCode.append(node);
-        qrCode.update({ data: ref?.current?.value });
-      }
-    },
-    [ref],
-  );
-
-  const onQRDownloadClick = (extension: FileExtension) => {
-    qrCode.download({
-      extension,
-    });
-  };
 
   const copyRoomLink = async () => {
     try {
@@ -183,23 +143,7 @@ const ActiveRoomDialog = ({
           }}
         />
       </div>
-      <div className="ShareDialog__active__qrCode">
-        <div className="ShareDialog__qrContainer" ref={qrRef} />
-        <div className="ShareDialog__qrDownloadContainer">
-          <FilledButton
-            variant="outlined"
-            size="large"
-            onClick={() => onQRDownloadClick("png")}
-            label={t("roomDialog.button_downloadPNG")}
-          />
-          <FilledButton
-            variant="outlined"
-            size="large"
-            onClick={() => onQRDownloadClick("svg")}
-            label={t("roomDialog.button_downloadSVG")}
-          />
-        </div>
-      </div>
+      <QRCode value={activeRoomLink} />
       <div className="ShareDialog__active__description">
         <p>
           <span

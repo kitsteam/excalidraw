@@ -1,9 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import ExcalidrawApp from "./App";
 import { registerSW } from "virtual:pwa-register";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+
+import "../excalidraw-app/sentry";
+
 import Start from "./start/Start";
+
+import ExcalidrawApp from "./App";
 
 window.__EXCALIDRAW_SHA__ = import.meta.env.VITE_APP_GIT_SHA;
 const rootElement = document.getElementById("root")!;

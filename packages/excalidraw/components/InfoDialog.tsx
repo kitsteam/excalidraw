@@ -1,4 +1,5 @@
 import React from "react";
+
 import "./InfoDialog.scss";
 import { Dialog } from "./Dialog";
 export const InfoDialog = ({ onClose }: { onClose?: () => void }) => {

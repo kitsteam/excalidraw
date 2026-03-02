@@ -1,8 +1,11 @@
 import React, { useEffect } from "react";
+
 import DialogActionButton from "../../packages/excalidraw/components/DialogActionButton";
-import type { KitsLastUsedState } from "../../packages/excalidraw/data/types";
 import { loadLastUsedRoomsToLocalStorage } from "../data/localStorage";
+
 import "./start.scss";
+
+import type { KitsLastUsedState } from "../../packages/excalidraw/data/types";
 
 const Start: React.FC = () => {
   const [windowInnerHeight, setWindowInnerHeight] = React.useState(

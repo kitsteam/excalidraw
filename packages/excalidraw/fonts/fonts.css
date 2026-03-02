@@ -18,13 +18,14 @@
   display: swap;
 }
 
-@font-face {
+/* Fira Sans - Medium is currently not available */
+/* @font-face {
   font-family: "FiraSans";
   src: url("FiraSans-Medium.otf") format("opentype");
   font-weight: 500;
   font-style: normal;
   display: swap;
-}
+} */
 
 /* Fira Sans - Semi Bold is currently not available */
 /* @font-face {
