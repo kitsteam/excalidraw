@@ -10,7 +10,6 @@
 .history
 .idea
 .vercel
-.vscode
 .yarn
 *.log
 *.tgz
@@ -33,5 +32,4 @@ examples/**/bundle.*
 meta*.json
 assets/
 docker-compose.override.yml
-CLAUDE.md
-.claude/
+.claude

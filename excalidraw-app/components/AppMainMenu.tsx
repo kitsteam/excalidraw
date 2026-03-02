@@ -1,9 +1,18 @@
-import React from "react";
-import { loginIcon, eyeIcon } from "@excalidraw/excalidraw/components/icons";
-import type { Theme } from "@excalidraw/excalidraw/element/types";
+import {
+  loginIcon,
+  ExcalLogo,
+  eyeIcon,
+} from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
-import { isExcalidrawPlusSignedUser } from "../app_constants";
+import React from "react";
+
+import { isDevEnv } from "@excalidraw/common";
+
+import type { Theme } from "@excalidraw/element/types";
+
 import { LanguageList } from "../app-language/LanguageList";
+import { isExcalidrawPlusSignedUser } from "../app_constants";
+
 import { saveDebugState } from "./DebugCanvas";
 
 export const AppMainMenu: React.FC<{
@@ -32,21 +41,19 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
       <MainMenu.DefaultItems.Socials />
-      {import.meta.env.VITE_APP_PLUS_LP && (
-        <MainMenu.ItemLink
-          icon={loginIcon}
-          href={`${import.meta.env.VITE_APP_PLUS_APP}${
-            isExcalidrawPlusSignedUser ? "" : "/sign-up"
-          }?utm_source=signin&utm_medium=app&utm_content=hamburger`}
-          className="highlighted"
-        >
-          {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
-        </MainMenu.ItemLink>
-      )}
-      {import.meta.env.DEV && (
+      <MainMenu.ItemLink
+        icon={loginIcon}
+        href={`${import.meta.env.VITE_APP_PLUS_APP}${
+          isExcalidrawPlusSignedUser ? "" : "/sign-up"
+        }?utm_source=signin&utm_medium=app&utm_content=hamburger`}
+        className="highlighted"
+      >
+        {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
+      </MainMenu.ItemLink>
+      {isDevEnv() && (
         <MainMenu.Item
           icon={eyeIcon}
-          onClick={() => {
+          onSelect={() => {
             if (window.visualDebug) {
               delete window.visualDebug;
               saveDebugState({ enabled: false });
@@ -61,6 +68,7 @@ export const AppMainMenu: React.FC<{
         </MainMenu.Item>
       )}
       <MainMenu.Separator />
+      <MainMenu.DefaultItems.Preferences />
       <MainMenu.DefaultItems.ToggleTheme
         allowSystemTheme
         theme={props.theme}
