@@ -24,10 +24,10 @@ services:
       STORAGE_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-excalidraw-prod}
 
   excalidraw-room:
-    image: excalidraw/excalidraw-room
-    restart: always
+    build:
+      context: https://github.com/kitsteam/excalidraw-room.git#master
     ports:
-      - "5012:80"
+      - "5012:8090"
 
   postgres:
     image: postgres:15-alpine

@@ -33,9 +33,9 @@ services:
 
   excalidraw-room:
     build:
-      context: https://github.com/b310-digital/excalidraw-room.git#master
+      context: https://github.com/kitsteam/excalidraw-room.git#master
     ports:
-      - "5001:80"
+      - "5001:8090"
 
   postgres:
     image: postgres:15-alpine
