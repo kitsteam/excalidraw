@@ -246,13 +246,14 @@ export const saveFilesToHttpStorage = async ({
 }) => {
   const erroredFiles: FileId[] = [];
   const savedFiles: FileId[] = [];
+  const normalizedPrefix = prefix.replace(/^\/+|\/+$/g, "");
 
   await Promise.all(
     files.map(async ({ id, buffer }) => {
       try {
         const payloadBlob = new Blob([buffer as Uint8Array<ArrayBuffer>]);
         const payload = await new Response(payloadBlob).arrayBuffer();
-        await fetch(`${HTTP_STORAGE_BACKEND_URL}/files/${id}`, {
+        await fetch(`${HTTP_STORAGE_BACKEND_URL}/${normalizedPrefix}/${id}`, {
           method: "PUT",
           body: payload,
         });
@@ -273,11 +274,14 @@ export const loadFilesFromHttpStorage = async (
 ) => {
   const loadedFiles: BinaryFileData[] = [];
   const erroredFiles = new Map<FileId, true>();
+  const normalizedPrefix = prefix.replace(/^\/+|\/+$/g, "");
 
   await Promise.all(
     [...new Set(filesIds)].map(async (id) => {
       try {
-        const response = await fetch(`${HTTP_STORAGE_BACKEND_URL}/files/${id}`);
+        const response = await fetch(
+          `${HTTP_STORAGE_BACKEND_URL}/${normalizedPrefix}/${id}`,
+        );
         if (response.status < 400) {
           const arrayBuffer = await response.arrayBuffer();
           const { data, metadata } = await decompressData<BinaryFileMetadata>(
@@ -380,11 +384,12 @@ export const refreshRoomFilesTimestamps = async (
   ];
   const refreshed: string[] = [];
   const errored: string[] = [];
+  const prefix = `files/rooms/${roomId}`;
 
   for (const id of fileIds) {
     try {
       const patchRes = await fetch(
-        `${HTTP_STORAGE_BACKEND_URL}/files/${id}/timestamp`,
+        `${HTTP_STORAGE_BACKEND_URL}/${prefix}/${id}/timestamp`,
         {
           method: "PATCH",
         },

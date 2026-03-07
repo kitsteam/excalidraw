@@ -8,7 +8,7 @@ import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
-import basicSsl from '@vitejs/plugin-basic-ssl'
+// import basicSsl from '@vitejs/plugin-basic-ssl'
 
 export default defineConfig(({ mode }) => {
   // To load .env variables
@@ -20,6 +20,10 @@ export default defineConfig(({ mode }) => {
       host: true, // listen on all addresses
       // open the browser
       open: false,
+      fs: {
+        // allow serving files from the project root (parent of excalidraw-app)
+        allow: [path.resolve(__dirname, "..")],
+      },
       proxy: {
         "/api": {
           target: "http://excalidraw-storage-backend:8080",
@@ -308,7 +312,7 @@ export default defineConfig(({ mode }) => {
       createHtmlPlugin({
         minify: true,
       }),
-      basicSsl()
+      // basicSsl()
     ],
     publicDir: "../public",
   };
