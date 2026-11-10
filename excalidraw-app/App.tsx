@@ -119,6 +119,7 @@ import {
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
+import { QRCode } from "./share/QRCode";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import { useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
@@ -891,7 +892,12 @@ const ExcalidrawWrapper = () => {
             link={latestShareableLink}
             onCloseRequest={() => setLatestShareableLink(null)}
             setErrorMessage={setErrorMessage}
-          />
+          >
+            <QRCode
+              value={latestShareableLink}
+              ariaLabel="QR code for shareable link"
+            />
+          </ShareableLinkDialog>
         )}
         {excalidrawAPI && !isCollabDisabled && (
           <Collab excalidrawAPI={excalidrawAPI} />
