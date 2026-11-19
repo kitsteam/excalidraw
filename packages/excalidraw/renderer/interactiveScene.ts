@@ -199,10 +199,7 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  context.fillStyle = getThemedColor(
-    "rgba(0, 163, 211, 0.4)",
-    appState.theme,
-  );
+  context.fillStyle = getThemedColor("rgba(0, 163, 211, 0.4)", appState.theme);
 
   fillCircle(
     context,
