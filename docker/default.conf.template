@@ -1,6 +1,6 @@
 server {
 
-    listen       8080;
+    listen       ${NGINX_PORT};
 
     location / {
       root   /usr/share/nginx/html;

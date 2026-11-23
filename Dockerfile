@@ -30,9 +30,13 @@ RUN npm_config_target_arch=${TARGETARCH} yarn build:app:docker
 
 FROM --platform=${TARGETPLATFORM} nginx/nginx-unprivileged:1.30.7-alpine-slim@sha256:8432c57ac86f178741af2b89948bd9087cb9df1c415bc1ab4d23735c4f0e3e61 as production
 
-COPY docker/default.conf /etc/nginx/conf.d/default.conf
+# nginx listens on NGINX_PORT (rendered from the template at container start).
+# Defaults to 8080, the port of the unprivileged nginx image.
+ENV NGINX_PORT=8080
+
+COPY docker/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=production_buildstage /opt/node_app/excalidraw-app/build /usr/share/nginx/html
 
-HEALTHCHECK CMD wget -q -O /dev/null http://127.0.0.1:8080 || exit 1
+HEALTHCHECK CMD wget -q -O /dev/null http://127.0.0.1:${NGINX_PORT} || exit 1
 
 FROM build as development
