@@ -9,10 +9,7 @@ services:
       target: production
     container_name: excalidraw
     ports:
-      - "${PROD_APP_PORT:-5010}:3000"
+      - "${PROD_APP_PORT:-5010}:8080"
     restart: always
-    healthcheck:
-      disable: true
     environment:
       - NODE_ENV=production
-      - NGINX_PORT=3000

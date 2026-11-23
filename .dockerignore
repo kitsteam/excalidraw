@@ -11,7 +11,7 @@
 !scripts/
 !tsconfig.json
 !yarn.lock
-!docker/default.conf.template
+!docker/default.conf
 # keep (sub)sub directories at the end to exclude from explicit included
 # e.g. ./packages/excalidraw/{dist,node_modules}
 **/build
