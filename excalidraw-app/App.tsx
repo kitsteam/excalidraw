@@ -895,7 +895,7 @@ const ExcalidrawWrapper = () => {
           >
             <QRCode
               value={latestShareableLink}
-              ariaLabel="QR code for shareable link"
+              ariaLabel={t("roomDialog.qrCodeShareableLink")}
             />
           </ShareableLinkDialog>
         )}

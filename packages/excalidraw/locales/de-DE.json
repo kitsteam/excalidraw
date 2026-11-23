@@ -396,7 +396,9 @@
     "desc_shareLink": "Teile diesen Link mit allen, mit denen du zusammenarbeiten möchtest:",
     "desc_exitSession": "Wenn du die Sitzung beendest, wird deine Verbindung zum Raum getrennt. Du kannst jedoch lokal weiter an der Zeichnung arbeiten. Beachte, dass dies keine Auswirkungen auf andere hat und diese weiterhin gemeinsam an ihrer Version arbeiten können.",
     "shareTitle": "An einer Live-Kollaborationssitzung auf Excalidraw teilnehmen",
-    "downloadQRCode": "QR-Code herunterladen"
+    "downloadQRCode": "QR-Code herunterladen",
+    "qrCodeCollabLink": "QR-Code für den Kollaborationslink",
+    "qrCodeShareableLink": "QR-Code für den teilbaren Link"
   },
   "errorDialog": {
     "title": "Fehler"

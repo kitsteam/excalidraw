@@ -145,7 +145,7 @@ const ActiveRoomDialog = ({
       </div>
       <QRCode
         value={activeRoomLink}
-        ariaLabel="QR code for collaboration link"
+        ariaLabel={t("roomDialog.qrCodeCollabLink")}
       />
       <div className="ShareDialog__active__description">
         <p>
