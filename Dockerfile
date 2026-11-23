@@ -11,6 +11,8 @@ COPY packages/excalidraw/package.json ./packages/excalidraw/
 COPY packages/common/package.json ./packages/common/
 COPY packages/element/package.json ./packages/element/
 COPY packages/math/package.json ./packages/math/
+COPY packages/fractional-indexing/package.json ./packages/fractional-indexing/
+COPY packages/laser-pointer/package.json ./packages/laser-pointer/
 
 # do not ignore optional dependencies:
 # Error: Cannot find module @rollup/rollup-linux-x64-gnu
@@ -26,11 +28,11 @@ ARG VITE_APP_ROOM_PORT=5012
 
 RUN npm_config_target_arch=${TARGETARCH} yarn build:app:docker
 
-FROM --platform=${TARGETPLATFORM} nginxinc/nginx-unprivileged:1.30.2-alpine-slim@sha256:59a7114c40708c891cc71f0338d116d9410d7c2a72d8d2e61ce4148219a20b10 as production
+FROM --platform=${TARGETPLATFORM} nginx/nginx-unprivileged:1.30.7-alpine-slim@sha256:8432c57ac86f178741af2b89948bd9087cb9df1c415bc1ab4d23735c4f0e3e61 as production
 
 COPY docker/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=production_buildstage /opt/node_app/excalidraw-app/build /usr/share/nginx/html
 
-HEALTHCHECK CMD wget -q -O /dev/null http://localhost || exit 1
+HEALTHCHECK CMD wget -q -O /dev/null http://127.0.0.1:8080 || exit 1
 
 FROM build as development
